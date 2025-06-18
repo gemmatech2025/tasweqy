@@ -22,8 +22,8 @@ abstract class BaseController implements BaseControllerInterface
 
     protected const RESOURCE = JsonResource::class;
     protected const RESOURCE_SHOW = JsonResource::class;
-    protected const REQUEST_STORE = Request::class;
-    protected const REQUEST_UPDATE = Request::class;
+    protected const REQUEST = Request::class;
+    // protected const REQUEST_UPDATE = Request::class;
 
 
     protected $model;
@@ -35,6 +35,7 @@ abstract class BaseController implements BaseControllerInterface
 
     public function __construct()
     {
+        // dd($this->model());
 
         $this->model = $this->model();
 
@@ -71,13 +72,14 @@ abstract class BaseController implements BaseControllerInterface
 
 public function index(Request $request)
 {
+
     $searchTerm = trim($request->input('search', ''));
     $filters = $request->input('filter', []);
     $sortBy = $request->input('sort_by', 'id');
     $sortOrder = $request->input('sort_order', 'asc');
-
     $query = $this->getModel()->with($this->getRelations());
     $columns = \Schema::getColumnListing($this->getModel()->getTable());
+    
 
     $filters = array_map(function ($value) {
         if (is_string($value)) {
@@ -169,7 +171,7 @@ public function index(Request $request)
 
   public function store(Request $request)
     {
-        $reqClass      = static::REQUEST_STORE;
+        $reqClass      = static::REQUEST;
         $effectiveRequest = $reqClass !== Request::class
             ? app($reqClass)
             : $request;
@@ -209,7 +211,7 @@ public function index(Request $request)
 
     public function update(int $id, Request $request)
     {
-        $reqClass      = static::REQUEST_UPDATE;
+        $reqClass      = static::REQUEST;
         $effectiveRequest = $reqClass !== Request::class
             ? app($reqClass)
             : $request;

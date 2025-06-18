@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Customer\Auth;
+namespace App\Http\Requests\Customer\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use App\Helpers\ResponseHelper;
 
-class VerifyPhoneRequest extends FormRequest
+class VerifyOtpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,18 +24,24 @@ class VerifyPhoneRequest extends FormRequest
     public function rules(): array
     {
 
-        // dd($this->all()); 
+
+
         return [
-           'phone' => 'required|string|exists:users,phone',
+           'otp'          => 'required|numeric',
         ];
     }
 
 
     protected function failedValidation(Validator $validator)
-{
-    $errors = $validator->errors()->all();
-    $response = ResponseHelper::error(__('messages.invalid_data'), $errors, 422);
-    throw new HttpResponseException($response);
-}
+    {
+        $errors = $validator->errors()->toArray();
+        $flatErrors = collect($errors)->map(function ($messages) {
+            return $messages[0];
+        });
+
+        throw new HttpResponseException(
+            jsonResponse(false, 422, __('messages.validation_error'), null, null, $flatErrors)
+        );
+    }
   
 }

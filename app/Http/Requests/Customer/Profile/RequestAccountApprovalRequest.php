@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Customer\Auth;
+namespace App\Http\Requests\Customer\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class ForgetPassword extends FormRequest
+class RequestAccountApprovalRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +25,19 @@ class ForgetPassword extends FormRequest
     public function rules(): array
     {
 
-        return [
-           'email' => 'nullable|email|exists:users,email|required_without:phone',
-           'phone' => 'nullable|exists:users,phone|required_without:email',
+
+
+         return [
+            'name'         => 'required|string',
+            'type'         => ['required', Rule::in(['id', 'passport'])],
+            'front_image'  => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'back_image'   => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:2048',
+                Rule::requiredIf($this->input('type') === 'id'),
+            ],
         ];
     }
 

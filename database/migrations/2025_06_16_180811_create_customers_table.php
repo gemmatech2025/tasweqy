@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             
-            $table->unsignedBigInteger('country_id')->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->nullOnDelete();
+            $table->unsignedBigInteger('country_id');
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->date('birthdate')->nullable();
-            $table->enum('gender' , ['male' , 'female'])->nullable();
+            $table->enum('gender' , ['male' , 'female']);
             $table->decimal('total_balance' , 10,2)->default(0);
             $table->boolean('is_verified')->default(false);
             // $table->timestamp('phone_verified_at')->nullable();

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Customer\Auth;
+namespace App\Http\Requests\Admin\General;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ForgetPassword extends FormRequest
+class CountryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,17 +21,40 @@ class ForgetPassword extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
 
-        return [
-           'email' => 'nullable|email|exists:users,email|required_without:phone',
-           'phone' => 'nullable|exists:users,phone|required_without:email',
-        ];
+
+       public function rules(): array
+    {
+        
+
+
+        $rules = array();
+
+        switch ($this->method()) {
+            case 'POST':
+                $rules +=  [
+                        'name'      => 'required|string',
+                        'code'      => 'required|numeric',
+                ];
+                break;
+
+            case 'PATCH':
+            case 'PUT':
+                $rules +=  [
+                        'name'      => 'required|string',
+                        'code'      => 'required|numeric',
+                ];
+
+                break;
+        }
+
+        return $rules;
     }
 
 
-    protected function failedValidation(Validator $validator)
+
+
+     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors()->toArray();
         $flatErrors = collect($errors)->map(function ($messages) {

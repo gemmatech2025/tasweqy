@@ -5,7 +5,6 @@ namespace App\Http\Requests\Customer\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use App\Helpers\ResponseHelper;
 
 class AddNewPasswordRequest extends FormRequest
 {
@@ -36,11 +35,16 @@ class AddNewPasswordRequest extends FormRequest
     }
 
 
-    protected function failedValidation(Validator $validator)
+     protected function failedValidation(Validator $validator)
     {
-        $errors = $validator->errors()->all();
-        $response = ResponseHelper::error(__('messages.invalid_data'), $errors, 422);
-        throw new HttpResponseException($response);
+        $errors = $validator->errors()->toArray();
+        $flatErrors = collect($errors)->map(function ($messages) {
+            return $messages[0];
+        });
+
+        throw new HttpResponseException(
+            jsonResponse(false, 422, __('messages.validation_error'), null, null, $flatErrors)
+        );
     }
   
 }

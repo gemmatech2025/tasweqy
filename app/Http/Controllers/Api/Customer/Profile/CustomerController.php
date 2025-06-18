@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Otp;
 use App\Models\Customer;
 
+use App\Models\Country;
+use App\Models\AccountVerificationRequest;
 
 
 
@@ -16,17 +18,33 @@ use Illuminate\Support\Facades\DB;
 
 
 use App\Http\Resources\Customer\CustomerResource;
+use App\Http\Resources\Customer\Profile\AccountVerificationRequestResource;
+
 
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Customer\Profile\UpdateProfileRequest;
+use App\Http\Requests\Customer\Profile\VerifyOtpRequest;
+use App\Http\Requests\Customer\Profile\RequestAccountApprovalRequest;
 
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+
+use App\Services\UploadFilesService;
 
 
 
 class CustomerController extends Controller
 {
 
+    protected $uploadFilesService = null;
+    public function __construct()
+    {
+        $this->uploadFilesService = new UploadFilesService();
+
+    }
 
     public function updateProfile(UpdateProfileRequest $request)
     {
@@ -37,7 +55,7 @@ class CustomerController extends Controller
             $user = Auth::user();
 
             $customer = Customer::where('user_id' , $user->id)->first();
-            $country = Country::find($request->country_id);
+            // $country = Country::find($request->country_id);
 
             if($customer){
 
@@ -48,22 +66,30 @@ class CustomerController extends Controller
                 $customer->birthdate = $request->birthdate;
                 $customer->gender = $request->gender;
                 $user->phone = $request->phone;
-                $user->code = $country->code;
+                $user->code = $request->code;
                 $customer->save();
             }else{
 
-                $customer = Customer::create([
+                $custoOtpmer = Customer::create([
                     'country_id'     => $request->country_id,
                     'birthdate'      => $request->birthdate,
                     'gender'         => $request->gender,
+                    'user_id'        => $user->id,
+
                 
                 ]);
                 $user->phone = $request->phone;
-                $user->code = $country->code;
+                $user->code = $request->code;
             }
 
+            $user->save();
+
+
             if(!$user->phone_verified_at){
-                $result = $this->sendPhoneOtp($country->code .$request->phone , $customer->id);
+
+                $result = $this->sendPhoneOtp($request->code .$request->phone , $customer->id);
+
+            DB::commit();
 
                 if($result){
                     return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_please_send_otp_on_your_whatsapp') ,
@@ -75,6 +101,7 @@ class CustomerController extends Controller
 
 
             }
+            DB::commit();
 
             
             return jsonResponse( true ,  201 ,__('messages.data_updated_successfully') ,
@@ -88,7 +115,7 @@ class CustomerController extends Controller
 
 
 
-            return jsonResponse(false , 500 ,__('messages.general_message') , null , null ,
+            return jsoOtpnResponse(false , 500 ,__('messages.general_message') , null , null ,
             [
                 'message' => $errorMessage,
                 'line' => $errorLine,
@@ -96,6 +123,59 @@ class CustomerController extends Controller
             ]);
         }
     }
+
+
+
+
+
+    function verifyPhoneOtp(VerifyOtpRequest $request) {
+        DB::beginTransaction();
+        try {
+
+
+            $user = Auth::user();
+            
+        
+            $otp = Otp::where('user_id', $user->id)->where('type',  'phone')->first();
+            if (!$otp) {
+                return jsonResponse(false , 400 ,__('messages.otp_not_found') , null , null ,[]);
+            }
+      
+            if (Carbon::now()->gt($otp->otp_expires_at)) {
+                return jsonResponse(false , 401 ,__('messages.otp_expired') , null , null ,[]);
+            }
+    
+            if (!Hash::check($request->otp, $otp->otp)) {
+                DB::rollBack();
+                return jsonResponse(false , 400 ,__('messages.wrong_otp') , null , null ,[]);
+            }
+
+            $user->phone_verified_at = Carbon::now();
+            
+            $otp->delete();
+            $user->save();
+
+            $token = $user->createToken('authToken')->plainTextToken;
+            DB::commit();
+            return jsonResponse( true ,  200 ,__('messages.general_success')  );    
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $errorMessage = $e->getMessage();
+            $errorLine = $e->getLine();
+            $errorFile = $e->getFile();
+            return jsonResponse(false , 500 ,__('messages.general_message') , null , null ,
+            [
+                'message' => $errorMessage,
+                'line' => $errorLine,
+                'file' => $errorFile
+            ]);    
+        }
+    }
+
+
+
 
     public function getMyData()
     {
@@ -112,6 +192,95 @@ class CustomerController extends Controller
 
 
 
+    public function getMyApprovalRequests()
+    {
+        $user = Auth::user();
+        $approvalRequests = AccountVerificationRequest::where('user_id' , $user->id)->get();
+        return jsonResponse( true ,  200 ,__('messages.sucess') , AccountVerificationRequestResource::collection($approvalRequests) );        
+    }
+
+
+
+    public function requestApproval(RequestAccountApprovalRequest $request)
+    {
+        $user = Auth::user();
+
+
+        $approvalRequest = AccountVerificationRequest::where('user_id' , $user->id)
+        ->where('type' , $request->type)->first();
+
+
+        if($approvalRequest){
+
+            $frontImagePath = $approvalRequest->front_image;
+            if ($request->hasFile('front_image')) {
+
+            if($approvalRequest->front_image){
+                $this->uploadFilesService->deleteImage($approvalRequest->front_image);
+            }
+
+
+                $image = $request->file('front_image');
+                $frontImagePath = $this->uploadFilesService->uploadImage($image , 'account_approve_request');
+            }
+            $backImagePath = $approvalRequest->back_image;
+            if ($request->hasFile('back_image')) {
+
+            if($approvalRequest->back_image){
+                $this->uploadFilesService->deleteImage($approvalRequest->back_image);
+            }
+
+
+                $image = $request->file('back_image');
+                $backImagePath = $this->uploadFilesService->uploadImage($image , 'account_approve_request');
+            }
+
+            $approvalRequest->update([
+                'name'           => $request->name,
+                'type'           => $request->type,
+                'front_image'    => $frontImagePath,
+                'back_image'     => $backImagePath,
+            ]);
+
+
+            return jsonResponse( true ,  200 ,__('messages.updated_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
+
+
+        }else{
+
+            $frontImagePath = null;
+            if ($request->hasFile('front_image')) {
+                $image = $request->file('front_image');
+                $frontImagePath = $this->uploadFilesService->uploadImage($image , 'account_approve_request');
+            }
+            $backImagePath = null;
+            if ($request->hasFile('back_image')) {
+                $image = $request->file('back_image');
+                $backImagePath = $this->uploadFilesService->uploadImage($image , 'account_approve_request');
+            }
+    
+    
+
+
+            $approvalRequest = AccountVerificationRequest::create([
+                'name'           => $request->name,
+                'type'           => $request->type,
+                'front_image'    => $frontImagePath,
+                'back_image'     => $backImagePath,
+                'user_id'        => $user->id,
+  
+            ]);
+
+            return jsonResponse( true ,  200 ,__('messages.created_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
+        }
+
+        return jsonResponse( true ,  500 ,__('messages.general_error_message')  );        
+
+                 
+    }
+
+
+
         private function sendPhoneOtp($phone , $user_id) {
         // $otp_code = random_int(100000, 999999);  
         try{
@@ -121,11 +290,12 @@ class CustomerController extends Controller
             $otp->delete();
         }
 
+
         $otp = Otp::create([
             'otp' =>  Hash::make($otp_code),
             'type' => 'phone',
             'otp_expires_at'=> Carbon::now()->addMinutes(5),
-            'user_id'=> $user->id,
+            'user_id'=> $user_id,
         ]);
         
 
@@ -136,10 +306,14 @@ class CustomerController extends Controller
         //         );
         //     return $result;
 
+
+
     return true;
     
     }catch (\Exception $e) {
     return false;
+
+
     }
     }
 

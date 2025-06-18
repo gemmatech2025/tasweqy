@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Customer\Auth;
+namespace App\Http\Requests\Customer\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ForgetPassword extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,17 @@ class ForgetPassword extends FormRequest
     public function rules(): array
     {
 
+
+
         return [
-           'email' => 'nullable|email|exists:users,email|required_without:phone',
-           'phone' => 'nullable|exists:users,phone|required_without:email',
+           'gender'        => 'required|in:male,female',
+           'country_id'    => 'required|exists:countries,id',
+           'birthdate'     => 'required|date',
+           'phone'         => 'required|numeric',
+           'code'          => 'required|numeric',
+
+
+
         ];
     }
 

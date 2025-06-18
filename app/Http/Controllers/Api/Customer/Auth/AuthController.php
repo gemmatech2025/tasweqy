@@ -10,6 +10,7 @@ use App\Models\Otp;
 use App\Models\FcmToken;
 use App\Models\Customer;
 
+use Illuminate\Support\Facades\Hash;
 
 
 use Illuminate\Support\Facades\DB;
@@ -18,8 +19,12 @@ use App\Mail\CustomEmail;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Services\WhatsAppOtpService;
+use App\Services\UploadFilesService;
+use Illuminate\Support\Facades\Validator;
 
 
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Customer\Auth\LoginRequest;
@@ -41,9 +46,13 @@ class AuthController extends Controller
 
 
     protected $whatsAppWebService = null;
+    protected $uploadFilesService = null;
+
     public function __construct()
     {
         $this->whatsAppWebService = new WhatsAppOtpService();
+        $this->uploadFilesService = new UploadFilesService();
+
     }
 
     public function register(RegisterRequest $request)
@@ -54,7 +63,7 @@ class AuthController extends Controller
             $imagePath = null;
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $imagePath = $this->uploadImage($image , 'users');
+                $imagePath = $this->uploadFilesService->uploadImage($image , 'users');
             }
     
             $user = User::create([
@@ -64,14 +73,6 @@ class AuthController extends Controller
                 'role' => 'customer',  
                 'password' => Hash::make($request->password), 
             ]);
-
-        //     $customer = Customer::create([
-        // 'user_id' => ,
-        // // 'birthdate',
-        // // 'gender',
-        // // 'total_balance',
-        // // 'is_verified',
-        //     ]);
 
             if( $request->deviceType && $request->fcmToken){
             $fcm = FcmToken::create([
@@ -86,12 +87,10 @@ class AuthController extends Controller
 
             if($result){
                 return jsonResponse( true ,  201 ,__('messages.user_created_success') ,  new UserResource($user) );    
-            }else{
-                return jsonResponse( true ,  201 ,__('messages.user_created_but_problem_in_otp_try_resend') ,  new UserResource($user) );    
-
             }
-            
-           return jsonResponse( true ,  201 ,__('messages.user_created_success') ,  new UserResource($user) );    
+
+            return jsonResponse( true ,  201 ,__('messages.user_created_but_problem_in_otp_try_resend') ,  new UserResource($user) );    
+  
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -385,27 +384,27 @@ class AuthController extends Controller
 
 
 
-
+$result =false;
         if($request->email){  
+            // dd('herer');
             
          $result = $this->sendEmailOtp($user->email , $user->id);
 
-        if($result){
-            DB::commit();
-            return jsonResponse(true , 200 ,__('messages.general_success') , null , null ,[]);
-        }
+      
     
     
         }else if($request->phone){
 
         $result = $this->sendPhoneOtp($request->code . $request->phone  , $user->id);
 
-        if($result){
+       
+      
+    } 
+
+     if($result){
             DB::commit();
             return jsonResponse(true , 200 ,__('messages.general_success') , null , null ,[]);
         }
-      
-    } 
 
         return jsonResponse(false , 500 ,__('messages.problem_sending_otp') , null , null , []);   
 
@@ -445,7 +444,7 @@ class AuthController extends Controller
                 }    
 
 
-                $otp = Otp::where('user_id', $user->id)->where('type', 'email_otp')->first();
+                $otp = Otp::where('user_id', $user->id)->where('type', 'email')->first();
                 
             }else if($request->phone){
             $user = User::where('phone' , $request->phone)->first();
@@ -459,7 +458,7 @@ class AuthController extends Controller
                 return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
             }   
 
-            $otp = Otp::where('user_id', $user->id)->where('type', 'phone_otp')->first();
+            $otp = Otp::where('user_id', $user->id)->where('type', 'phone')->first();
         
 
             } 
@@ -536,7 +535,7 @@ class AuthController extends Controller
                 $customer->delete();
             }
             if($user->image){
-                $this->deleteImage($user->image);
+                $this->uploadFilesService->deleteImage($user->image);
             }
             $user->delete();
             DB::commit();
@@ -591,7 +590,7 @@ class AuthController extends Controller
 
 
 
-        public function changeOldPassword(Request $request)
+    public function changeOldPassword(Request $request)
     {
         DB::beginTransaction();
         $validator = Validator::make($request->all(), [
@@ -622,10 +621,8 @@ class AuthController extends Controller
 
         return jsonResponse(true , 200 ,__('messages.password_updated_successfully') , null , null ,[]);
     } catch (\Exception $e) {
-
         DB::rollBack();
-
-$errorMessage = $e->getMessage();
+            $errorMessage = $e->getMessage();
             $errorLine = $e->getLine();
             $errorFile = $e->getFile();
             return jsonResponse(false , 500 ,__('messages.general_message') , null , null ,
@@ -634,16 +631,14 @@ $errorMessage = $e->getMessage();
                 'line' => $errorLine,
                 'file' => $errorFile
             ]);  
-        
         }
-        
     }
 
 
 
 
 
-        public function sendEmailOtp($email , $user_id) {
+        private function sendEmailOtp($email , $user_id) {
         // $otp_code = random_int(100000, 999999);  
         try{
         $otp_code = 123456;
@@ -656,7 +651,7 @@ $errorMessage = $e->getMessage();
             'otp' =>  Hash::make($otp_code),
             'type' => 'email',
             'otp_expires_at'=> Carbon::now()->addMinutes(5),
-            'user_id'=> $user->id,
+            'user_id'=> $user_id,
         ]);
         
 

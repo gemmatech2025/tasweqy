@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Customer\Auth;
+namespace App\Http\Requests\Admin\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ForgetPassword extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +25,14 @@ class ForgetPassword extends FormRequest
     {
 
         return [
-           'email' => 'nullable|email|exists:users,email|required_without:phone',
-           'phone' => 'nullable|exists:users,phone|required_without:email',
+            'email' => 'required|email|exists:users,email',
+            // 'phone' => 'nullable|exists:users,phone|required_without:email',
+            // 'code' => 'nullable|numeric|required_without:email',
+
+            // 'fcmToken'   => 'nullable|required_with:deviceType|string|max:255',
+            // 'deviceType' => 'nullable|required_with:fcmToken|string|max:255',
+            'password' => 'required|string|min:8',
+
         ];
     }
 
