@@ -22,6 +22,10 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'code' => $this->code,
             'email' => $this->email,
+            'is_2fa_enabled' => (bool) $this->two_factor_secret,
+            'is_2fa_confirmed' => (bool) $this->two_factor_confirmed_at,
+            'has_recovery_codes' => (bool) $this->two_factor_recovery_codes,
+
             'email_verified_at' => $this->email_verified_at,
             'phone_verified_at' => $this->phone_verified_at,
             'created_at' => $this->created_at,

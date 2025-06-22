@@ -14,6 +14,7 @@ use App\Helpers\ResponseHelper;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\Is2FAConfirmed;
 
 
 
@@ -38,7 +39,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SetLocale::class);
         $middleware->alias([
-            'role' => RoleMiddleware::class
+            'role' => RoleMiddleware::class,
+            '2fa-confirmed' => Is2FAConfirmed::class
+
+
+            
         ]);
 
 

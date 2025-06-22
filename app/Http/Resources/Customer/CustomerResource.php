@@ -30,6 +30,9 @@ class CustomerResource extends JsonResource
                 'name' => $this->user?->name,
                 'phone'     => $this->user->phone,
                 'code'     => $this->user->code,
+                'is_2fa_enabled' => (bool) $this->user->two_factor_secret,
+                'is_2fa_confirmed' => (bool) $this->user->two_factor_confirmed_at,
+                'has_recovery_codes' => (bool) $this->user->two_factor_recovery_codes,
 
 
             ],
