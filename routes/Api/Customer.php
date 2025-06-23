@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\Customer\Auth\_2FAuthController;
 use App\Http\Controllers\Api\Customer\Profile\CustomerController;
 use App\Http\Controllers\Api\Customer\Payment\BankInfoController;
 use App\Http\Controllers\Api\Customer\Payment\PayPalAccountController;
+use App\Http\Controllers\Api\Customer\Community\PostController;
+use App\Http\Controllers\Api\Customer\Community\PostCommentController;
 
 
 
@@ -87,6 +89,40 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', 'show');
             Route::delete('/{id}', 'delete');
         });
+
+
+
+
+          Route::controller(PostController::class)->prefix('posts')->group(function () {
+            Route::post('/', 'store');
+            Route::get('/', 'index');
+
+            Route::put('/{id}', 'update');
+            Route::get('/{id}', 'show');
+            Route::delete('/{id}', 'delete');
+            Route::get('/toggle-like/{id}', 'toggleLikePost');
+            Route::get('/share/{id}', 'sharePost');
+
+
+
+            
+        });
+
+
+
+          Route::controller(PostCommentController::class)->prefix('post-comments')->group(function () {
+            Route::post('/', 'store');
+
+            Route::put('/{id}', 'update');
+            Route::get('/{id}', 'show');
+            Route::delete('/{id}', 'delete');
+            Route::get('/by-post/{id}', 'getCommentsByPost');
+
+
+
+            
+        });
+
 
 
 

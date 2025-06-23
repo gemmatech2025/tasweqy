@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\Is2FAConfirmed;
+use App\Http\Middleware\VerifiedUserMiddleware;
 
 
 
@@ -40,7 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SetLocale::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,
-            '2fa-confirmed' => Is2FAConfirmed::class
+            '2fa-confirmed' => Is2FAConfirmed::class,
+            'verified-user' => VerifiedUserMiddleware::class
 
 
             
