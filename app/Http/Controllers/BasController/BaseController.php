@@ -274,11 +274,16 @@ public function index(Request $request)
 
 
 
+    public function showRelations()
+    {
 
+        return [];
+    }
 
 public function show(int $id)
 {
-    $model = $this->getModel()->find($id);
+    $relations = $this->showRelations();
+    $model = $this->getModel()->with($relations)->find($id);
 
     if (!$model) {
         return jsonResponse(false, 404, __('messages.not_found'));

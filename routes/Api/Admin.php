@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\Admin\Auth\AuthController;
 use App\Http\Controllers\Api\Admin\Customer\ApprovalRequestController;
 use App\Http\Controllers\Api\Admin\Brand\CategoryController;
 use App\Http\Controllers\Api\Admin\Brand\BrandController;
+use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
+use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 
 
 
@@ -72,6 +74,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
         });
+
+
+
+      Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+        });
+
+
+      Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+        });
+        
 
    
 

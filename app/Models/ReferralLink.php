@@ -13,7 +13,7 @@ class ReferralLink extends Model
         'earning_precentage'
     ];
 
-    protected $timestamps = false;
+    public $timestamps = false;
 
     public function brand()
     {
