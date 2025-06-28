@@ -24,4 +24,11 @@ class PaypalAccount extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+
+    public function withdrawRequests()
+    {
+        return $this->morphMany(WithdrawRequest::class, 'withdrawable');
+    }
 }

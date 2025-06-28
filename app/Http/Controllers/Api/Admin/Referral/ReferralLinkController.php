@@ -11,10 +11,16 @@ use App\Services\WhatsAppOtpService;
 use App\Models\ReferralLink ;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Requests\Admin\Referral\ImportReferralLinkRequest;
 use App\Http\Requests\Admin\Referral\ReferralLinkRequest;
 use App\Http\Resources\Admin\Referral\ReferralLinkResource;
 use App\Http\Resources\Admin\Referral\ReferralLinkIndexResource;
 
+use Maatwebsite\Excel\Facades\Excel;
+
+
+use App\Imports\ReferralLinksImport;
+use App\Exports\ReferralLinksExportTemplate;
 
 class ReferralLinkController extends BaseController
 {
@@ -153,6 +159,25 @@ class ReferralLinkController extends BaseController
 
 
 
+
+
+    public function exportReferralLinksTemplate(){
+        return Excel::download(new ReferralLinksExportTemplate, 'Referral Links Template.xlsx');
+    }
+    
+
+
+
+    public function importReferralLinks(ImportReferralLinkRequest $request)
+    {
+
+        Excel::import(new ReferralLinksImport($request->brand_id), $request->file('file'));
+        return jsonResponse(
+            true,
+            200,
+            __('messages.Referral_Links_Imported_Successfully'),
+        );
+    }
 
 
 

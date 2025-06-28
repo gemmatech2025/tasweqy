@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('brand_id')->constrained('brands')->onDelete('cascade');
             $table->string('link');
             $table->decimal('earning_precentage' ,4,2 );
-            // $table->timestamps();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->integer('clients')->default(0);
+
         });
     }
 

@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\Admin\Brand\CategoryController;
 use App\Http\Controllers\Api\Admin\Brand\BrandController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
-
+use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 
 
     Route::post('login', [AuthController::class, 'login']);
@@ -78,21 +78,51 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
       Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
+            Route::get('/export-template', 'exportReferralLinksTemplate');
+            Route::post('/import-data', 'importReferralLinks');
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
+
         });
 
 
       Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
+        
+        
+            Route::get('/export-template', 'exportDiscountCodesTemplate');
+            Route::post('/import-data', 'importDiscountCodes');
+
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
+
+
+
+
+
         });
+
+Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
+        
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+
+
+
+
+
+        });
+
+
+        
         
 
    
@@ -103,6 +133,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         
 });
+
+
+Route::get('export', [DiscountCodeController::class, 'exportDiscountCodesTemplate']);
+
+
 
 
 

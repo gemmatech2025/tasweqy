@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Customer\Payment\BankInfoController;
 use App\Http\Controllers\Api\Customer\Payment\PayPalAccountController;
 use App\Http\Controllers\Api\Customer\Community\PostController;
 use App\Http\Controllers\Api\Customer\Community\PostCommentController;
+use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
 
 
@@ -123,6 +124,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
         });
 
+          Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::get('/{id}', 'show');
+            Route::delete('/{id}', 'delete');
+            // Route::get('/by-post/{id}', 'getCommentsByPost');
+
+
+
+            
+        });
+
+
+        
 
 
 

@@ -14,7 +14,13 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Admin\Referral\DiscountCodeRequest;
 use App\Http\Resources\Admin\Referral\DiscountCodeResource;
 use App\Http\Resources\Admin\Referral\DiscountCodeIndexResource;
+use Maatwebsite\Excel\Facades\Excel;
 
+
+use App\Http\Requests\Admin\Referral\ImportReferralLinkRequest;
+
+use App\Imports\DiscountCodesImport;
+use App\Exports\DiscountCodeExportTemplate;
 class DiscountCodeController extends BaseController
 {
 
@@ -149,5 +155,24 @@ class DiscountCodeController extends BaseController
     }
 
 
+
+
+    public function exportDiscountCodesTemplate(){
+        return Excel::download(new DiscountCodeExportTemplate, 'Discount codes Template.xlsx');
+    }
+    
+
+    public function importDiscountCodes(ImportReferralLinkRequest $request)
+    {
+
+        Excel::import(new DiscountCodesImport($request->brand_id), $request->file('file'));
+        return jsonResponse(
+            true,
+            200,
+            __('messages.discount_codes_Imported_Successfully'),
+        );
+    }
+
+    
 
 }
