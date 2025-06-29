@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
 
             $table->decimal('amount' , 10 ,2);
-            $table->enum('status' ,['approved' , 'rejected' , 'pending']);
+            $table->enum('status' ,['approved' , 'rejected' , 'pending'])->default('pending');
             $table->enum('type' ,['referral_link' , 'discount_code' , 'withdraw']);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
