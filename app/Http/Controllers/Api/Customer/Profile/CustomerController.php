@@ -74,6 +74,15 @@ class CustomerController extends Controller
 
             $customer = Customer::where('user_id' , $user->id)->first();
             // $country = Country::find($request->country_id);
+            $imagePath =  $user->image;
+            if ($request->hasFile('image')) {
+                if($user->image){
+                    $this->uploadFilesService->deleteImage($user->image);
+                }
+                $image = $request->file('image');
+                $imagePath = $this->uploadFilesService->uploadImage($image , 'users');
+            }
+    
 
             if($customer){
 
@@ -99,6 +108,8 @@ class CustomerController extends Controller
                 $user->phone = $request->phone;
                 $user->code = $request->code;
             }
+
+            $user->image =$imagePath;
 
             $user->save();
 

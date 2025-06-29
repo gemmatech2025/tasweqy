@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
 
 
-    Route::middleware(['set-locale'])->group(function () {
+Route::middleware(['set-locale'])->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -125,15 +125,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
           Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
+            Route::get('/my-requests', 'getMyRequests');
             Route::post('/', 'store');
             Route::put('/{id}', 'update');
             Route::get('/{id}', 'show');
-            Route::delete('/{id}', 'delete');
-            // Route::get('/by-post/{id}', 'getCommentsByPost');
-
-
-
-            
+            Route::delete('/{id}', 'delete');            
         });
 
 

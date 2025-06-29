@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Admin\Brand\BrandController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
+use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
 
 
@@ -111,7 +112,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         });
 
-Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
+        Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
         
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
@@ -127,7 +128,12 @@ Route::controller(SocialMediaPlatformController::class)->prefix('social-media-pl
 
 
         
-        
+           Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
+            Route::put('/update-status/{request_id}/{status}', 'updateRequestStatus');
+   
+
+        });
+
 
    
 

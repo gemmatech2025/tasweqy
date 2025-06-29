@@ -35,6 +35,7 @@ use App\Http\Requests\Customer\Auth\VerifyPhoneRequest;
 use App\Http\Requests\Customer\Auth\ForgetPassword;
 use App\Http\Requests\Customer\Auth\AddNewPasswordRequest;
 use App\Http\Requests\Customer\Auth\SendOtpRequest;
+use Illuminate\Support\Str;
 
 
 
@@ -355,7 +356,7 @@ class AuthController extends Controller
 
 
 
-    public function sendForgetPasswordOtp(ForgetPassword $request) {
+    public function sendForgetPasswordOtp(SendOtpRequest $request) {
         DB::beginTransaction();
         try {
             if($request->email){
@@ -364,9 +365,9 @@ class AuthController extends Controller
                 {
                     return jsonResponse(false , 404 ,__('messages.email_not_found') , null , null ,[]);
                 }
-                if(!$user->email_verified_at){
-                    return jsonResponse(false , 400 ,__('messages.email_not_verified') , null , null ,[]);
-                }    
+                // if(!$user->email_verified_at){
+                //     return jsonResponse(false , 400 ,__('messages.email_not_verified') , null , null ,[]);
+                // }    
     
             }else if($request->phone){
             $user = User::where('phone' , $request->phone)->first();
@@ -376,32 +377,22 @@ class AuthController extends Controller
 
             }
     
-            if(!$user->phone_verified_at){
-                return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
-            }    
+            // if(!$user->phone_verified_at){
+            //     return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
+            // }    
             } 
 
 
 
 
-$result =false;
-        if($request->email){  
-            // dd('herer');
-            
-         $result = $this->sendEmailOtp($user->email , $user->id);
-
-      
-    
-    
+        $result =false;
+        if($request->email){              
+         $result = $this->sendEmailOtp($user->email , $user->id , 'forget');
         }else if($request->phone){
+        $result = $this->sendPhoneOtp($request->code . $request->phone  , $user->id , 'forget');
+        } 
 
-        $result = $this->sendPhoneOtp($request->code . $request->phone  , $user->id);
-
-       
-      
-    } 
-
-     if($result){
+        if($result){
             DB::commit();
             return jsonResponse(true , 200 ,__('messages.general_success') , null , null ,[]);
         }
@@ -439,12 +430,12 @@ $result =false;
                 {
                     return jsonResponse(false , 404 ,__('messages.email_not_found') , null , null ,[]);
                 }
-                if(!$user->email_verified_at){
-                    return jsonResponse(false , 400 ,__('messages.email_not_verified') , null , null ,[]);
-                }    
+                // if(!$user->email_verified_at){
+                //     return jsonResponse(false , 400 ,__('messages.email_not_verified') , null , null ,[]);
+                // }    
 
 
-                $otp = Otp::where('user_id', $user->id)->where('type', 'email')->first();
+                $otp = Otp::where('user_id', $user->id)->where('type', 'forgot_password_email')->first();
                 
             }else if($request->phone){
             $user = User::where('phone' , $request->phone)->first();
@@ -454,14 +445,17 @@ $result =false;
 
             }
     
-            if(!$user->phone_verified_at){
-                return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
-            }   
+            // if(!$user->phone_verified_at){
+            //     return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
+            // }   
 
-            $otp = Otp::where('user_id', $user->id)->where('type', 'phone')->first();
+            $otp = Otp::where('user_id', $user->id)->where('type', 'forgot_password_phone')->first();
         
 
             } 
+
+
+
             if (!$otp) {
                 return jsonResponse(false , 404 ,__('messages.otp_not_found') , null , null ,[]);
             }
@@ -474,10 +468,16 @@ $result =false;
             }
 
 
-            // $user->password = Hash::make($request->password);
-            // $user->save();
+
+
+            $token = Str::random(64);
+            $otp->otp =  Hash::make($token);
+            $otp->otp_expires_at = Carbon::now()->addMinutes(5);
+            $otp->save();
+
+
             DB::commit();
-            return jsonResponse(true , 200 ,__('messages.password_updated_successfully') , null , null ,[]);
+            return jsonResponse(true , 200 ,__('messages.corrrect_otp_code') , ['token' => $token ] , null ,[]);
     
         } catch (\Exception $e) {
             DB::rollBack();
@@ -497,6 +497,82 @@ $result =false;
 
 
 
+
+
+
+
+
+
+    function addNewPasswordForgetPassword(AddNewPasswordRequest $request) {
+        DB::beginTransaction();
+        
+        try {
+
+            $otp =null;
+             if($request->email){
+                $user = User::where('email' , $request->email)->first();
+                if(!$user)
+                {
+                    return jsonResponse(false , 404 ,__('messages.email_not_found') , null , null ,[]);
+                }
+                // if(!$user->email_verified_at){
+                //     return jsonResponse(false , 400 ,__('messages.email_not_verified') , null , null ,[]);
+                // }    
+
+
+                $otp = Otp::where('user_id', $user->id)->where('type', 'forgot_password_email')->first();
+                
+            }else if($request->phone){
+            $user = User::where('phone' , $request->phone)->first();
+            if(!$user)
+            {
+                return jsonResponse(false , 404 ,__('messages.phone_not_found') , null , null ,[]);
+
+            }
+    
+            // if(!$user->phone_verified_at){
+            //     return jsonResponse(false , 400 ,__('messages.phone_not_verified') , null , null ,[]);
+            // }   
+
+            $otp = Otp::where('user_id', $user->id)->where('type', 'forgot_password_phone')->first();
+        
+
+            } 
+
+
+
+            if (!$otp) {
+                return jsonResponse(false , 404 ,__('messages.otp_not_found') , null , null ,[]);
+            }
+            if (Carbon::now()->gt($otp->otp_expires_at)) {
+                return jsonResponse(false , 401 ,__('messages.otp_expired') , null , null ,[]);
+            }
+    
+            if (!Hash::check($request->otp, $otp->otp)) {
+                return jsonResponse(false , 400 ,__('messages.wrong_otp') , null , null ,[]);
+            }
+
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+
+            DB::commit();
+            return jsonResponse(true , 200 ,__('messages.password_changed_successfully') , null , null ,[]);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $errorMessage = $e->getMessage();
+            $errorLine = $e->getLine();
+            $errorFile = $e->getFile();
+            return jsonResponse(false , 500 ,__('messages.general_message') , null , null ,
+            [
+                'message' => $errorMessage,
+                'line' => $errorLine,
+                'file' => $errorFile
+            ]);
+        }
+    }
 
 
 
@@ -638,18 +714,28 @@ $result =false;
 
 
 
-        private function sendEmailOtp($email , $user_id) {
+        private function sendEmailOtp($email , $user_id , $type = 'verify') {
         // $otp_code = random_int(100000, 999999);  
         try{
         $otp_code = 123456;
-        $otp= Otp::where('user_id' , $user_id)->where('type' , 'email')->first();
-        if($otp){
-            $otp->delete();
+        $otpType = '';
+
+
+       if ($type == 'verify') {
+            $otpType = 'email';
+
+        } elseif ($type == 'forget') {
+
+            $otpType = 'forgot_password_email';
+        } else {
+            return false;
         }
+
+        Otp::where('user_id', $user_id)->where('type', $otpType)->delete();
 
         $otp = Otp::create([
             'otp' =>  Hash::make($otp_code),
-            'type' => 'email',
+            'type' => $otpType,
             'otp_expires_at'=> Carbon::now()->addMinutes(5),
             'user_id'=> $user_id,
         ]);
@@ -671,18 +757,23 @@ $result =false;
 
 
 
-        public function sendPhoneOtp($phone , $user_id ) {
+        public function sendPhoneOtp($phone , $user_id ,$type = 'verify' ) {
         // $otp_code = random_int(100000, 999999);  
         try{
         $otp_code = 123456;
-        $otp= Otp::where('user_id' , $user_id)->where('type' , 'phone')->first();
-        if($otp){
-            $otp->delete();
+        $otpType = '';
+
+        if ($type == 'verify') {
+            $otpType = 'phone';
+        } elseif ($type == 'forget') {
+            $otpType = 'forgot_password_phone';
+        } else {
+            return false;
         }
 
         $otp = Otp::create([
             'otp' =>  Hash::make($otp_code),
-            'type' => 'phone',
+            'type' => $otpType,
             'otp_expires_at'=> Carbon::now()->addMinutes(5),
             'user_id'=> $user->id,
         ]);
