@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 
 class SetLocale
 {
@@ -17,12 +18,29 @@ class SetLocale
     public function handle(Request $request, Closure $next): Response
     {
 
-        $localeHeader = $request->header('Accept-Language', 'en');
         $supportedLocales = ['en', 'ar'];
-        $locale = strtolower(substr($localeHeader, 0, 2));
-        if (!in_array($locale, $supportedLocales)) {
+        $locale = null;
+
+        $localeHeader = $request->header('Accept-Language');
+
+        if ($localeHeader) {
+            $headerLocale = strtolower(substr($localeHeader, 0, 2));
+            if (in_array($headerLocale, $supportedLocales)) {
+                $locale = $headerLocale;
+            }
+        }
+
+        if (!$locale) {
+            $user = Auth::user();
+            if ($user && in_array($user->locale, $supportedLocales)) {
+                $locale = $user->locale;
+            }
+        }
+
+        if (!$locale) {
             $locale = 'en';
         }
+
         App::setLocale($locale);
         return $next($request);
     }

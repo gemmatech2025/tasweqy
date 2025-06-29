@@ -34,6 +34,8 @@ class WithdrawRequestRequest extends FormRequest
 
             'email' => 'nullable|email|max:255',
         ];
+
+        
     }
 
     public function withValidator($validator)

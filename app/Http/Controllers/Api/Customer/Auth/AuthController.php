@@ -474,8 +474,8 @@ $result =false;
             }
 
 
-            $user->password = Hash::make($request->password);
-            $user->save();
+            // $user->password = Hash::make($request->password);
+            // $user->save();
             DB::commit();
             return jsonResponse(true , 200 ,__('messages.password_updated_successfully') , null , null ,[]);
     

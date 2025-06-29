@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Customer\Profile\UpdateProfileRequest;
 use App\Http\Requests\Customer\Profile\VerifyOtpRequest;
 use App\Http\Requests\Customer\Profile\RequestAccountApprovalRequest;
+use App\Http\Requests\Customer\Profile\UpdateLocalRequest;
 
 
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,23 @@ class CustomerController extends Controller
         $this->uploadFilesService = new UploadFilesService();
 
     }
+
+
+
+
+
+    public function updateLocale(UpdateLocalRequest $request)
+    {
+        $user = $request->user();
+        $user->locale = $request->locale;
+        $user->save();
+
+        return jsonResponse( true ,  200 ,__('messages.data_updated_successfully'));
+    }
+
+
+
+
 
     public function updateProfile(UpdateProfileRequest $request)
     {

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
 
 
+    Route::middleware(['set-locale'])->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -34,9 +35,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware(['role:customer'])->group(function () {
 
-      
 
-
+    Route::post('/user/locale', [CustomerController::class, 'updateLocale']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::delete('delete-profile', [AuthController::class, 'deleteProfile']);
     Route::put('change-old-password', [AuthController::class, 'changeOldPassword']);
@@ -150,6 +150,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
 
 
 

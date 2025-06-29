@@ -14,16 +14,17 @@ class AccountVerificationRequestResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
- return [
-            'id'          => $this->id,
-            'name'        => $this->name,
-            'type'        => $this->type,
-            'front_image' => asset($this->front_image),
-            'back_image'  => $this->back_image ? asset($this->back_image) : null,
-            'user_id'     => $this->user_id,
-            'approved'    => $this->approved,
-            'approved_by' => $this->approved_by,
-            'created_at'  => $this->created_at,
-            'updated_at'  => $this->updated_at,
-        ];    }
+        return [
+                    'id'          => $this->id,
+                    'name'        => $this->name,
+                    'type'        => $this->type,
+                    'front_image' => asset($this->front_image),
+                    'back_image'  => $this->back_image ? asset($this->back_image) : null,
+                    'user_id'     => $this->user_id,
+                    'approved'    => $this->approved,
+                    'approved_by' => $this->approved_by,
+                    'created_at'  => $this->created_at,
+                    'updated_at'  => $this->updated_at,
+                ]; 
+       }
 }

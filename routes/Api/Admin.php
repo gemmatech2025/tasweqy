@@ -16,7 +16,11 @@ use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 
 
-    Route::post('login', [AuthController::class, 'login']);
+
+
+Route::middleware(['set-locale'])->group(function () {
+
+Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -135,11 +139,12 @@ Route::controller(SocialMediaPlatformController::class)->prefix('social-media-pl
 });
 
 
-Route::get('export', [DiscountCodeController::class, 'exportDiscountCodesTemplate']);
+// Route::get('export', [DiscountCodeController::class, 'exportDiscountCodesTemplate']);
 
 
 
 
+});
 
 
 

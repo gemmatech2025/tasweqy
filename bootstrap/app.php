@@ -38,11 +38,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(SetLocale::class);
+        // $middleware->append(SetLocale::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,
             '2fa-confirmed' => Is2FAConfirmed::class,
-            'verified-user' => VerifiedUserMiddleware::class
+            'verified-user' => VerifiedUserMiddleware::class,
+            'set-locale' => SetLocale::class
 
 
             
