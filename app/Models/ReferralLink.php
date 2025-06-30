@@ -19,4 +19,18 @@ class ReferralLink extends Model
     {
         return $this->belongsTo(Brand::class);
     }   
+
+
+
+    public function referralEarning()
+    {
+        return $this->morphOne(ReferralEarning::class, 'referrable');
+    }
+
+
+
+    public function isReserved(): bool
+    {
+        return $this->referralEarning()->exists();
+    }
 }

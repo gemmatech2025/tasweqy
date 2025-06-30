@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Customer\Payment;
+namespace App\Http\Requests\Admin\Referral;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class PayPalRequest extends FormRequest
+class AssignReferralRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,31 +24,31 @@ class PayPalRequest extends FormRequest
      */
 
 
-       public function rules(): array
+         public function rules(): array
     {
         
 
 
-        $rules = array();
+        
 
-        switch ($this->method()) {
-            case 'POST':
-                $rules +=  [
-                    'email'        => 'required|email|max:255',
+        return [
+            'referral_request_id'      => 'required|exists:referral_requests,id',
 
-                ];
-                break;
+            'type'                     => ['required', Rule::in(['discount_code', 'referral_link'])],
 
-            case 'PATCH':
-            case 'PUT':
-                $rules +=  [
-                'email'           => 'required|email|max:255',
-                ];
+            'discount_code_id'         =>[
+                'nullable',
+                'exists:discount_codes,id',
+                Rule::requiredIf($this->input('type') === 'discount_code'),
+        ],
+            'referral_link_id'          => [
+                'nullable',
+                'exists:referral_links,id',
+                Rule::requiredIf($this->input('type') === 'referral_link'),
+        ],
 
-                break;
-        }
 
-        return $rules;
+        ];
     }
 
 

@@ -33,4 +33,32 @@ class CountryController extends BaseController
     }
 
 
+    public function indexPaginat()
+    {
+        return true;
+    }
+
+
+    public function getAllForSellect()
+    {
+
+
+        $countries = Country::all();
+
+
+        return jsonResponse(
+        true,
+        200,
+        __('messages.success'),
+        (static::RESOURCE)::collection($countries)
+        );
+
+
+
+    }
+
+
+
+    
+
 }

@@ -28,7 +28,7 @@ class AddNewPasswordRequest extends FormRequest
 
             'email'      => 'nullable|email|exists:users,email|required_without:phone',
             'phone'      => 'nullable|exists:users,phone|required_without:email',
-            'otp'        => 'required|numeric|digits:6',
+            'token'        => 'required|string',
             'password'   => 'required|string|min:8|confirmed',
         
         ];

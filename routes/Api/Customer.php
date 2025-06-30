@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\Customer\Community\PostController;
 use App\Http\Controllers\Api\Customer\Community\PostCommentController;
 use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
+use App\Http\Controllers\Api\Admin\General\CountryController;
+use App\Http\Controllers\Api\Customer\Referral\ReferralRequestController;
 
 
 
@@ -26,6 +28,7 @@ Route::middleware(['set-locale'])->group(function () {
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('send-forget-password-otp', [AuthController::class, 'sendForgetPasswordOtp']);
     Route::post('verify-forget-password-otp', [AuthController::class, 'verifyOtpForgetPassword']);
+    Route::post('add-new-password-forgot-password', [AuthController::class, 'addNewPasswordForgetPassword']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -136,6 +139,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
 
 
+        Route::controller(CountryController::class)->prefix('countries')->group(function () {
+          Route::get('/get-all', 'getAllForSellect');
+        });
+
+
+        Route::controller(ReferralRequestController::class)->prefix('referral-request')->group(function () {
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete'); 
+            Route::get('/', 'index');
+        
+        });
+
+
+
+        
 
    
 

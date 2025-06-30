@@ -17,32 +17,41 @@ class CustomerResource extends JsonResource
 
 
 
+        $customer = $this->customer;
+        $country = $this->customer? $this->customer->country :null;
+
+
+
 
             return [
             'id'            => $this->id,
-            'country'       => $this->country ? [
-                'id'        =>$this->country->id ,
-                'name'      =>$this->country->name , 
-                'code'      =>$this->country->code , 
+            'name'                => $this->name,
+            'phone'               => $this->phone,
+            'code'                => $this->code,
+            'image'               => $this->image ? asset($this->image) : null,
+            'locale'              => $this->locale,
+            'is_phone_verified'   => $this->phone_verified_at ? true : false,
+            'is_2fa_enabled'      => (bool) $this->two_factor_secret,
+            'is_2fa_confirmed'    => (bool) $this->two_factor_confirmed_at,
+            'has_recovery_codes'  => (bool) $this->two_factor_recovery_codes,
+            'completed_profile'   => $customer ? true : false,
+            'country'       => $country ? [
+                'id'        => $country->id ,
+                'name'      => $country->name , 
+                'code'      => $country->code , 
              ]:null,
-            'user'          => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-                'phone'     => $this->user->phone,
-                'code'     => $this->user->code,
-                'is_2fa_enabled' => (bool) $this->user->two_factor_secret,
-                'is_2fa_confirmed' => (bool) $this->user->two_factor_confirmed_at,
-                'has_recovery_codes' => (bool) $this->user->two_factor_recovery_codes,
 
 
-            ],
-            'birthdate' => $this->birthdate ? $this->birthdate->format('Y-m-d') : null,
+            'profile'   => $customer ?[
+                    'birthdate' => $customer->birthdate ? $customer->birthdate->format('Y-m-d') : null,
+                    'gender'        => $customer->gender,
+                    'total_balance' => $customer->total_balance,
+                    'is_verified'   => $customer->is_verified,
+            ] :null,
 
-            'gender'        => $this->gender,
-            'total_balance' => $this->total_balance,
-            'is_verified'   => $this->is_verified,
-            'created_at'    => $this->created_at,
-            'updated_at'    => $this->updated_at,
+            
+            // 'created_at'    => $this->created_at,
+            // 'updated_at'    => $this->updated_at,
         ];
     
     

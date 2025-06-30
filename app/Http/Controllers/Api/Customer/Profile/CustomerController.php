@@ -73,7 +73,7 @@ class CustomerController extends Controller
             $user = Auth::user();
 
             $customer = Customer::where('user_id' , $user->id)->first();
-            // $country = Country::find($request->country_id);
+
             $imagePath =  $user->image;
             if ($request->hasFile('image')) {
                 if($user->image){
@@ -97,7 +97,7 @@ class CustomerController extends Controller
                 $customer->save();
             }else{
 
-                $custoOtpmer = Customer::create([
+                $customer = Customer::create([
                     'country_id'     => $request->country_id,
                     'birthdate'      => $request->birthdate,
                     'gender'         => $request->gender,
@@ -122,11 +122,11 @@ class CustomerController extends Controller
 
                 if($result){
                     return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_please_send_otp_on_your_whatsapp') ,
-                      ['whatsapp_otp' =>true , 'customer' => new CustomerResource($customer)] );    
+                      ['whatsapp_otp' =>true , 'customer' => new CustomerResource($user)] );    
                 }
 
                 return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_but_otp_not_sent_make_sure_phone_number_correct') ,
-                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($customer)] );    
+                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($user)] );    
 
 
             }
@@ -134,7 +134,7 @@ class CustomerController extends Controller
 
             
             return jsonResponse( true ,  201 ,__('messages.data_updated_successfully') ,
-                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($customer)] );                            
+                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($user)] );                            
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -144,7 +144,7 @@ class CustomerController extends Controller
 
 
 
-            return jsoOtpnResponse(false , 500 ,__('messages.general_message') , null , null ,
+            return jsonResponse(false , 500 ,__('messages.general_message') , null , null ,
             [
                 'message' => $errorMessage,
                 'line' => $errorLine,
@@ -209,11 +209,11 @@ class CustomerController extends Controller
     public function getMyData()
     {
         $user = Auth::user();
-        $customer = Customer::where('user_id' , $user->id)->first();
-        if(!$customer){
-            return jsonResponse( true ,  404 ,__('messages.customer_not_found_complete_profile') , null,null,[] );        
-        }                       
-        return jsonResponse( true ,  200 ,__('messages.sucess') , new CustomerResource($customer) );        
+        // $customer = Customer::where('user_id' , $user->id)->first();
+        // if(!$customer){
+        //     return jsonResponse( true ,  404 ,__('messages.customer_not_found_complete_profile') , null,null,[] );        
+        // }                       
+        return jsonResponse( true ,  200 ,__('messages.sucess') , new CustomerResource($user) );        
     }
 
 

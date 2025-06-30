@@ -12,7 +12,9 @@ class ReferralEarning extends Model
         'total_earnings',
         'referrable_type',
         'referrable_id',
-        'total_clients'
+        'total_clients',
+        'user_id'
+
     ];
 
     protected $casts = [

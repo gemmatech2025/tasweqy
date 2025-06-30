@@ -548,14 +548,14 @@ class AuthController extends Controller
                 return jsonResponse(false , 401 ,__('messages.otp_expired') , null , null ,[]);
             }
     
-            if (!Hash::check($request->otp, $otp->otp)) {
+            if (!Hash::check($request->token, $otp->otp)) {
                 return jsonResponse(false , 400 ,__('messages.wrong_otp') , null , null ,[]);
             }
 
 
             $user->password = Hash::make($request->password);
             $user->save();
-
+$otp->delete();
 
             DB::commit();
             return jsonResponse(true , 200 ,__('messages.password_changed_successfully') , null , null ,[]);
@@ -757,7 +757,7 @@ class AuthController extends Controller
 
 
 
-        public function sendPhoneOtp($phone , $user_id ,$type = 'verify' ) {
+        public function sendPhoneOtp($phone , $user_id ,$type = 'verify') {
         // $otp_code = random_int(100000, 999999);  
         try{
         $otp_code = 123456;

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
+use App\Http\Controllers\Api\Admin\Referral\ReferralRequestController;
 
 
 
@@ -134,6 +135,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         });
 
+       Route::controller(ReferralRequestController::class)->prefix('referral-requests')->group(function () {
+            Route::post('/assign-referral', 'assifnReferralToCustomer');
+            Route::get('/', 'index');
+   
+
+        });
 
    
 
