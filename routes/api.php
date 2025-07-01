@@ -27,9 +27,19 @@ Route::get('/artisan/run-migrate', function () {
 });
 
 
+
+
 Route::get('/artisan/run-migrate-refresh', function () {
     Artisan::call('migrate:refresh', ['--force' => true]);
     return response()->json(['message' => 'Migration refresh executed successfully']);
 });
 
+Route::get('/run-seeder/{name}', function ($name) {
+    Artisan::call('db:seed', [
+        '--class' => $name,
+        '--force' => true
+    ]);
+
+    return response()->json(['message' => 'Seeder executed successfully']);
+});
 
