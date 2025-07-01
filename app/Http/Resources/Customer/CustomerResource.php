@@ -32,6 +32,8 @@ class CustomerResource extends JsonResource
             'image'               => $this->image ? asset($this->image) : null,
             'locale'              => $this->locale,
             'is_phone_verified'   => $this->phone_verified_at ? true : false,
+            'is_email_verified'   => $this->email_verified_at ? true : false,
+
             'is_2fa_enabled'      => (bool) $this->two_factor_secret,
             'is_2fa_confirmed'    => (bool) $this->two_factor_confirmed_at,
             'has_recovery_codes'  => (bool) $this->two_factor_recovery_codes,
