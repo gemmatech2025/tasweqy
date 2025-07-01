@@ -28,6 +28,7 @@ class CustomerResource extends JsonResource
             'name'                => $this->name,
             'phone'               => $this->phone,
             'code'                => $this->code,
+            'email'               => $this->email,
             'image'               => $this->image ? asset($this->image) : null,
             'locale'              => $this->locale,
             'is_phone_verified'   => $this->phone_verified_at ? true : false,
