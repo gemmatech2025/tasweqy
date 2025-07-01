@@ -33,6 +33,11 @@ class CountryController extends BaseController
     }
 
 
+    public function uploadImages()
+    {
+        return ['image'];
+    }
+
     public function indexPaginat()
     {
         return true;

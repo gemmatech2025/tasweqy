@@ -18,6 +18,8 @@ class CountryResource extends JsonResource
             'id'   => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'image' => $this->image ? asset($this->image) :null ,
+
         ];
     }
 }

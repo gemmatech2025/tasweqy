@@ -33,16 +33,24 @@ class CountryRequest extends FormRequest
         switch ($this->method()) {
             case 'POST':
                 $rules +=  [
-                        'name'      => 'required|string',
-                        'code'      => 'required|numeric',
+                        'name'                        => 'required|array',
+                        'name.ar'                     => 'required|string|max:255',
+                        'name.en'                     => 'required|string|max:255',
+                        'code'                        => 'required|numeric',
+                        'image'                       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
                 ];
                 break;
 
             case 'PATCH':
             case 'PUT':
                 $rules +=  [
-                        'name'      => 'required|string',
-                        'code'      => 'required|numeric',
+                        'name'                        => 'required|sometimes|array',
+                        'name.ar'                     => 'required|string|max:255',
+                        'name.en'                     => 'required|string|max:255',
+                        'code'                        => 'required|sometimes|numeric',
+                        'image'                       => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
                 ];
 
                 break;

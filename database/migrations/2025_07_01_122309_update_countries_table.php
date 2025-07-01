@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('otps', function (Blueprint $table) {
-            $table->enum('type' , ['phone' , 'email' , 'forgot_password_email', 'forgot_password_phone' ,'update_email' , 'update_phone'])->change();
+        Schema::table('countries', function (Blueprint $table) {
+            $table->dropColumn('name'); 
+            $table->string('image')->nullabe();
+            $table->json('name');             
         });
     }
 
@@ -21,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('otps', function (Blueprint $table) {
+        Schema::table('countries', function (Blueprint $table) {
             //
         });
     }

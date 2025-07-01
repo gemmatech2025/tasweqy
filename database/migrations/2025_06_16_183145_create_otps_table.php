@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('otps', function (Blueprint $table) {
             $table->id();
             $table->string('otp');
-            $table->enum('type' , ['phone' , 'email' , 'forget_password' ,'update_email' , 'update_phone']);
+            $table->enum('type' , ['phone' , 'email' , 'forgot_password_email', 'forgot_password_phone' ,'update_email' , 'update_phone']);
             $table->timestamp('otp_expires_at');
             $table->unsignedBigInteger('user_id'); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
