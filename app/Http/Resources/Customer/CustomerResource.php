@@ -43,12 +43,18 @@ class CustomerResource extends JsonResource
              ]:null,
 
 
-            'profile'   => $customer ?[
-                    'birthdate' => $customer->birthdate ? $customer->birthdate->format('Y-m-d') : null,
-                    'gender'        => $customer->gender,
-                    'total_balance' => $customer->total_balance,
-                    'is_verified'   => $customer->is_verified,
-            ] :null,
+
+            'birthdate' => $customer ?  $customer->birthdate ? $customer->birthdate->format('Y-m-d') : null : null,
+            'gender' => $customer ?  $customer->gender : null,
+            'total_balance' => $customer ?  $customer->total_balance : 0 ,
+            'is_verified'   => $customer ?  $customer->is_verified : false,
+
+
+            // 'profile'   => $customer ?[
+            //         'gender'        => $customer->gender,
+            //         'total_balance' => $customer->total_balance,
+            //         'is_verified'   => $customer->is_verified,
+            // ] :null,
 
             
             // 'created_at'    => $this->created_at,
