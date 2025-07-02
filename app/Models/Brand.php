@@ -31,4 +31,14 @@ class Brand extends Model
     {
         return $this->belongsToMany(Country::class, 'brand_countries');
     }
+
+    public function referralLinks()
+    {
+        return $this->hasMany(ReferralLink::class);
+    }
+
+    public function discountCodes()
+    {
+        return $this->hasMany(DiscountCode::class);
+    }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('total_earnings' , 10 ,2)->default(0);
             $table->morphs('referrable');
             $table->integer('total_clients')->default(0);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');  
             $table->timestamps();
         });
     }

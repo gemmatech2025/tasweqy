@@ -116,7 +116,7 @@ class CustomerController extends Controller
 
             if(!$user->phone_verified_at){
 
-                $result = $this->sendPhoneOtp($request->code .$request->phone , $customer->id);
+                $result = $this->sendPhoneOtp($request->code .$request->phone , $user->id);
 
             DB::commit();
 

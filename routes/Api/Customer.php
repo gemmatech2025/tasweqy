@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 
 use App\Http\Controllers\Api\Admin\General\CountryController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralRequestController;
+use App\Http\Controllers\Api\Customer\Brand\BrandController;
 
 
 
@@ -150,6 +151,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/', 'index');
         
         });
+
+
+        Route::controller(BrandController::class)->prefix('brands')->group(function () {
+            Route::get('/get-new-brands', 'getNewBrands');
+            Route::get('/get-my-brands', 'getMyBrands');
+
+        
+        });
+
+
+        
+
+        
 
 
 
