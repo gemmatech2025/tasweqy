@@ -5,6 +5,7 @@ namespace App\Http\Requests\Customer\Profile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -23,18 +24,39 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user       = auth()->user();
+        $customer   = $user->customer;
 
+
+
+        if($customer){
+            return [
+           'gender'        => 'required|sometimes|in:male,female',
+           'country_id'    => 'required|sometimes|exists:countries,id',
+           'birthdate'     => 'required|sometimes|date',
+        //    'phone'         => 'required|numeric',
+            'phone'      => [
+                'nullable',
+                'numeric',
+                Rule::unique('users', 'phone')->ignore($user->id),
+            ],
+           'code'          => 'required|sometimes|numeric',
+        ];
+
+        }
 
 
         return [
            'gender'        => 'required|in:male,female',
            'country_id'    => 'required|exists:countries,id',
            'birthdate'     => 'required|date',
-           'phone'         => 'required|numeric',
+        //    'phone'         => 'required|numeric',
+            'phone'      => [
+                'required',
+                'numeric',
+                Rule::unique('users', 'phone')->ignore($user->id),
+            ],
            'code'          => 'required|numeric',
-
-
-
         ];
     }
 

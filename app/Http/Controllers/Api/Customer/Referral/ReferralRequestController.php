@@ -66,10 +66,10 @@ class ReferralRequestController extends BaseController
             ->where('user_id' , Auth::id())->first();
 
             if($model ){
-   return jsonResponse(
-                true, 201, __('messages.add_success'),
-                new (static::RESOURCE)($model)
-            );
+                return jsonResponse(
+                    true, 201, __('messages.add_success'),
+                    new (static::RESOURCE)($model)
+                );
             }
 
             $excludeKeys   = $this->uploadImages();

@@ -156,14 +156,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::controller(BrandController::class)->prefix('brands')->group(function () {
             Route::get('/get-new-brands', 'getNewBrands');
             Route::get('/get-my-brands', 'getMyBrands');
+            Route::get('/get-brand-by-id/{brand_id}', 'getBrandById');
+            Route::put('/update-social-platform/{earning_id}/{platform_id}', 'addSocialMediaPlatform');
 
-        
+
         });
-
-
-        
-
-        
+ 
 
 
 

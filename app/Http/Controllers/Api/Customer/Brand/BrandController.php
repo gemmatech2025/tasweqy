@@ -7,6 +7,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Brand;
+use App\Models\ReferralLink;
+use App\Models\ReferralRequest;
+use App\Models\DiscountCode;
+use App\Models\ReferralEarning;
 
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +20,10 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\Customer\Brand\NewBrandCardResource;
 use App\Http\Resources\Customer\Brand\CustomerBrandCardResource;
+
+use App\Http\Resources\Customer\Brand\BrandDetailsResource;
+use App\Http\Resources\Customer\Brand\BrandDetailsCustomerResource;
+
 
 
 class BrandController extends Controller
@@ -196,5 +204,84 @@ class BrandController extends Controller
 
 
 
+
+    public function getBrandById($brand_id)
+    {
+
+
+        $user = Auth::user();
+
+        $brand = Brand::find($brand_id);
+
+        if (!$brand) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+
+
+
+         $hasReferralEarning = ReferralEarning::where('user_id', $user->id)
+        ->whereHasMorph(
+            'referrable',
+            [ReferralLink::class, DiscountCode::class],
+            function ($query) use ($brand_id) {
+                $query->where('brand_id', $brand_id);
+            }
+        )
+        ->exists();
+
+
+        $hasReferralRequest = ReferralRequest::where('user_id', $user->id)
+        ->where('brand_id', $brand_id)
+        ->exists();
+
+
+        if($hasReferralEarning || $hasReferralRequest){
+        
+        
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            new BrandDetailsCustomerResource($brand),
+        );
+
+        }
+
+
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            new BrandDetailsResource($brand),
+        );
+
+
+    }
+
+
+
+    public function addSocialMediaPlatform($earning_id , $platform_id)
+    {
+
+        $referralEarning = ReferralEarning::find($earning_id);
+
+        if (!$referralEarning) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+
+
+        $referralEarning->social_media_platform_id = $platform_id;
+        $referralEarning->save();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+        );
+
+
+    }
 
 }
