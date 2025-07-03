@@ -86,10 +86,25 @@ class ApprovalRequestController extends Controller
         if($request->value == '1'){
         $approvalRequest->approved = '1';
         $approvalRequest->approved_by = Auth::id();
+
+
+        
+        $customer =$approvalRequest->user->customer;
+        if($customer){
+            $customer->is_verified = '1';
+            $customer->save();
+        }
+
+
         $approvalRequest->save();
         }else{
             $approvalRequest->approved = '0';
             $approvalRequest->approved_by = null;
+            $customer =$approvalRequest->user->customer;
+            if($customer){
+                $customer->is_verified = '0';
+                $customer->save();
+            }
             $approvalRequest->save();
         }
 

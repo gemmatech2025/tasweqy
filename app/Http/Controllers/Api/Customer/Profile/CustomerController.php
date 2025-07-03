@@ -238,6 +238,11 @@ class CustomerController extends Controller
         $approvalRequest = AccountVerificationRequest::where('user_id' , $user->id)
         ->where('type' , $request->type)->first();
 
+        $customer = $user->customer;
+        if(!$customer){
+            return jsonResponse( false ,  400 ,__('messages.complete_profile_first')  );        
+        }
+
 
         if($approvalRequest){
 
@@ -289,8 +294,6 @@ class CustomerController extends Controller
             }
     
     
-
-
             $approvalRequest = AccountVerificationRequest::create([
                 'name'           => $request->name,
                 'type'           => $request->type,
@@ -303,7 +306,7 @@ class CustomerController extends Controller
             return jsonResponse( true ,  200 ,__('messages.created_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
         }
 
-        return jsonResponse( true ,  500 ,__('messages.general_error_message')  );        
+        return jsonResponse( false ,  500 ,__('messages.general_error_message')  );        
 
                  
     }
