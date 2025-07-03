@@ -236,11 +236,18 @@ class CustomerController extends Controller
 
 
         $approvalRequest = AccountVerificationRequest::where('user_id' , $user->id)
-        ->where('type' , $request->type)->first();
+        ->where('type' , $request->type)
+        // ->where('approved' , '0')
+        ->first();
 
         $customer = $user->customer;
         if(!$customer){
             return jsonResponse( false ,  400 ,__('messages.complete_profile_first')  );        
+        }
+
+
+        if($customer->is_verified){
+            return jsonResponse( false ,  400 ,__('messages.already_verified')  );        
         }
 
 
@@ -274,7 +281,8 @@ class CustomerController extends Controller
                 'type'           => $request->type,
                 'front_image'    => $frontImagePath,
                 'back_image'     => $backImagePath,
-            ]);
+                'approved'       => '0'
+           ]);
 
 
             return jsonResponse( true ,  200 ,__('messages.updated_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
