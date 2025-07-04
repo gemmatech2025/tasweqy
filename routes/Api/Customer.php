@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\Admin\General\CountryController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Customer\Brand\BrandController;
 
+use App\Http\Controllers\Api\Customer\Wallet\WalletController;
+use App\Http\Controllers\Api\Customer\Notification\NotificationController;
 
 
 
@@ -68,6 +70,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-profile', 'getMyData');
             Route::post('/request-approval', 'requestApproval');
             Route::get('/get-my-approval-requests', 'getMyApprovalRequests');
+            Route::get('/home-info', 'homeInfo');
+
+
+            
         });
 
 
@@ -162,6 +168,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         });
  
+
+
+     Route::controller(WalletController::class)->prefix('wallet')->group(function () {
+      Route::get('/get-wallet-details', 'getWalletDetails');
+      Route::get('/get-earnings', 'getEarnings');
+      Route::get('/get-wallet-transactions', 'getTransactions');
+
+
+
+        });
+
+
+     Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
+      Route::get('/get-my-notifications', 'getMyNotifications');
+      Route::delete('/delete/{id}', 'deleteNotification');
+
+
+
+        });
 
 
 

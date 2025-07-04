@@ -12,10 +12,15 @@ use App\Models\Customer;
 use App\Models\Country;
 use App\Models\AccountVerificationRequest;
 
+use App\Models\ReferralLink;
+use App\Models\DiscountCode;
+use App\Models\ReferralEarning;
+
 
 
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Resources\Customer\Referral\ReferralEarningResource;
 
 use App\Http\Resources\Customer\CustomerResource;
 use App\Http\Resources\Customer\Profile\AccountVerificationRequestResource;
@@ -34,7 +39,6 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 use App\Services\UploadFilesService;
-
 
 
 class CustomerController extends Controller
@@ -355,6 +359,97 @@ class CustomerController extends Controller
 
 
     }
+    }
+
+
+
+
+
+
+
+
+    public function homeInfo()
+    {
+        $user = Auth::user();
+
+
+        $customer = $user->customer;
+
+        if(!$customer){
+            return jsonResponse( false ,  400 ,__('messages.complete_profile_first')  );        
+        }
+
+
+        $referralLink = ReferralEarning::where('user_id', $user->id)
+            ->where('referrable_type', ReferralLink::class)
+            ->orderBy('total_earnings', 'desc')
+            ->first();
+
+
+        $descountcode = ReferralEarning::where('user_id', $user->id)
+            ->where('referrable_type', DiscountCode::class)
+            ->orderBy('total_earnings', 'desc')
+            ->first();
+
+
+
+
+
+        $total_earnings = ReferralEarning::where('user_id', $user->id)
+            ->sum('total_earnings');
+            
+        $total_clients = ReferralEarning::where('user_id', $user->id)
+            ->sum('total_clients');
+
+
+
+        $now = Carbon::now();
+        $startDate = $now->copy()->subDays(30);
+
+        $intervals = [];
+
+
+        for ($i = 0; $i < 6; $i++) {
+            $from = $startDate->copy()->addDays($i * 5);
+            $to = $from->copy()->addDays(5);
+
+            $data = ReferralEarning::where('user_id', $user->id)
+                ->where('referrable_type', DiscountCode::class)
+                ->whereBetween('created_at', [$from, $to])
+                ->select(
+                    DB::raw('COALESCE(SUM(total_earnings), 0) as earnings'),
+                    DB::raw('COALESCE(SUM(total_clients), 0) as clients')
+                )
+                ->first();
+
+            $intervals[] = [
+                'label' => $from->format('M d') . ' - ' . $to->format('M d'),
+                'total_earnings' => $data->earnings,
+                'total_clients' => $data->clients,
+            ];
+        
+        
+        }
+
+        $data = [
+            'referral_link' => new ReferralEarningResource($referralLink),
+            'descount_code' => new ReferralEarningResource($descountcode),
+            'chart_points'  => $intervals,
+            'total_balance' => $customer->total_balance,
+            'total_earning' => $total_earnings,
+            'total_clients' => $total_clients
+
+        ];
+
+
+
+        return jsonResponse( true ,  200 ,
+        __('messages.created_successfully') ,
+        $data);        
+
+
+
+
     }
 
 
