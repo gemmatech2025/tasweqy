@@ -166,7 +166,7 @@ class WalletController extends Controller
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 20);
         $orderBy = $request->input('sort_by', 'newest'); // total_client - earnings
-        $socialMediaPlatform = $request->input('socialMediaPlatform', ''); // total_client - earnings
+        $socialMediaPlatform = $request->input('socialMediaPlatform', ''); 
         $source = $request->input('source', ''); // referral_link - discount_code
 
 

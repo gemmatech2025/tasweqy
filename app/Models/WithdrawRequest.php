@@ -23,4 +23,12 @@ class WithdrawRequest extends Model
     {
         return $this->morphTo();
     }
+
+
+
+    public function walletTransaction()
+    {
+        return $this->morphOne(TrackingEvent::class, 'transatable');
+    }
+
 }

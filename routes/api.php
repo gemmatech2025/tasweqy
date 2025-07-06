@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Tracking\TrakingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -41,5 +42,14 @@ Route::get('/run-seeder/{name}', function ($name) {
     ]);
 
     return response()->json(['message' => 'Seeder executed successfully']);
+});
+
+
+
+
+
+Route::controller(TrakingController::class)->prefix('event-tracker')->group(function () {
+    Route::get('/track', 'trackPixel');
+
 });
 

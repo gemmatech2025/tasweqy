@@ -8,6 +8,7 @@ class ReferralLink extends Model
 {
     protected $fillable = 
     [
+        'link_code',
         'brand_id',
         'link' ,
         'earning_precentage'
@@ -28,9 +29,21 @@ class ReferralLink extends Model
     }
 
 
+    public function trackingEvents()
+    {
+        return $this->morphMany(TrackingEvent::class, 'trackable');
+    }
+
+
 
     public function isReserved(): bool
     {
         return $this->referralEarning()->exists();
     }
+
+
+    // public function transatable()
+    // {
+    //     return $this->morphTo();
+    // }
 }

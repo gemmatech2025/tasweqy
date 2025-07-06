@@ -26,6 +26,12 @@ class DiscountCode extends Model
         return $this->morphOne(ReferralEarning::class, 'referrable');
     }
 
+    
+    public function trackingEvents()
+    {
+        return $this->morphMany(TrackingEvent::class, 'trackable');
+    }
+
 
     public function isReserved(): bool
     {

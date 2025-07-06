@@ -60,6 +60,7 @@ class ReferralLinkController extends BaseController
                         'brand_id'            => $request->brand_id,
                         'link'                => $link['link'],
                         'earning_precentage'  => $link['earning_precentage'],
+                        'link_code'           => $link['link_code'],
                     ]);
                 }
                 DB::commit();
