@@ -137,12 +137,10 @@ class PostCommentController extends BaseController
 public function getCommentsByPost(Request $request , $id)
 {
 
-    $searchTerm = trim($request->input('search', ''));
-    $filters = $request->input('filter', []);
-    $sortBy = $request->input('sort_by', 'id');
-    $sortOrder = $request->input('sort_order', 'asc');
+    $page = $request->input('page', 1);
+    $perPage = $request->input('per_page', 20);
 
-      $post = Post::find($id);
+    $post = Post::find($id);
 
     if (!$post) {
         return jsonResponse(false, 404, __('messages.not_found'));
@@ -150,56 +148,7 @@ public function getCommentsByPost(Request $request , $id)
 
 
 
-    $query = $this->getModel()->where('post_id' , $post->id);
-    $columns = \Schema::getColumnListing($this->getModel()->getTable());
-    
-
-    $filters = array_map(function ($value) {
-        if (is_string($value)) {
-            $lower = strtolower($value);
-            return match ($lower) {
-                'true' => 1,
-                'false' => 0,
-                default => is_numeric($value) ? $value + 0 : $value,
-            };
-        }
-        return $value;
-    }, $filters);
-
-
-  
-
-
-    $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
-
-    foreach ($filters as $key => $value) {
-        if (in_array($key, $columns)) {
-            $query->where($key, $value);
-        }
-    }
-
-
-
-    if (!empty($searchTerm)) {
-        $searchableFields = $this->getSearchableFields();
-        $query->where(function ($q) use ($searchableFields, $searchTerm) {
-            foreach ($searchableFields as $field) {
-                $q->orWhere($field, 'LIKE', "%{$searchTerm}%");
-            }
-        });
-    }
-
-    if ($sortBy && $sortOrder) {
-        $query->orderBy($sortBy, $sortOrder);
-    } else {
-        foreach ($this->getSort() as $sort) {
-            $query->orderBy($sort['sort'], $sort['order']);
-        }
-    }
-
-        $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
-
+    $query = PostComment::where('post_id' , $post->id);
 
         $query->orderBy('created_at', 'desc');
 

@@ -125,10 +125,23 @@ class WalletController extends Controller
 
 
 
+         $totalLinkEarnings = ReferralEarning::where('user_id', $user->id)
+        ->where('referrable_type', ReferralLink::class)
+        ->sum('total_earnings');
+
+        $totalDiscountEarnings = ReferralEarning::where('user_id', $user->id)
+            ->where('referrable_type', DiscountCode::class)
+            ->sum('total_earnings');
+
+
+
+
         $data = [
             'total_balance' => $customer->total_balance,
             'walet_transactions' => WalletTransactionResource::collection($transaction),
             'referral_earnings' => ReferralEarningResource::collection($referralEarning),
+            'totalLinkEarnings' => $totalLinkEarnings,
+            'totalDiscountEarnings' => $totalDiscountEarnings ,
 
             'monthly_comparison'=>[
                 'earnings'       => ['this_mounth' => $thisMonthTotal ,'last_mounth' => $lastMonthTotal],
