@@ -8,93 +8,114 @@ use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
 use App\Models\SocialMediaPlatform;
 use App\Models\User;
+use App\Models\WalletTransaction;
 
 class ReferralEarningSeeder extends Seeder
 {
     public function run(): void
     {
-          $platforms = [
-            [
-                'name' => [
-                    'en' => 'Facebook',
-                    'ar' => 'فيسبوك'
-                ],
-                'logo' => 'logos/facebook.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'Instagram',
-                    'ar' => 'إنستغرام'
-                ],
-                'logo' => 'logos/instagram.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'TikTok',
-                    'ar' => 'تيك توك'
-                ],
-                'logo' => 'logos/tiktok.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'Snapchat',
-                    'ar' => 'سناب شات'
-                ],
-                'logo' => 'logos/snapchat.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'YouTube',
-                    'ar' => 'يوتيوب'
-                ],
-                'logo' => 'logos/youtube.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'X (Twitter)',
-                    'ar' => 'تويتر (X)'
-                ],
-                'logo' => 'logos/x.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'LinkedIn',
-                    'ar' => 'لينكد إن'
-                ],
-                'logo' => 'logos/linkedin.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'Telegram',
-                    'ar' => 'تليجرام'
-                ],
-                'logo' => 'logos/telegram.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'WhatsApp',
-                    'ar' => 'واتساب'
-                ],
-                'logo' => 'logos/whatsapp.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'Pinterest',
-                    'ar' => 'بينترست'
-                ],
-                'logo' => 'logos/pinterest.png'
-            ],
-        ];
+        //   $platforms = [
+        //     [
+        //         'name' => [
+        //             'en' => 'Facebook',
+        //             'ar' => 'فيسبوك'
+        //         ],
+        //         'logo' => 'logos/facebook.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'Instagram',
+        //             'ar' => 'إنستغرام'
+        //         ],
+        //         'logo' => 'logos/instagram.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'TikTok',
+        //             'ar' => 'تيك توك'
+        //         ],
+        //         'logo' => 'logos/tiktok.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'Snapchat',
+        //             'ar' => 'سناب شات'
+        //         ],
+        //         'logo' => 'logos/snapchat.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'YouTube',
+        //             'ar' => 'يوتيوب'
+        //         ],
+        //         'logo' => 'logos/youtube.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'X (Twitter)',
+        //             'ar' => 'تويتر (X)'
+        //         ],
+        //         'logo' => 'logos/x.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'LinkedIn',
+        //             'ar' => 'لينكد إن'
+        //         ],
+        //         'logo' => 'logos/linkedin.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'Telegram',
+        //             'ar' => 'تليجرام'
+        //         ],
+        //         'logo' => 'logos/telegram.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'WhatsApp',
+        //             'ar' => 'واتساب'
+        //         ],
+        //         'logo' => 'logos/whatsapp.png'
+        //     ],
+        //     [
+        //         'name' => [
+        //             'en' => 'Pinterest',
+        //             'ar' => 'بينترست'
+        //         ],
+        //         'logo' => 'logos/pinterest.png'
+        //     ],
+        // ];
 
-        foreach ($platforms as $platform) {
-            SocialMediaPlatform::updateOrCreate(
-                ['name->en' => $platform['name']['en']],
-                [
-                    'name' => $platform['name'],
-                    'logo' => $platform['logo'],
-                ]
-            );
+        // foreach ($platforms as $platform) {
+        //     SocialMediaPlatform::updateOrCreate(
+        //         ['name->en' => $platform['name']['en']],
+        //         [
+        //             'name' => $platform['name'],
+        //             'logo' => $platform['logo'],
+        //         ]
+        //     );
+        // }
+
+
+
+          $users = User::all();
+
+    if ($users->isEmpty()) {
+        $users = User::factory()->count(5)->create();
+    }
+
+    foreach ($users as $user) {
+        for ($i = 0; $i < 10; $i++) {
+            WalletTransaction::create([
+                'code' =>  random_int(100000, 999999),
+                'amount' => rand(100, 10000) / 100, 
+                'status' => ['approved' , 'rejected' , 'pending'][rand(0, 2)],
+                'type' => ['referral_link' , 'discount_code' , 'withdraw'][rand(0, 2)],
+                'user_id' => $user->id,
+            ]);
         }
+    }
 
 
         
