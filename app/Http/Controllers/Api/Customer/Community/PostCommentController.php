@@ -197,9 +197,12 @@ public function getCommentsByPost(Request $request , $id)
         }
     }
 
-    if ($this->indexPaginat()) {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 20);
+
+
+        $query->orderBy('created_at', 'desc');
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
@@ -216,14 +219,7 @@ public function getCommentsByPost(Request $request , $id)
             (static::RESOURCE)::collection($data),
             $pagination
         );
-    }
-
-    return jsonResponse(
-        true,
-        200,
-        __('messages.success'),
-        (static::RESOURCE)::collection($query->get())
-    );
+ 
 }
 
 
