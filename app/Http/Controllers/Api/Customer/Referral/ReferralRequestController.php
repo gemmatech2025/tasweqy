@@ -47,7 +47,7 @@ class ReferralRequestController extends BaseController
 
 
 
-      public function store(Request $request)
+    public function store(Request $request)
     {
         $reqClass      = static::REQUEST;
         $effectiveRequest = $reqClass !== Request::class

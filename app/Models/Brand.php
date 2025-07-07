@@ -41,4 +41,14 @@ class Brand extends Model
     {
         return $this->hasMany(DiscountCode::class);
     }
+
+
+    public function referralRequests()
+    {
+        return $this->hasMany(ReferralRequest::class);
+    }
+
+
+
+    
 }

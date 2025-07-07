@@ -147,10 +147,12 @@ class BrandController extends Controller
                 $q->where('user_id', $userId);
             });
         })
-        ->whereHas('discountCodes', function ($query) use ($userId) {
+        ->orWhereHas('discountCodes', function ($query) use ($userId) {
             $query->whereHas('referralEarning', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             });
+        })->orWhereHas('referralRequests', function ($query) use ($userId) {
+            $query->where('user_id', $userId);  
         }); 
 
 
