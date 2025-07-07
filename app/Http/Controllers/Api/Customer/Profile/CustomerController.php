@@ -90,15 +90,26 @@ class CustomerController extends Controller
 
             if($customer){
 
-                if($request->phone !=  $customer->phone ){
-                    $user->phone_verified_at = null;
+                if ($request->phone && $request->phone != $customer->phone) {
+                    $user->phone_verified_at = null; // Reset phone verification if phone changed
+                    $user->phone = $request->phone;
+                    $user->code = $request->code ?? $user->code;
                 }
-                $customer->country_id = $request->country_id;
-                $customer->birthdate = $request->birthdate;
-                $customer->gender = $request->gender;
-                $user->phone = $request->phone;
-                $user->code = $request->code;
-                $customer->save();
+
+                // Get the allowed customer fields from the request
+                $customerData = $request->only('country_id', 'birthdate', 'gender', 'phone', 'code');
+
+                // dd($customer);
+
+                // Update customer with the provided data
+                $customer->update($customerData);
+
+                // $customer->country_id = $request->country_id;
+                // $customer->birthdate = $request->birthdate;
+                // $customer->gender = $request->gender;
+                // $user->phone = $request->phone;
+                // $user->code = $request->code;
+                // $customer->save();
             }else{
 
                 $customer = Customer::create([
