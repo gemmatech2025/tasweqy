@@ -23,27 +23,6 @@ class BrandDetailsCustomerResource   extends JsonResource
 
         $user = Auth::user();
 
-        // $referralLinkEarnings = $this->referralLinks()
-        //     ->whereHas('referralEarning', function ($q) use ($user) {
-        //         $q->where('user_id', $user->id);
-        //     })
-        //     ->with(['referralEarning' => function ($q) use ($user) {
-        //         $q->where('user_id', $user->id);
-        //     }])
-        //     ->get()
-        //     ->sum(fn ($link) => $link->referralEarning->total_earnings ?? 0);
-
-        // $discountCodeEarnings = $this->discountCodes()
-        //     ->whereHas('referralEarning', function ($q) use ($user) {
-        //         $q->where('user_id', $user->id);
-        //     })
-        //     ->with(['referralEarning' => function ($q) use ($user) {
-        //         $q->where('user_id', $user->id);
-        //     }])
-        //     ->get()
-        //     ->sum(fn ($code) => $code->referralEarning->total_earnings ?? 0);
-
-
         $referralLinks = $this->referralLinks()
         ->whereHas('referralEarning', function ($q) use ($user) {
             $q->where('user_id', $user->id);

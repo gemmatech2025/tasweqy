@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Customer\Brand\BrandController;
 use App\Http\Controllers\Api\Customer\Wallet\WalletController;
 use App\Http\Controllers\Api\Customer\Notification\NotificationController;
 
+use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 
 
 Route::middleware(['set-locale'])->group(function () {
@@ -190,7 +191,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-        
+  Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
+    Route::get('/', 'index');
+  });
 
    
 
