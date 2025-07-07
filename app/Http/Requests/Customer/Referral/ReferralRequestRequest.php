@@ -18,7 +18,7 @@ class ReferralRequestRequest extends FormRequest
     {
         return [
             'brand_id'          => 'required|exists:brands,id',
-            'type'              => 'required|in:discount_code,referal_link',
+            'type'              => 'required|in:discount_code,referral_link',
         ];
 
 

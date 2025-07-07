@@ -9,6 +9,8 @@ class SocialMediaPlatformSeeder extends Seeder
 {
     public function run(): void
     {
+
+        SocialMediaPlatform::all()->delete();
         $platforms = [
             [
                 'name' => [
@@ -22,14 +24,7 @@ class SocialMediaPlatformSeeder extends Seeder
                     'en' => 'Instagram',
                     'ar' => 'إنستغرام'
                 ],
-                'logo' => 'logos/instagram.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'TikTok',
-                    'ar' => 'تيك توك'
-                ],
-                'logo' => 'logos/tiktok.png'
+                'logo' => 'logos/Instagram.png'
             ],
             [
                 'name' => [
@@ -38,27 +33,8 @@ class SocialMediaPlatformSeeder extends Seeder
                 ],
                 'logo' => 'logos/snapchat.png'
             ],
-            [
-                'name' => [
-                    'en' => 'YouTube',
-                    'ar' => 'يوتيوب'
-                ],
-                'logo' => 'logos/youtube.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'X (Twitter)',
-                    'ar' => 'تويتر (X)'
-                ],
-                'logo' => 'logos/x.png'
-            ],
-            [
-                'name' => [
-                    'en' => 'LinkedIn',
-                    'ar' => 'لينكد إن'
-                ],
-                'logo' => 'logos/linkedin.png'
-            ],
+       
+   
             [
                 'name' => [
                     'en' => 'Telegram',
@@ -73,13 +49,14 @@ class SocialMediaPlatformSeeder extends Seeder
                 ],
                 'logo' => 'logos/whatsapp.png'
             ],
-            [
+                [
                 'name' => [
-                    'en' => 'Pinterest',
-                    'ar' => 'بينترست'
+                    'en' => 'Messanger',
+                    'ar' => 'ماسنجر'
                 ],
-                'logo' => 'logos/pinterest.png'
+                'logo' => 'logos/messanger.png'
             ],
+
         ];
 
         foreach ($platforms as $platform) {
