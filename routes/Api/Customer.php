@@ -24,6 +24,12 @@ use App\Http\Controllers\Api\Customer\Notification\NotificationController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 
 
+
+
+
+use App\Http\Controllers\Api\Customer\Chat\ChatController;
+
+
 Route::middleware(['set-locale'])->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
@@ -194,7 +200,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
     Route::get('/', 'index');
   });
+  Route::controller(ChatController::class)->prefix('chat-messages')->group(function () {
+    Route::post('/send', 'sendMessage');
+    Route::get('/get-my-messages', 'getMessages');
 
+    
+  });
    
 
     });

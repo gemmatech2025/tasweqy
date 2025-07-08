@@ -113,6 +113,8 @@ class ReferralEarningSeeder extends Seeder
                 'status' => ['approved' , 'rejected' , 'pending'][rand(0, 2)],
                 'type' => ['referral_link' , 'discount_code' , 'withdraw'][rand(0, 2)],
                 'user_id' => $user->id,
+                'transatable_type',
+                'transatable_id',
             ]);
         }
     }

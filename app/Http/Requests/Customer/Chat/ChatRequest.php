@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Admin\Auth;
+namespace App\Http\Requests\Customer\Chat;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LoginRequest extends FormRequest
+class ChatRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,23 +21,21 @@ class LoginRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+
+
+       public function rules(): array
     {
+        
 
         return [
-            'email' => 'required|email|exists:users,email',
-            // 'phone' => 'nullable|exists:users,phone|required_without:email',
-            // 'code' => 'nullable|numeric|required_without:email',
-
-            'fcmToken'   => 'nullable|required_with:deviceType|string|max:255',
-            'deviceType' => 'nullable|required_with:fcmToken|string|max:255',
-            'password' => 'required|string|min:8',
-
+            'message' => 'required|string|max:500',
         ];
     }
 
 
-    protected function failedValidation(Validator $validator)
+
+
+     protected function failedValidation(Validator $validator)
     {
         $errors = $validator->errors()->toArray();
         $flatErrors = collect($errors)->map(function ($messages) {

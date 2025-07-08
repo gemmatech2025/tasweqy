@@ -51,6 +51,21 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('authToken')->plainTextToken;
+            if( $request->deviceType && $request->fcmToken){
+            $fcmToken = FcmToken::where('deviceType' ,$request->deviceType)->where('user_id' , $user->id)->first();
+            if($fcmToken){
+            $fcmToken->fcm_token = $request->fcmToken;
+            $fcmToken->save();
+            }else{
+                $fcm = FcmToken::create([
+                    'deviceType'   => $request->deviceType,
+                    'fcm_token'    => $request->fcmToken , 
+                    'user_id'      => $user->id ,
+                    ]);
+            }   
+            }
+
+
             DB::commit();
             return jsonResponse( true ,  200 ,__('messages.login_success') ,  ['user' => new UserResource($user) , 'token' => $token] );    
         }
