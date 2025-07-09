@@ -36,6 +36,8 @@ class ReferralLinksImport implements ToModel, WithHeadingRow
                 'brand_id'            => $this->brand_id,
                 'link'                => $row['link'],
                 'earning_precentage'  => $row['earning'],
+                'earning_precentage'  => $row['earning'],
+                'link_code'           => $row['link_code'] ?? null,
             ]);
         }
 

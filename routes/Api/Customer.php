@@ -200,11 +200,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
     Route::get('/', 'index');
   });
+
+
   Route::controller(ChatController::class)->prefix('chat-messages')->group(function () {
     Route::post('/send', 'sendMessage');
     Route::get('/get-my-messages', 'getMessages');
-
-    
   });
    
 

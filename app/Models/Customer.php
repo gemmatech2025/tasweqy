@@ -16,10 +16,12 @@ class Customer extends Model
         'gender',
         'total_balance',
         'is_verified',
+        'is_blocked'
     ];
 
 
      protected $casts = [
+        'is_blocked' => 'boolean',
         'is_verified' => 'boolean',
         'birthdate'   => 'date',
         'total_balance' => 'decimal:2',

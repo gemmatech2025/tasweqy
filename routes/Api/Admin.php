@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralRequestController;
+use App\Http\Controllers\Api\Admin\Customer\CustomerController;
+use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
 
 
 
@@ -141,6 +143,29 @@ Route::middleware(['auth:sanctum'])->group(function () {
    
 
         });
+
+
+        Route::controller(CustomerController::class)->prefix('customers')->group(function () {
+            
+            
+    // public function walletWithdrawRequests(Request $request , $id)
+            Route::get('/wallet-requests/{id}', 'walletWithdrawRequests');
+
+            Route::get('/get-referrals/{id}/{type}', 'getAllReferral');
+            
+            Route::get('/', 'getCustomers');
+            Route::get('/{id}', 'show');
+
+
+
+
+        });
+     Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
+            Route::get('/get-info', 'dashboardInfo');
+            Route::get('/{id}', 'show');
+        });
+
+        
 
    
 

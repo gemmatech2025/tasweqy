@@ -24,7 +24,7 @@ class ReferralLinksExportTemplate implements FromCollection, WithHeadings, WithS
 
     public function headings(): array
     {
-        return ['Earning %', 'Link'];
+        return ['Earning %', 'Link' , 'link_code'];
     }
 
 
@@ -33,7 +33,7 @@ class ReferralLinksExportTemplate implements FromCollection, WithHeadings, WithS
     public function styles(Worksheet $sheet)
     {
 
-        $sheet->getStyle('A1:B1')->applyFromArray([
+        $sheet->getStyle('A1:B1:C1')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -55,6 +55,8 @@ class ReferralLinksExportTemplate implements FromCollection, WithHeadings, WithS
         return [
             'A' => 20, 
             'B' => 50, 
+            'C' => 20, 
+
         ];
     }
 
