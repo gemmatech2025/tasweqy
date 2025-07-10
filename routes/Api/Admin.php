@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Admin\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Admin\Customer\CustomerController;
 use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
 
+use App\Http\Controllers\Api\Admin\Customer\ChatController;
 
 
 
@@ -54,6 +55,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
         Route::controller(ApprovalRequestController::class)->prefix('approval-requests')->group(function () {
+
+
+            
+            Route::get('/get-customer-requests/{customer_id}', 'getApprovalRequestsByCustomerId');
+
             Route::get('/', 'getRequests');
             Route::get('/{id}', 'show');
             Route::delete('/{id}', 'delete');
@@ -149,6 +155,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
             
     // public function walletWithdrawRequests(Request $request , $id)
+
+    
+            Route::get('/get-brands/{id}', 'getBrands');
+
             Route::get('/wallet-requests/{id}', 'walletWithdrawRequests');
 
             Route::get('/get-referrals/{id}/{type}', 'getAllReferral');
@@ -165,6 +175,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', 'show');
         });
 
+
+
+        Route::controller(ChatController::class)->prefix('chat')->group(function () {
+            Route::post('/send-message', 'sendMessage');
+            Route::get('/get-messages-by-user/{user_id}', 'getMessagesByUserId');
+            Route::get('/get-chats', 'getChats');
+
+        });
+
         
 
    
@@ -177,26 +196,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 
-// Route::get('export', [DiscountCodeController::class, 'exportDiscountCodesTemplate']);
-
-
-
-
 });
-
-
-
-//   Route::controller(WhatsappController::class)->prefix('whatsapp')->group(function () {
-//             Route::post('/create-session', 'createSession');
-//             Route::delete('/delete-session/{id}', 'deleteSession');
-//             Route::get('/get-all-sessions', 'getSessions');
-//             Route::get('/get-session/{id}', 'getSessionDetails');
-
-
-// });
-
-
-
 
 
 

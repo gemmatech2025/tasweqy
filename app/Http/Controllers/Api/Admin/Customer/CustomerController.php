@@ -23,6 +23,7 @@ use App\Http\Resources\Admin\Customer\CustomerResource;
 use App\Http\Resources\Admin\Customer\CustomerDetailsResource;
 use App\Http\Resources\Admin\Customer\ReferralEarningResource;
 use App\Http\Resources\Admin\Customer\WithdrawRequestResource;
+use App\Http\Resources\Admin\Customer\BrandResource;
 
 
 
@@ -30,6 +31,7 @@ use App\Models\DiscountCode;
 use App\Models\ReferralLink;
 
 use App\Models\ReferralEarning;
+use App\Models\Brand;
 
 
 class CustomerController extends Controller
@@ -51,7 +53,17 @@ class CustomerController extends Controller
         $query =Customer::query();
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-        return jsonResponse(true, 200, __('messages.success' ),  CustomerResource::collection($data));
+
+
+         $pagination = [
+                'total' => $data->total(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'last_page' => $data->lastPage(),
+            ];
+
+
+        return jsonResponse(true, 200, __('messages.success' ),  CustomerResource::collection($data) ,$pagination);
     }
 
 
@@ -136,4 +148,114 @@ class CustomerController extends Controller
             return jsonResponse(true, 200, __('messages.success' ), WithdrawRequestResource::collection($data) ,$pagination);
       
     }
+
+
+
+    // public function getBrands(Request $request , $id)
+    // {
+    //     $page = $request->input('page', 1);
+    //     $perPage = $request->input('per_page', 20);
+    //     $customer = Customer::find($id); 
+        
+    //     if(!$customer){
+    //         return jsonResponse(false, 404, __('messages.not_found'));
+    //     }      
+    
+    //         $query = Brand::whereHas('referralLinks' , function ($query) {
+    //             $query->whereHas('referralEarnings', function ($q) {
+    //                 $q->where('user_id',$customer->user->id);
+    //             });
+    //         })->orWhereHas('discountCodes', function ($query) {
+    //             $query->whereHas('referralEarnings', function ($q) {
+    //                 $q->where('user_id',$customer->user->id);
+    //             });
+    //         })->orderByDesc('created_at');
+
+    //         $data = $query->paginate($perPage, ['*'], 'page', $page);
+    //         $pagination = [
+    //             'total' => $data->total(),
+    //             'current_page' => $data->currentPage(),
+    //             'per_page' => $data->perPage(),
+    //             'last_page' => $data->lastPage(),
+    //         ];
+
+    //         return jsonResponse(true, 200, __('messages.success' ), WithdrawRequestResource::collection($data) ,$pagination);
+      
+    // }
+
+
+
+
+    public function getBrands(Request $request , $id)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
+
+        $customer = Customer::find($id); 
+        
+        if(!$customer){
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }      
+
+        $userId = $customer->user->id;
+
+        $query = Brand::where(function ($q) use ($userId) {
+            $q->whereHas('referralLinks', function ($query) use ($userId) {
+                $query->whereHas('referralEarning', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                });
+            })->orWhereHas('discountCodes', function ($query) use ($userId) {
+                $query->whereHas('referralEarning', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                });
+            });
+        })->orderByDesc('created_at');
+
+
+
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        foreach ($data as $brand) {
+
+            $brandId = $brand->id;
+            $brand->total_clients = ReferralEarning::whereHas('referrable', function ($q) use ($brandId) {
+                    $q->where('brand_id', $brandId);
+                })
+                ->where('user_id', $userId)
+                ->sum('total_clients');
+
+
+            $brand->total_earnigns = ReferralEarning::whereHas('referrable', function ($q) use ($brandId) {
+                    $q->where('brand_id', $brandId);
+                })
+                ->where('user_id', $userId)
+                ->sum('total_earnings');
+
+            $firstJoin = ReferralEarning::whereHas('referrable', function ($q) use ($brandId) {
+                    $q->where('brand_id', $brandId);
+                })
+                ->where('user_id', $userId)
+                ->orderBy('created_at', 'asc')->first();
+            
+
+            if($firstJoin){
+                $brand->first_join = $firstJoin ? $firstJoin->created_at->format('F j, Y g:i A') : null;
+            } else {
+                $brand->first_join = null;
+            }
+            
+            
+
+        }
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        return jsonResponse(true, 200, __('messages.success'), BrandResource::collection($data), $pagination);
+    }
+
 }

@@ -11,8 +11,12 @@ use App\Models\AccountVerificationRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\General\CountryRequest;
 use App\Http\Resources\Admin\Customer\AccountVerificationRequestResource;
+use App\Http\Resources\Admin\Customer\VerificationRequestResource;
+
+
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
 
 
 
@@ -47,7 +51,7 @@ class ApprovalRequestController extends Controller
 
     public function show($id)
     {
-        $request = AccountVerificationRequest::with(['user' , 'approver'])->find($id); 
+        $request = AccountVerificationRequest::with(['approver'])->find($id); 
         if(!$request){
         return jsonResponse(false, 404, __('messages.not_found'));
         }      
@@ -76,33 +80,31 @@ class ApprovalRequestController extends Controller
 
     public function updateApproval(UpdateAccountApprovalRequest $request ,$id)
     {
-        $approvalRequest = AccountVerificationRequest::with(['user' , 'approver'])->find($id); 
+        $approvalRequest = AccountVerificationRequest::find($id); 
         if(!$approvalRequest){
         return jsonResponse(false, 404, __('messages.not_found'));
-        }   
+        }  
+        if($request->new_status == 'rejected'){
+            $approvalRequest->status = 'rejected';
+            $approvalRequest->reason = $request->reason;
+            $approvalRequest->approved_by = Auth::id();
 
-
-
-        if($request->value == '1'){
-        $approvalRequest->approved = '1';
-        $approvalRequest->approved_by = Auth::id();
-
-
-        
-        $customer =$approvalRequest->user->customer;
-        if($customer){
-            $customer->is_verified = '1';
-            $customer->save();
-        }
-
-
-        $approvalRequest->save();
-        }else{
-            $approvalRequest->approved = '0';
-            $approvalRequest->approved_by = null;
             $customer =$approvalRequest->user->customer;
             if($customer){
                 $customer->is_verified = '0';
+                $customer->save();
+            }
+            $approvalRequest->save();
+
+
+        }else if($request->new_status == 'approved' ){
+            $approvalRequest->status = $request->new_status;
+            $approvalRequest->approved_by = Auth::id();
+            $approvalRequest->reason = null; // Clear reason if approved
+
+            $customer =$approvalRequest->user->customer;
+            if($customer){
+                $customer->is_verified = '1';
                 $customer->save();
             }
             $approvalRequest->save();
@@ -112,4 +114,39 @@ class ApprovalRequestController extends Controller
         return jsonResponse(true, 200, __('messages.updates_successfully' ));
 
     }
+
+
+
+
+        public function getApprovalRequestsByCustomerId(Request $request ,$customer_id)
+        {
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 20);
+
+
+
+
+            $customer = Customer::find($customer_id); 
+            if(!$customer){
+            return jsonResponse(false, 404, __('messages.not_found'));
+        
+        }
+            $requests = AccountVerificationRequest::where('user_id', $customer->user_id); 
+            $data = $requests->paginate($perPage, ['*'], 'page', $page);
+
+            $pagination = [
+                    'total' => $data->total(),
+                    'current_page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'last_page' => $data->lastPage(),
+                ];
+
+        
+            return jsonResponse(true, 200, __('messages.success') , VerificationRequestResource::collection($data), $pagination);
+
+    }
+
+
+
+    
 }

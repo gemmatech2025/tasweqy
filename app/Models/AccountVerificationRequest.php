@@ -16,23 +16,15 @@ class AccountVerificationRequest extends Model
         'front_image',
         'back_image',
         'user_id',
-        'approved',
+        'reason',
+        'status',
         'approved_by',
     ];
 
-
-
-
-    protected $casts = [
-    'approved' => 'boolean',
-];
-
- 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
 
     public function approver()
     {

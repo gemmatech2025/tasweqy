@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Admin\Customer;
+namespace App\Http\Requests\Admin\Chat;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class UpdateAccountApprovalRequest extends FormRequest
+class MessageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,17 @@ class UpdateAccountApprovalRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+       public function rules(): array
     {
-
-
+        
 
         return [
-            'new_status'         => 'required|in:approved,rejected',
-            'reason'             => 'required_if:new_status,rejected|string|max:255',
+            'message' => 'required|string|max:500',
+            'customer_id' => 'required|exists:customers,id',
+        
         ];
     }
+
 
 
     protected function failedValidation(Validator $validator)
