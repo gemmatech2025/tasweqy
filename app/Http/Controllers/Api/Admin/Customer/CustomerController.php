@@ -29,6 +29,8 @@ use App\Http\Resources\Admin\Customer\BrandResource;
 
 use App\Models\DiscountCode;
 use App\Models\ReferralLink;
+use App\Models\UserBlock;
+
 
 use App\Models\ReferralEarning;
 use App\Models\Brand;
@@ -151,41 +153,6 @@ class CustomerController extends Controller
 
 
 
-    // public function getBrands(Request $request , $id)
-    // {
-    //     $page = $request->input('page', 1);
-    //     $perPage = $request->input('per_page', 20);
-    //     $customer = Customer::find($id); 
-        
-    //     if(!$customer){
-    //         return jsonResponse(false, 404, __('messages.not_found'));
-    //     }      
-    
-    //         $query = Brand::whereHas('referralLinks' , function ($query) {
-    //             $query->whereHas('referralEarnings', function ($q) {
-    //                 $q->where('user_id',$customer->user->id);
-    //             });
-    //         })->orWhereHas('discountCodes', function ($query) {
-    //             $query->whereHas('referralEarnings', function ($q) {
-    //                 $q->where('user_id',$customer->user->id);
-    //             });
-    //         })->orderByDesc('created_at');
-
-    //         $data = $query->paginate($perPage, ['*'], 'page', $page);
-    //         $pagination = [
-    //             'total' => $data->total(),
-    //             'current_page' => $data->currentPage(),
-    //             'per_page' => $data->perPage(),
-    //             'last_page' => $data->lastPage(),
-    //         ];
-
-    //         return jsonResponse(true, 200, __('messages.success' ), WithdrawRequestResource::collection($data) ,$pagination);
-      
-    // }
-
-
-
-
     public function getBrands(Request $request , $id)
     {
         $page = $request->input('page', 1);
@@ -257,5 +224,196 @@ class CustomerController extends Controller
 
         return jsonResponse(true, 200, __('messages.success'), BrandResource::collection($data), $pagination);
     }
+
+
+
+    public function getBlockedCustomers(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
+
+
+        $query = Customer::where('is_blocked', true);
+
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        $blockedCustomers = [];
+
+        foreach ($data as $customer) {
+
+            $blockDetails = UserBlock::where('customer_id', $customer->id)
+                ->where('type', 'block')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if (!$blockDetails) {
+
+                $customer->is_blocked = false;
+                $customer->save();
+
+                continue;
+            }
+
+            $hasUnblockAfter = UserBlock::where('customer_id', $customer->id)
+                ->where('type', 'unblock')
+                ->where('created_at', '>', $blockDetails->created_at)
+                ->exists();
+
+            if ($hasUnblockAfter) {
+                $customer->is_blocked = false;
+                $customer->save();
+                continue;
+            }
+
+            $user = $customer->user;
+
+            $blockedCustomers[] = [
+                'customer_id' => $customer->id,
+
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'code' => $user->code,
+
+
+                'block_id' => $blockDetails->id,
+
+
+                'block_created_at' => $blockDetails->created_at->format('F j, Y g:i A'),
+                'block_reason' => $blockDetails->reason,
+                'creator' => $blockDetails->creator->name,
+
+
+            ];
+
+
+
+        }
+
+
+        return jsonResponse(true, 200, __('messages.success'),$blockedCustomers, $pagination);
+    }
+
+
+
+
+    public function getBlockedCustomerDetails($id)
+    {
+        $blockData = UserBlock::find($id);
+        if (!$blockData) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+        $user = $blockData->customer->user;
+        $data = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'code' => $user->code,
+            'block_id' => $blockData->id,
+            'customer_id' => $blockData->customer_id,
+            'type' => $blockData->type,
+            'reason' => $blockData->reason,
+            'creator' => $blockData->creator ? [
+                'id' => $blockData->creator->id,
+                'name' => $blockData->creator->name,
+            ] : null,
+             'images'                => $blockData->images->map(function ($image){
+                    return [
+                        'id' => $image->id,
+                        'image' => asset($image->image),
+                    ];
+                 }) ,
+            'created_at' => $blockData->created_at->format('F j, Y g:i A'),
+        ];
+        return jsonResponse(true, 200, __('messages.success'),$data);
+    }
+
+
+    // public function getDistinguishedCustomers(Request $request)
+    // {
+    //     $page = $request->input('page', 1);
+    //     $perPage = $request->input('per_page', 20);
+    //     $query = Customer::select('customers.*')
+    //         ->join('users', 'users.id', '=', 'customers.user_id')
+    //         ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
+    //         ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings')
+    //         ->selectRaw('SUM(referral_earnings.total_clients) as total_clients')
+    //         ->groupBy('customers.id')
+    //         ->orderByDesc('total_earnings');
+    //     $data = $query->paginate($perPage, ['*'], 'page', $page)->map((function ($customer) {
+    //         // $firstJoin = ReferralEarning::where('user_id', $customer->user_id)
+    //         //     ->orderBy('created_at', 'asc')->first();
+    //         // $customer->first_join = $firstJoin ? $firstJoin->created_at->format('F j, Y g:i A') : null;
+    //         return [
+    //             'id' => $customer->id,
+    //             'name' => $customer->user->name,
+    //             'email' => $customer->user->email,
+    //             'phone' => $customer->user->phone,
+    //             'code' => $customer->user->code,
+    //             'total_earnings' => $customer->total_earnings ?? 0,
+    //             'total_clients' => $customer->total_clients ?? 0,
+    //         ];
+    //     }));
+
+
+
+
+    //      $pagination = [
+    //             'total' => $data->total(),
+    //             'current_page' => $data->currentPage(),
+    //             'per_page' => $data->perPage(),
+    //             'last_page' => $data->lastPage(),
+    //         ];
+
+
+    //     return jsonResponse(true, 200, __('messages.success' ),  $data ,$pagination);
+    // }
+
+    public function getDistinguishedCustomers(Request $request)
+{
+    $page = $request->input('page', 1);
+    $perPage = $request->input('per_page', 20);
+
+    $query = Customer::select('customers.*')
+        ->join('users', 'users.id', '=', 'customers.user_id')
+        ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
+        ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings')
+        ->selectRaw('SUM(referral_earnings.total_clients) as total_clients')
+        ->groupBy('customers.id')
+        ->orderByDesc('total_earnings');
+
+    $customers = $query->paginate($perPage, ['*'], 'page', $page);
+
+    $data = $customers->map(function ($customer) {
+        return [
+            'id' => $customer->id,
+            'name' => $customer->user->name,
+            'email' => $customer->user->email,
+            'phone' => $customer->user->phone,
+            'code' => $customer->user->code,
+            'total_earnings' => $customer->total_earnings ?? 0,
+            'total_clients' => $customer->total_clients ?? 0,
+        ];
+    });
+
+    $pagination = [
+        'total' => $customers->total(),
+        'current_page' => $customers->currentPage(),
+        'per_page' => $customers->perPage(),
+        'last_page' => $customers->lastPage(),
+    ];
+
+    return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
+}
+
+
 
 }

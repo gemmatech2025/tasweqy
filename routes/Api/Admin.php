@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Admin\Customer\CustomerController;
 use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
 
 use App\Http\Controllers\Api\Admin\Customer\ChatController;
+use App\Http\Controllers\Api\Admin\Customer\UserBlockController;
 
 
 
@@ -155,14 +156,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
             
     // public function walletWithdrawRequests(Request $request , $id)
-
     
+            Route::get('/get-distinguished-customer', 'getDistinguishedCustomers');
+
+            Route::get('/get-blocked-customer-details/{id}', 'getBlockedCustomerDetails');
+            Route::get('/get-blocked-customers', 'getBlockedCustomers');
             Route::get('/get-brands/{id}', 'getBrands');
-
             Route::get('/wallet-requests/{id}', 'walletWithdrawRequests');
-
             Route::get('/get-referrals/{id}/{type}', 'getAllReferral');
-            
             Route::get('/', 'getCustomers');
             Route::get('/{id}', 'show');
 
@@ -183,6 +184,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-chats', 'getChats');
 
         });
+
+
+
+
+
+
+        Route::controller(UserBlockController::class)->prefix('user-blocks')->group(function () {
+        
+
+
+            
+
+            Route::get('/get-customer-blocks/{id}', 'getCustomersBlocks');
+
+
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+
+
+
+
+
+        });
+
+        
 
         
 
