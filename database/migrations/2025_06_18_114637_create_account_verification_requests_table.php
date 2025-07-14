@@ -21,12 +21,14 @@ return new class extends Migration
             $table->string('back_image')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
-            $table->boolean('approved')->default(false);
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->foreign('approved_by')
                 ->references('id')
                 ->on('users')
                 ->nullOnDelete();
+
+            $table->string('reason')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

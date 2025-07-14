@@ -21,10 +21,8 @@ return new class extends Migration
             $table->enum('gender' , ['male' , 'female']);
             $table->decimal('total_balance' , 10,2)->default(0);
             $table->boolean('is_verified')->default(false);
-            // $table->timestamp('phone_verified_at')->nullable();
-            // $table->string('phone')->nullable();
-            // $table->string('code')->nullable();
-            // $table->unique(['code', 'phone']);
+            $table->boolean('is_blocked')->default(false);
+
             $table->timestamps();
         });
     }

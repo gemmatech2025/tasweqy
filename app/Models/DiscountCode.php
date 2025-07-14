@@ -10,7 +10,8 @@ class DiscountCode extends Model
     [
         'brand_id',
         'code' ,
-        'earning_precentage'
+        'earning_precentage',
+        'inactive_reason',
     ];
     // public $timestamps = false;
 

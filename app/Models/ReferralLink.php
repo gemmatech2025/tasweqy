@@ -11,6 +11,7 @@ class ReferralLink extends Model
         'link_code',
         'brand_id',
         'link' ,
+        'inactive_reason',
         'earning_precentage'
     ];
 

@@ -18,6 +18,11 @@ return new class extends Migration
             $table->decimal('earning_precentage' ,4,2 );
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->integer('clients')->default(0);
+            $table->enum('status', ['active', 'inactive', 'expired'])
+                ->default('active'); 
+            $table->string('inactive_reason')->nullable()->after('status');  
+
+            $table->timestamps();
         });
     }
 

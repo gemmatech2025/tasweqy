@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('type' ,['referral_link' , 'discount_code' , 'withdraw']);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
+            $table->morphs('transatable');
 
             $table->timestamps();
         });

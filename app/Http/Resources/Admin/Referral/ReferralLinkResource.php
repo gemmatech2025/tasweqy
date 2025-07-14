@@ -43,6 +43,7 @@ class ReferralLinkResource extends JsonResource
                                                     'code' => $customer->code , 
 
                                                     ]:null,
+            'inactive_reason'       => $this->inactive_reason,
 
 
             'last_event'            => $lastEvent ? $lastEvent->created_at->format('F j, Y g:i A') :null

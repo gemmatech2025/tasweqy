@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('media')->nullable();
             $table->boolean('is_read')->default(false);
             $table->dateTime('read_at')->nullable();
+             $table->foreignId('to_user_id')
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

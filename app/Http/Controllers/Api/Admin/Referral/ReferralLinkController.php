@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\Admin\Referral\ImportReferralLinkRequest;
 use App\Http\Requests\Admin\Referral\ReferralLinkRequest;
+use App\Http\Requests\Admin\Referral\UpdateLinkStatusRequest;
+
+
 
 use App\Http\Requests\Admin\Referral\ReferralLinkListRequest;
 
@@ -198,7 +201,7 @@ class ReferralLinkController extends BaseController
     }
 
 
-    public function updateStatus(Request $request , $id){
+    public function updateStatus(UpdateLinkStatusRequest $request , $id){
     
 
         $referralLink = ReferralLink::find($id);
@@ -207,7 +210,15 @@ class ReferralLinkController extends BaseController
             return jsonResponse(false, 404, __('messages.not_found'));
         }
 
-        $referralLink->status = $status;
+
+        if($request->status == 'inactive'){
+        $referralLink->inactive_reason = $request->reason;
+        } else {
+            $referralLink->inactive_reason = null;
+
+        }
+
+        $referralLink->status = $request->status;
         $referralLink->save();
 
         return jsonResponse(

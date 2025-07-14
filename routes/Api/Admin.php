@@ -98,7 +98,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-numbers', 'getReferralLinksNumbers');
 
 
-            Route::put('/{update-status/id}', 'updateStatus');
+            Route::put('/update-status/{id}', 'updateStatus');
 
             Route::get('/export-template', 'exportReferralLinksTemplate');
             Route::post('/import-data', 'importReferralLinks');
