@@ -21,7 +21,7 @@ return new class extends Migration
   $table->enum('status', ['active', 'inactive', 'expired'])
                 ->default('active'); 
                             $table->string('link_code');
-            $table->string('inactive_reason')->nullable()->after('status');  
+            $table->string('inactive_reason')->nullable();  
 
                 $table->timestamps();
         });

@@ -22,7 +22,6 @@ return new class extends Migration
             $table->morphs('referrable');
             $table->integer('total_clients')->default(0);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
-                        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');  
 
             $table->timestamps();
         });
