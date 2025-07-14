@@ -20,7 +20,7 @@ class WithdrawRequestRequest extends FormRequest
             'total'   => 'required|numeric|min:1',
 
 
-            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'bank_account_id' => 'nullable|exists:bank_info,id',
             'paypal_account_id' => 'nullable|exists:paypal_accounts,id',
 
 

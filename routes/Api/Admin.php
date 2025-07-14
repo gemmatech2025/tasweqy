@@ -93,9 +93,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
       Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
+
+        
+            Route::get('/get-numbers', 'getReferralLinksNumbers');
+
+
+            Route::put('/{update-status/id}', 'updateStatus');
+
             Route::get('/export-template', 'exportReferralLinksTemplate');
             Route::post('/import-data', 'importReferralLinks');
+            Route::post('/store-list', 'storeList');
+            
             Route::post('/', 'store');
+
+            
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
@@ -104,22 +115,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
 
-      Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
-        
+        Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
         
             Route::get('/export-template', 'exportDiscountCodesTemplate');
             Route::post('/import-data', 'importDiscountCodes');
-
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
-
-
-
-
-
         });
 
         Route::controller(SocialMediaPlatformController::class)->prefix('social-media-platforms')->group(function () {
@@ -130,35 +134,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
 
-
-
-
-
         });
 
-
-        
-           Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
+        Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
             Route::put('/update-status/{request_id}/{status}', 'updateRequestStatus');
-   
-
         });
 
-       Route::controller(ReferralRequestController::class)->prefix('referral-requests')->group(function () {
+        Route::controller(ReferralRequestController::class)->prefix('referral-requests')->group(function () {
             Route::post('/assign-referral', 'assifnReferralToCustomer');
             Route::get('/', 'index');
-   
-
         });
 
 
-        Route::controller(CustomerController::class)->prefix('customers')->group(function () {
-            
-            
-    // public function walletWithdrawRequests(Request $request , $id)
-    
+        Route::controller(CustomerController::class)->prefix('customers')->group(function () {  
             Route::get('/get-distinguished-customer', 'getDistinguishedCustomers');
-
             Route::get('/get-blocked-customer-details/{id}', 'getBlockedCustomerDetails');
             Route::get('/get-blocked-customers', 'getBlockedCustomers');
             Route::get('/get-brands/{id}', 'getBrands');
@@ -166,12 +155,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-referrals/{id}/{type}', 'getAllReferral');
             Route::get('/', 'getCustomers');
             Route::get('/{id}', 'show');
-
-
-
-
         });
-     Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
+
+
+        Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
             Route::get('/get-info', 'dashboardInfo');
             Route::get('/{id}', 'show');
         });
@@ -186,36 +173,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
 
-
-
-
-
         Route::controller(UserBlockController::class)->prefix('user-blocks')->group(function () {
-        
-
-
-            
-
             Route::get('/get-customer-blocks/{id}', 'getCustomersBlocks');
-
-
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
-
-
-
-
-
         });
-
-        
-
-        
-
-   
 
     });
 

@@ -12,7 +12,7 @@ class DiscountCode extends Model
         'code' ,
         'earning_precentage'
     ];
-    public $timestamps = false;
+    // public $timestamps = false;
 
 
     public function brand()

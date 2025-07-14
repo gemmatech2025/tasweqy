@@ -3,12 +3,19 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Tracking\TrakingController;
+use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
 
+Route::controller(ReferralLinkController::class)->prefix('refferral')->group(function () {
+            Route::get('/export-template', 'exportReferralLinksTemplate');
+
+});
 
 
 

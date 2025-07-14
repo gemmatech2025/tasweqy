@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\Admin\Referral\ImportReferralLinkRequest;
 use App\Http\Requests\Admin\Referral\ReferralLinkRequest;
+
+use App\Http\Requests\Admin\Referral\ReferralLinkListRequest;
+
+
 use App\Http\Resources\Admin\Referral\ReferralLinkResource;
 use App\Http\Resources\Admin\Referral\ReferralLinkIndexResource;
 
@@ -42,17 +46,44 @@ class ReferralLinkController extends BaseController
     }
 
 
-    public function store(Request $request)
+
+    // public function store(Request $request)
+    // {
+    //         $reqClass      = static::REQUEST;
+    //         $effectiveRequest = $reqClass !== Request::class
+    //             ? app($reqClass)
+    //             : $request;
+
+    //         $validated = method_exists($effectiveRequest, 'validated')
+    //             ? $effectiveRequest->validated()
+    //             : $effectiveRequest->all();
+
+    //         DB::beginTransaction();
+    //         try {
+    //                 ReferralLink::create([
+    //                     'brand_id'            => $request->brand_id,
+    //                     'link'                => $request->link,
+    //                     'earning_precentage'  => $link['earning_precentage'],
+    //                     'link_code'           => $link['link_code'],
+    //                 ]);
+                
+    //             DB::commit();
+    //             return jsonResponse(
+    //                 true, 201, __('messages.add_success'),
+    //             );
+    //     }catch (\Throwable $e) {
+    //             DB::rollBack();
+    //             return jsonResponse(false, 500, __('messages.general_message'), null, null, [
+    //                 'message' => $e->getMessage(),
+    //                 'file'    => $e->getFile(),
+    //                 'line'    => $e->getLine(),
+    //             ]);
+    //     }
+    // }
+
+
+    public function storeList(ReferralLinkListRequest $request)
     {
-            $reqClass      = static::REQUEST;
-            $effectiveRequest = $reqClass !== Request::class
-                ? app($reqClass)
-                : $request;
-
-            $validated = method_exists($effectiveRequest, 'validated')
-                ? $effectiveRequest->validated()
-                : $effectiveRequest->all();
-
             DB::beginTransaction();
             try {
                 foreach($request->links as $link){
@@ -84,52 +115,12 @@ class ReferralLinkController extends BaseController
         $filters = $request->input('filter', []);
         $sortBy = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'asc');
-        $query = $this->getModel()->with($this->getRelations());
-        $columns = \Schema::getColumnListing($this->getModel()->getTable());
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
         
-
-        $filters = array_map(function ($value) {
-            if (is_string($value)) {
-                $lower = strtolower($value);
-                return match ($lower) {
-                    'true' => 1,
-                    'false' => 0,
-                    default => is_numeric($value) ? $value + 0 : $value,
-                };
-            }
-            return $value;
-        }, $filters);
-
-        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
-
-        foreach ($filters as $key => $value) {
-            if (in_array($key, $columns)) {
-                $query->where($key, $value);
-            }
-        }
-
-
-
-        if (!empty($searchTerm)) {
-            $searchableFields = $this->getSearchableFields();
-            $query->where(function ($q) use ($searchableFields, $searchTerm) {
-                foreach ($searchableFields as $field) {
-                    $q->orWhere($field, 'LIKE', "%{$searchTerm}%");
-                }
-            });
-        }
-
-        if ($sortBy && $sortOrder) {
-            $query->orderBy($sortBy, $sortOrder);
-        } else {
-            foreach ($this->getSort() as $sort) {
-                $query->orderBy($sort['sort'], $sort['order']);
-            }
-        }
-
-        if ($this->indexPaginat()) {
-            $page = $request->input('page', 1);
-            $perPage = $request->input('per_page', 20);
+        $query = ReferralLink::query();
+      
+            
             $data = $query->paginate($perPage, ['*'], 'page', $page);
 
             $pagination = [
@@ -146,14 +137,7 @@ class ReferralLinkController extends BaseController
                 (static::RESOURCE)::collection($data),
                 $pagination
             );
-        }
 
-        return jsonResponse(
-            true,
-            200,
-            __('messages.success'),
-            (static::RESOURCE)::collection($query->get())
-        );
     }
 
 
@@ -179,6 +163,64 @@ class ReferralLinkController extends BaseController
             __('messages.Referral_Links_Imported_Successfully'),
         );
     }
+
+
+
+
+
+    public function getReferralLinksNumbers()
+    {
+        $referralLinksCount = ReferralLink::count();
+
+        $usedReferralLinksCount = ReferralLink::whereHas('referralEarning')->count();
+
+        $notUsedReferralLinksCount = ReferralLink::whereDoesntHave('referralEarning')->count();
+
+        $inactiveReferralLinksCount = ReferralLink::where('status', 'inactive')->count();
+
+        $usedReferralLinksThisMonthCount = ReferralLink::whereHas('referralEarning', function ($query) {
+            $query->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
+        })->count();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'referral_links_count' => $referralLinksCount,
+                'used_referral_links_count' => $usedReferralLinksCount,
+                'not_used_referral_links_count' => $notUsedReferralLinksCount,
+                'inactive_referral_links_count' => $inactiveReferralLinksCount,
+                'used_referral_links_this_month_count' => $usedReferralLinksThisMonthCount,
+            ]
+        );
+    }
+
+
+    public function updateStatus(Request $request , $id){
+    
+
+        $referralLink = ReferralLink::find($id);
+
+        if (!$referralLink) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+
+        $referralLink->status = $status;
+        $referralLink->save();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.status_updated_successfully'),
+            new ReferralLinkResource($referralLink)
+        );
+    }
+
+    
+
+
 
 
 

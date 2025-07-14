@@ -34,11 +34,10 @@ class ReferralLinkRequest extends FormRequest
             case 'POST':
                 $rules +=  [
 
-                        'brand_id'                    => 'required|exists:brands,id',
-                        'links'                       => 'required|array',
-                        'links.*.link'                => 'required|url|max:255',
-                        'links.*.earning_precentage'  => 'required|numeric|min:1|max:99',
-                        'link_code'                   => 'required|string|max:255',
+                        'brand_id'            => 'required|exists:brands,id',
+                        'link'                => 'required|url|max:255',
+                        'earning_precentage'  => 'required|numeric|min:1|max:99',
+                        'link_code'           => 'required|string|max:255',
                 ];
                 break;
 
