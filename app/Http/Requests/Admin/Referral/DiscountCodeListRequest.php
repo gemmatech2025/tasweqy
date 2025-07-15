@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DiscountCodeRequest extends FormRequest
+class DiscountCodeListRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,28 +28,12 @@ class DiscountCodeRequest extends FormRequest
         
 
 
-        $rules = array();
-
-        switch ($this->method()) {
-            case 'POST':
-                $rules +=  [
-                        'brand_id'            => 'required|exists:brands,id',
-                        'code'                => 'required|string|max:255',
-                        'earning_precentage'  => 'required|numeric|min:1|max:99',
+        return [
+                        'brand_id'                    => 'required|exists:brands,id',
+                        'codes'                       => 'required|array',
+                        'codes.*.code'                => 'required|string|max:255',
+                        'codes.*.earning_precentage'  => 'required|numeric|min:1|max:99',
                 ];
-                break;
-
-            case 'PATCH':
-            case 'PUT':
-                $rules +=  [
-                        'code'                => 'required|string|max:255',
-                        'earning_precentage'  => 'required|numeric|min:1|max:99',
-                ];
-
-                break;
-        }
-
-        return $rules;
     }
 
 

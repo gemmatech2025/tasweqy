@@ -104,7 +104,7 @@ class PostController extends BaseController
 
             return jsonResponse(
                 true, 201, __('messages.add_success'),
-                ['id' => $post->id]
+                new PostIndexResource($post)
             );
         }
         catch (\Throwable $e) {

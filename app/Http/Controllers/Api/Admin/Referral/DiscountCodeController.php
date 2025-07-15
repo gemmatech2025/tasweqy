@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
     
 use App\Http\Requests\Admin\Referral\DiscountCodeRequest;
+use App\Http\Requests\Admin\Referral\DiscountCodeListRequest;
+use App\Http\Requests\Admin\Referral\UpdateLinkStatusRequest
+;
+
 use App\Http\Resources\Admin\Referral\DiscountCodeResource;
 use App\Http\Resources\Admin\Referral\DiscountCodeIndexResource;
 use Maatwebsite\Excel\Facades\Excel;
@@ -41,25 +45,74 @@ class DiscountCodeController extends BaseController
     }
 
 
+
     public function store(Request $request)
     {
-            $reqClass      = static::REQUEST;
-            $effectiveRequest = $reqClass !== Request::class
-                ? app($reqClass)
-                : $request;
+        $reqClass      = static::REQUEST;
+        $effectiveRequest = $reqClass !== Request::class
+            ? app($reqClass)
+            : $request;
 
-            $validated = method_exists($effectiveRequest, 'validated')
-                ? $effectiveRequest->validated()
-                : $effectiveRequest->all();
+        $validated = method_exists($effectiveRequest, 'validated')
+            ? $effectiveRequest->validated()
+            : $effectiveRequest->all();
+            
+            DB::beginTransaction();
+            try {
+                 $discountCode = DiscountCode::where('code' , $request->code)
+                    ->where('brand_id' ,  $request->brand_id)->first();
+
+                    if($discountCode){
+
+                        $discountCode->earning_precentage = $request->earning_precentage;
+                        $discountCode->save();
+
+                    }else{
+                        DiscountCode::create([
+                            'brand_id'            => $request->brand_id,
+                            'code'                => $request->code,
+                            'earning_precentage'  => $request->earning_precentage,
+                        ]);
+                    }              
+                DB::commit();
+                return jsonResponse(
+                    true, 201, __('messages.add_success'),
+                );
+        }catch (\Throwable $e) {
+                DB::rollBack();
+                return jsonResponse(false, 500, __('messages.general_message'), null, null, [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                ]);
+        }
+    }
+
+
+    public function storeList(DiscountCodeListRequest $request)
+    {
 
             DB::beginTransaction();
             try {
                 foreach($request->codes as $code){
-                    DiscountCode::create([
-                        'brand_id'            => $request->brand_id,
-                        'code'                => $code['code'],
-                        'earning_precentage'  => $code['earning_precentage'],
-                    ]);
+
+                    $discountCode = DiscountCode::where('code' , $code['code'])
+                    ->where('brand_id' ,  $request->brand_id)->first();
+
+                    if($discountCode){
+
+                        $discountCode->earning_precentage = $code['earning_precentage'];
+                        $discountCode->save();
+
+                    }else{
+                        DiscountCode::create([
+                            'brand_id'            => $request->brand_id,
+                            'code'                => $code['code'],
+                            'earning_precentage'  => $code['earning_precentage'],
+                        ]);
+                    }
+
+                    
                 }
                 DB::commit();
                 return jsonResponse(
@@ -170,6 +223,68 @@ class DiscountCodeController extends BaseController
             true,
             200,
             __('messages.discount_codes_Imported_Successfully'),
+        );
+    }
+
+
+
+
+
+
+    public function getDiscountCodesNumbers()
+    {
+        $discountCodesCount = DiscountCode::count();
+
+        $usedDiscountCodesCount = DiscountCode::whereHas('referralEarning')->count();
+
+        $notUsedDiscountCodesCount = DiscountCode::whereDoesntHave('referralEarning')->count();
+
+        $inactiveDiscountCodesCount = DiscountCode::where('status', 'inactive')->count();
+
+        $usedDiscountCodesThisMonthCount = DiscountCode::whereHas('referralEarning', function ($query) {
+            $query->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
+        })->count();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'discount_codes_count' => $discountCodesCount,
+                'used_discount_codes_count' => $usedDiscountCodesCount,
+                'not_used_discount_codes_count' => $notUsedDiscountCodesCount,
+                'inactive_discount_codes_count' => $inactiveDiscountCodesCount,
+                'used_discount_codes_this_month_count' => $usedDiscountCodesThisMonthCount,
+            ]
+        );
+    }
+
+
+    public function updateStatus(UpdateLinkStatusRequest $request , $id){
+    
+
+        $discountCode = DiscountCode::find($id);
+
+        if (!$discountCode) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+
+
+        if($request->status == 'inactive'){
+            $discountCode->inactive_reason = $request->reason;
+        } else {
+            $discountCode->inactive_reason = null;
+        }
+
+        $discountCode->status = $request->status;
+        $discountCode->save();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.status_updated_successfully'),
+            new DiscountCodeResource($discountCode)
         );
     }
 

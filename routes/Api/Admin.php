@@ -117,6 +117,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
         
+            Route::get('/get-numbers', 'getDiscountCodesNumbers');
+            Route::put('/update-status/{id}', 'updateStatus');
+            Route::post('/store-list', 'storeList');
+
+
             Route::get('/export-template', 'exportDiscountCodesTemplate');
             Route::post('/import-data', 'importDiscountCodes');
             Route::post('/', 'store');
