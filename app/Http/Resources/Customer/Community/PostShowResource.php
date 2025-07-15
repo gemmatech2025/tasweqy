@@ -52,7 +52,7 @@ class PostShowResource extends JsonResource
             'medias'     => $this->medias->map(function ($media){
                 return [
                     'id'        => $media->id,
-                    'media'     => $media->media,
+                    'media'     => $media->media ? asset($media->media) :null,
                     'type'      => $media->type,
                 ];
             }),

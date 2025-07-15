@@ -4,6 +4,7 @@ namespace App\Http\Resources\Admin\Referral;
 use App\Http\Resources\Admin\Brand\BrandShowResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\TrackingEvent;
 
 class DiscountCodeResource extends JsonResource
 {
@@ -14,13 +15,48 @@ class DiscountCodeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // return [
+        //     'id'   => $this->id,
+        //     'brand' => new BrandShowResource($this->whenLoaded('brand')),
+
+        //     'earning_precentage' => $this->earning_precentage,
+        //     'link' => $this->link,
+
+        // ];
+
+
+        $referralEarning = $this->referralEarning;
+        $customer =  $this->referralEarning ? $this->referralEarning->user : null;
+        $lastEvent = TrackingEvent::where('trackable_type', 'App\Models\DiscountCode')
+            ->where('trackable_id', $this->id)
+            ->where('event_type', 'purchase')
+            ->latest()
+            ->first();
         return [
-            'id'   => $this->id,
-            'brand' => new BrandShowResource($this->whenLoaded('brand')),
+            'id'                    => $this->id,
+            'brand'                 => $this->brand->name,
+            'status'                => $this->status,
+            'created_at'            => $this->created_at ? $this->created_at->format('F j, Y g:i A') : null,
 
-            'earning_precentage' => $this->earning_precentage,
-            'link' => $this->link,
+            'earning_precentage'    => $this->earning_precentage,
+            'code'                  => $this->code,
+            
+            'for_user'              => $referralEarning ? $referralEarning->user->name : null ,
+            'usered_at'             => $referralEarning ? $referralEarning->created_at->format('F j, Y g:i A') : null ,
+            'total_clients'         => $referralEarning ? $referralEarning->total_clients : null ,
+            // 'total_clients'         => $referralEarning ? $referralEarning->total_clients : null ,
+            'total_earnings'         => $referralEarning ? $referralEarning->total_earnings : null ,
+            'customers'             => $customer ? [
+                                                    'name' => $customer->name , 
+                                                    'email' => $customer->email ,
+                                                    'phone' => $customer->phone ,
+                                                    'code' => $customer->code , 
 
+                                                    ]:null,
+            'inactive_reason'       => $this->inactive_reason,
+
+
+            'last_event'            => $lastEvent ? $lastEvent->created_at->format('F j, Y g:i A') :null
         ];
     }
 }
