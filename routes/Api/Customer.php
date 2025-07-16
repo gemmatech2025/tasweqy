@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Customer\Wallet\WalletController;
 use App\Http\Controllers\Api\Customer\Notification\NotificationController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralController;
+use App\Http\Controllers\Api\Admin\Brand\CategoryController;
 
 
 
@@ -202,7 +203,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/get-my-messages', 'getMessages');
   });
 
-  Route::controller(ReferralController::class)->prefix('chat-messages')->group(function () {
+  Route::controller(ReferralController::class)->prefix('referrals')->group(function () {
     Route::get('/my-links', 'getAllMyReferralLinks');
     Route::get('/my-codes', 'getAllMyDiscountCodes');
   });
@@ -215,6 +216,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
+
+
+       Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+            Route::get('/', 'index');
+        });
 
         
 });

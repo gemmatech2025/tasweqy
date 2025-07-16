@@ -11,6 +11,9 @@ use App\Models\ReferralLink;
 use App\Models\ReferralRequest;
 use App\Models\DiscountCode;
 
+use App\Models\ReferralEarning;
+
+
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\Customer\Referral\ReferralRequestRequest;
@@ -42,7 +45,7 @@ class ReferralController extends Controller
 
 
         if($brand_id){
-            $query->whereHas('referrable' , function($query){
+            $query->whereHas('referrable' , function($query)  use($brand_id){
                 $query->where('brand_id' ,$brand_id);
             });
         }
@@ -80,7 +83,7 @@ class ReferralController extends Controller
 
 
         if($brand_id){
-            $query->whereHas('referrable' , function($query){
+            $query->whereHas('referrable' , function($query) use($brand_id){
                 $query->where('brand_id' ,$brand_id);
             });
         }
