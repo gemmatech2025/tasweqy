@@ -15,10 +15,16 @@ class Brand extends Model
         'description',
         'logo',
         'category_id',
-        // 'discount_code_earning',
+        'is_active',
         // 'referral_link_earning',
         'total_marketers',
     ];
+
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
 
     public $translatable = ['name', 'description'];
 

@@ -83,6 +83,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
         Route::controller(BrandController::class)->prefix('brands')->group(function () {
+
+
+            
+
+            Route::get('/get-numbers', 'getNumbers');
+
+
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');

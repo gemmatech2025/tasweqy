@@ -14,19 +14,42 @@ class BrandIndexResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+
+        $highestReferralLink = $this->referralLinks()
+            ->orderByDesc('earning_precentage')
+            ->first();
+
+        $highestDiscountCode = $this->discountCodes()
+            ->orderByDesc('earning_precentage')
+            ->first();
+           
+
+        $ReferralLinkCount = $this->referralLinks()
+            ->count();
+
+        $DiscountCodeCount = $this->discountCodes()
+            ->count();
+
+
+
+
         return [
-            'id'                => $this->id,
-            'name'              => $this->name,
-            'description'       => $this->description,
-            'logo'              => $this->logo ? asset($this->logo) :null,
-            'total_marketers'   => $this->total_marketers,
+            'id'                        => $this->id,
+            'name'                      => $this->name,
+            'description'               => $this->description,
+            'logo'                      => $this->logo ? asset($this->logo) :null,
+            'total_marketers'           => $this->total_marketers,
+            'is_active'                 => $this->is_active,
+            'category'                  => $this->category->name,
+            'highest_referral_link'     => $highestReferralLink ? $highestReferralLink->earning_precentage : null,
+            'highest_discount_code'     => $highestDiscountCode ? $highestDiscountCode->earning_precentage : null,
+            'ReferralLinkCount'         => $ReferralLinkCount,
+            'DiscountCodeCount'         => $DiscountCodeCount,
 
-            'category'          => $this->category->name,
-            // 'countries'         => $this->countries->map(function($country){
-            //     return ['country_id' => $country->id];
-            // }),
+            'category'                  => $this->category->name,
+            'created_at'                => $this->created_at?->format('F j, Y g:i A'),
 
-            'created_at'        => $this->created_at?->toDateTimeString(),
-            'updated_at'        => $this->updated_at?->toDateTimeString(),
-        ];      }
+        ];       
+    }
 }

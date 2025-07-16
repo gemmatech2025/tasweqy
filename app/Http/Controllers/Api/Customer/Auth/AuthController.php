@@ -771,6 +771,20 @@ $otp->delete();
             return false;
         }
 
+        // $otp = Otp::where('user_id' , $user_id)->
+        // where('type' , $otpType)->delete();
+
+        $otp = Otp::where('user_id', 5)->where('type', $otpType)->delete();
+
+
+        // if($otp){
+        //     $otp->otp_expires_at = Carbon::now()->addMinutes(5);
+        //     $otp->otp = Hash::make($otp_code);
+        //     $otp->save();
+        // }else{
+
+        // }
+
         $otp = Otp::create([
             'otp' =>  Hash::make($otp_code),
             'type' => $otpType,
