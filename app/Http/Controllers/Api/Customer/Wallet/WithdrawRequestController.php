@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\BasController\BaseController;
 use App\Models\WithdrawRequest;
 use App\Models\PaypalAccount;
+use App\Models\BankInfo;
 
 
 use App\Http\Resources\Customer\Wallet\WithdrawRequestResource;
@@ -90,7 +91,7 @@ class WithdrawRequestController extends BaseController
                 ]);
 
                 }             
-                $model = $paypal->withdrawRequests()->create([
+                $model = $bank->withdrawRequests()->create([
                 'user_id' => Auth::id(),
                 'total'   => $request->total,
                 ]);
