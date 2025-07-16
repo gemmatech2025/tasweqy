@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('brands', function (Blueprint $table) {
+            $table->string('google_drive_url')->nullable();
             $table->boolean('is_active')->default(true);
         });
     }
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('brands', function (Blueprint $table) {
-            $table->dropColumn('is_active');
+            $table->dropColumn(['is_active' , 'google_drive_url']);
         });
     }
 };

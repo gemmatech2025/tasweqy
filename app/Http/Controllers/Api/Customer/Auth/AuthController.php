@@ -555,7 +555,7 @@ class AuthController extends Controller
 
             $user->password = Hash::make($request->password);
             $user->save();
-$otp->delete();
+            $otp->delete();
 
             DB::commit();
             return jsonResponse(true , 200 ,__('messages.password_changed_successfully') , null , null ,[]);

@@ -16,7 +16,7 @@ class Brand extends Model
         'logo',
         'category_id',
         'is_active',
-        // 'referral_link_earning',
+        'google_drive_url',
         'total_marketers',
     ];
 

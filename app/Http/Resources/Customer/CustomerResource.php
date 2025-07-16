@@ -5,6 +5,8 @@ namespace App\Http\Resources\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use App\Models\ReferralEarning;
+
 class CustomerResource extends JsonResource
 {
     /**
@@ -19,6 +21,7 @@ class CustomerResource extends JsonResource
 
         $customer = $this->customer;
         $country = $this->customer? $this->customer->country :null;
+        $earnings= ReferralEarning::where('user_id' ,$this->id)->first();
 
 
 
@@ -51,7 +54,10 @@ class CustomerResource extends JsonResource
             'total_balance' => $customer ?  $customer->total_balance : 0 ,
             'is_verified'   => $customer ?  $customer->is_verified : false,
 
+            'has_referrals'   => $earnings ? true : false,
 
+
+            
             // 'profile'   => $customer ?[
             //         'gender'        => $customer->gender,
             //         'total_balance' => $customer->total_balance,
