@@ -9,6 +9,7 @@ use App\Models\ReferralEarning;
 use App\Models\SocialMediaPlatform;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Models\Customer;
 
 class ReferralEarningSeeder extends Seeder
 {
@@ -16,13 +17,18 @@ class ReferralEarningSeeder extends Seeder
     {
        
 
-          $users = User::all();
+    $users = User::all();
 
     if ($users->isEmpty()) {
         $users = User::factory()->count(5)->create();
     }
 
     foreach ($users as $user) {
+        $customer = Customer::where('user_id',$user->id)->first();
+        if($customer){
+           $customer->total_balance = 5000000;
+           $customer->save();
+        }
         for ($i = 0; $i < 10; $i++) {
             WalletTransaction::create([
                 'code' =>  random_int(100000, 999999),

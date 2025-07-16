@@ -35,6 +35,8 @@ class BrandDetailsCustomerResource   extends JsonResource
         $earning = $referralLink->referralEarning;
 
         return [
+            
+                'social_media_set' => $earning?->social_media_set ?? false,
                 'earning_id'       => $earning?->id ?? null,
                 'total_earnings'   => $earning?->total_earnings ?? 0,
                 'total_clients'    => $earning?->total_clients ?? 0,
@@ -68,6 +70,7 @@ class BrandDetailsCustomerResource   extends JsonResource
             $earning = $discountCode->referralEarning;
 
             return [
+                'social_media_set'       => $earning?->social_media_set ?? false,
                 'earning_id'       => $earning?->id ?? null,
                 'total_earnings'   => $earning?->total_earnings ?? 0,
                 'total_clients'    => $earning?->total_clients ?? 0,
@@ -113,6 +116,7 @@ class BrandDetailsCustomerResource   extends JsonResource
             'referral_links' => $referralLinks,
             'discount_codes' => $discountCodes,
 
+            'google_drive_url' => $this->google_drive_url,
 
             'referral_link_has_request' => $referralLinkRequest ? true :false,
             'discount_code_has_request' => $disountCodeRequest ? true :false,

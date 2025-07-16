@@ -13,7 +13,8 @@ class ReferralEarning extends Model
         'referrable_type',
         'referrable_id',
         'total_clients',
-        'user_id'
+        'user_id',
+        'social_media_set'
 
     ];
 
