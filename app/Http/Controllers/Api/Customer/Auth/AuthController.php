@@ -774,7 +774,7 @@ $otp->delete();
         // $otp = Otp::where('user_id' , $user_id)->
         // where('type' , $otpType)->delete();
 
-        $otp = Otp::where('user_id', 5)->where('type', $otpType)->delete();
+        $otp = Otp::where('user_id', $user_id )->where('type', $otpType)->delete();
 
 
         // if($otp){
