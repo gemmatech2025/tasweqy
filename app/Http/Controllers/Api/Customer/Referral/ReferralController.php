@@ -29,15 +29,61 @@ class ReferralController extends Controller
 
 
    
-    public function getAllMyreferralLinks(Request $request)
+    public function getAllMyReferralLinks(Request $request)
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 20);
+        $brand_id = $request->input('brand_id', '');
 
         $user = Auth::user();
 
-        $referrals = ReferralEarning::where('user_id' , $user->id)
+        $query = ReferralEarning::where('user_id' , $user->id)
         ->where('referrable_type' , ReferralLink::class);
+
+
+        if($brand_id){
+            $query->whereHas('referrable' , function($query){
+                $query->where('brand_id' ,$brand_id);
+            });
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            ReferralEarningResource::collection($data),
+            $pagination
+        );
+    }
+
+
+
+    public function getAllMyDiscountCodes(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
+        $brand_id = $request->input('brand_id', '');
+
+        $user = Auth::user();
+
+        $query = ReferralEarning::where('user_id' , $user->id)
+        ->where('referrable_type' , ReferralLink::class);
+
+
+        if($brand_id){
+            $query->whereHas('referrable' , function($query){
+                $query->where('brand_id' ,$brand_id);
+            });
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 

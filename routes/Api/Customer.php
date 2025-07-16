@@ -3,26 +3,21 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\Customer\Auth\AuthController;
 use App\Http\Controllers\Api\Customer\Auth\_2FAuthController;
-
 use App\Http\Controllers\Api\Customer\Profile\CustomerController;
 use App\Http\Controllers\Api\Customer\Payment\BankInfoController;
 use App\Http\Controllers\Api\Customer\Payment\PayPalAccountController;
 use App\Http\Controllers\Api\Customer\Community\PostController;
 use App\Http\Controllers\Api\Customer\Community\PostCommentController;
 use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
-
 use App\Http\Controllers\Api\Admin\General\CountryController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Customer\Brand\BrandController;
-
 use App\Http\Controllers\Api\Customer\Wallet\WalletController;
 use App\Http\Controllers\Api\Customer\Notification\NotificationController;
-
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
-
+use App\Http\Controllers\Api\Customer\Referral\ReferralController;
 
 
 
@@ -206,6 +201,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/send', 'sendMessage');
     Route::get('/get-my-messages', 'getMessages');
   });
+
+  Route::controller(ReferralController::class)->prefix('chat-messages')->group(function () {
+    Route::get('/my-links', 'getAllMyReferralLinks');
+    Route::get('/my-codes', 'getAllMyDiscountCodes');
+  });
+
+
+
+  
    
 
     });
