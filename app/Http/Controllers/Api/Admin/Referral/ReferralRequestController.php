@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Log;
 use App\Services\SearchService;
 use App\Http\Resources\Admin\Referral\ReferralRequestIndexResource;
 use App\Http\Requests\Admin\Referral\AssignReferralRequest;
-use App\Http\Resources\Admin\Referral\ReferralLinkIndexResource;
 use App\Http\Resources\Admin\Referral\DiscountCodeIndexResource;
+use App\Http\Resources\Admin\Referral\ReferralRequestShowResource;
 
 
 
@@ -35,16 +35,27 @@ class ReferralRequestController extends Controller
     public function index(Request $request)
     {
 
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
 
-        $result =   $this->searchService->search(
-        $request, ReferralRequest::class, 
-        ReferralRequestIndexResource::class,
-        true,
-        ['name'], 
-        [] 
+        $query =  ReferralRequest::query();
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            ReferralRequestIndexResource::collection($data),
+            $pagination
         );
-    return $result;
-
     }
    
 
@@ -149,7 +160,59 @@ class ReferralRequestController extends Controller
 
     }
    
+    public function show($id)
+    {
 
+        $request = ReferralRequest::find($id);
+        if(!$request){
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+        return jsonResponse(
+            true, 200, __('messages.success'),
+            new ReferralRequestShowResource($request)
+        );
+
+    }
+
+
+
+
+
+
+
+    public function getNumbers()
+    {
+        $totalCount = ReferralRequest::count();
+
+        $referralLinkRequestsCount = ReferralRequest::where('type' , 'referral_link')->count();
+        $discountCodeRequestsCount = ReferralRequest::where('type' , 'discount_code')->count();
+        $topBrandLinks = ReferralRequest::select('brand_id')
+        ->where('type' , 'referral_link')
+        ->selectRaw('COUNT(*) as request_count')
+        ->groupBy('brand_id')
+        ->orderByDesc('request_count')
+        ->first();
+        $topBrandCodes = ReferralRequest::select('brand_id')
+        ->where('type' , 'discount_code')
+        ->selectRaw('COUNT(*) as request_count')
+        ->groupBy('brand_id')
+        ->orderByDesc('request_count')
+        ->first();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'totalCount' => $totalCount,
+                'referralLinkRequestsCount' => $referralLinkRequestsCount,
+                'discountCodeRequestsCount' => $discountCodeRequestsCount,
+                'topBrandLinks' => $topBrandLinks ? $topBrandLinks->brand->name:'',
+                'topBrandCodes' =>  $topBrandCodes ? $topBrandCodes->brand->name:'',
+            ]
+        );
+    }
+   
 
 
 

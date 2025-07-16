@@ -146,8 +146,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
         Route::controller(ReferralRequestController::class)->prefix('referral-requests')->group(function () {
+            
+            Route::get('/get-numbers', 'getNumbers');
+
             Route::post('/assign-referral', 'assifnReferralToCustomer');
             Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+
+            
         });
 
 

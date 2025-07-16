@@ -775,7 +775,7 @@ $otp->delete();
             'otp' =>  Hash::make($otp_code),
             'type' => $otpType,
             'otp_expires_at'=> Carbon::now()->addMinutes(5),
-            'user_id'=> $user->id,
+            'user_id'=> $user_id,
         ]);
         
 

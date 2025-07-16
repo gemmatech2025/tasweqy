@@ -16,13 +16,12 @@ class ReferralRequestShowResource extends JsonResource
        public function toArray(Request $request): array
     {
         return [
-            'id'        => $this->id,
-            'type'      => $this->type,
-            'brand'     => ['id' => $this->brand->id,'name' => $this->brand->name],
-            'user'      => ['id' => $this->user->id,'name' => $this->user->name],
+            'id'       => $this->id,
+            'type'     => $this->type,
+            'brand'    => $this->brand->name,
+            'user'     => $this->user->name,
 
-            'created_at' => $this->created_at?->toDateTimeString(),
-            'updated_at' => $this->updated_at?->toDateTimeString(),
+            'created_at' => $this->created_at?->format('F j, Y g:i A'),
         ];
     }
 }
