@@ -14,6 +14,9 @@ use App\Models\DiscountCode;
 use Illuminate\Support\Facades\Log;
 
 use App\Services\SearchService;
+use App\Services\FirebaseService;
+
+
 use App\Http\Resources\Admin\Referral\ReferralRequestIndexResource;
 use App\Http\Requests\Admin\Referral\AssignReferralRequest;
 use App\Http\Resources\Admin\Referral\DiscountCodeIndexResource;
@@ -25,9 +28,13 @@ class ReferralRequestController extends Controller
 {
 
     protected $searchService = null;
+    protected $firebaseService = null;
+
     public function __construct()
     {
         $this->searchService = new SearchService();
+        $this->firebaseService = new FirebaseService();
+
     }
 
 
@@ -61,11 +68,8 @@ class ReferralRequestController extends Controller
 
 
 
-    public function assifnReferralToCustomer(AssignReferralRequest $request)
+    public function assignReferralToCustomer(AssignReferralRequest $request)
     {
-
-
-
         DB::beginTransaction();
         try {
 
@@ -84,6 +88,7 @@ class ReferralRequestController extends Controller
                     'user_id'        => $referralRequest->user_id,
                 ]);
 
+            $this->firebaseService->handelNotification($referralRequest->user, 'discount_code_added' , $discountCode->id );
 
             } else if($request->type == 'referral_link'){
                 $referralLink = ReferralLink::find($request->referral_link_id);
@@ -96,8 +101,12 @@ class ReferralRequestController extends Controller
                     'total_clients'  => 0,
                     'user_id'        => $referralRequest->user_id,
                 ]);
+            $this->firebaseService->handelNotification($referralRequest->user, 'referral_link_added' , $referralLink->id );
 
 
+       //     'referral_link_added',
+        //     'discount_code_added',
+        //     'earning_added',
             }else {
                  return jsonResponse(false, 500, __('messages.wrong_type'));
         }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 class Notification extends Model
 {
-     use  HasTranslations;
+    use  HasTranslations;
     protected $fillable = [
         'user_id',
         'title',
@@ -14,6 +14,8 @@ class Notification extends Model
         'image',
         'is_read',
         'read_at',
+        'type',
+        'payload_id'
     ];
 
     protected $casts = [

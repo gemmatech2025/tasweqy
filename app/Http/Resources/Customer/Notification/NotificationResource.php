@@ -14,15 +14,19 @@ class NotificationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $this->markAsRead();
+
+        if(!$this->read_at){
+            $this->markAsRead();
+        }
         return [
                     'id'          => $this->id,
                     'title'       => $this->title,
                     'body'        => $this->body,
                     'image'       => $this->image? asset($this->image) : null,
-                    'read_at'     => $this->read_at ,
-                    'created_at'  => $this->created_at,
-                    'updated_at'  => $this->updated_at,
+                    'read_at'     => $this->read_at->diffForHumans(),
+                    'type'        => $this->type ,
+                    'payload_id'  => $this->payload_id ,
+                    'created_at'  => $this->created_at->diffForHumans(),
                 ]; 
 
        }

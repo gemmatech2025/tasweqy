@@ -13,18 +13,22 @@ use App\Models\ReferralEarning;
 
 
 use Illuminate\Support\Str;
+use App\Services\FirebaseService;
 
 
 class EarningService
 {
 
-
+    protected $firebaseService = null;
+    
+    public function __construct()
+    {
+        $this->firebaseService = new FirebaseService();
+    }
 
     public function recordAnEvent($amount  ,TrackingEvent $trackingEvent)
     {
-        
-        
-        
+    
         $trackable         = $trackingEvent->trackable;
         $precentage        = $trackable->earning_precentage;
         $referralEarning   = $trackable->referralEarning;
@@ -39,6 +43,7 @@ class EarningService
             return ['status' => false , 'reason' => "customer dose not have profile" , 'event' => $trackingEvent];
         }
 
+        $this->firebaseService->handelNotification($referralEarning->user, 'earning_added' , $referralEarning->id );
 
         $valueToBeAdded = $precentage * $amount;
         $referralEarning->total_clients += 1;

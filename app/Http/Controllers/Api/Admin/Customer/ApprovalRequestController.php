@@ -18,6 +18,7 @@ use App\Services\SearchService;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 
+use App\Services\FirebaseService;
 
 
 
@@ -29,9 +30,13 @@ class ApprovalRequestController extends Controller
 
 
     protected $searchService = null;
+    protected $firebaseService = null;
+    
     public function __construct()
     {
         $this->searchService = new SearchService();
+        $this->firebaseService = new FirebaseService();
+
     }
 
     public function getRequests(Request $request)
@@ -84,7 +89,11 @@ class ApprovalRequestController extends Controller
         if(!$approvalRequest){
         return jsonResponse(false, 404, __('messages.not_found'));
         }  
+
+        $user = $approvalRequest->user;
         if($request->new_status == 'rejected'){
+
+            $this->firebaseService->handelNotification($user, 'verification_rejected' , $approvalRequest->id );
             $approvalRequest->status = 'rejected';
             $approvalRequest->reason = $request->reason;
             $approvalRequest->approved_by = Auth::id();
@@ -98,6 +107,8 @@ class ApprovalRequestController extends Controller
 
 
         }else if($request->new_status == 'approved' ){
+            $this->firebaseService->handelNotification($user, 'account_verified' , $approvalRequest->id );
+
             $approvalRequest->status = $request->new_status;
             $approvalRequest->approved_by = Auth::id();
             $approvalRequest->reason = null; // Clear reason if approved

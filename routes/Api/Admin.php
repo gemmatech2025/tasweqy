@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\Admin\Brand\BrandController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 use App\Http\Controllers\Api\Admin\Referral\DiscountCodeController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
-use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
+use App\Http\Controllers\Api\Admin\Payment\WithdrawRequestController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Admin\Customer\CustomerController;
 use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
@@ -156,7 +156,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
             Route::get('/get-numbers', 'getNumbers');
 
-            Route::post('/assign-referral', 'assifnReferralToCustomer');
+            Route::post('/assign-referral', 'assignReferralToCustomer');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
 
