@@ -22,7 +22,7 @@ class FirebaseService
 
     public function __construct()
     {
-        $credentialsPath = public_path('assets/taswiqi-c0b96-firebase-adminsdk-fbsvc-cdec13a5ec.json');
+        $credentialsPath = config_path('firebase_credentials.json');
         Log::info($credentialsPath);
         if (!file_exists($credentialsPath)) {
             throw new \Exception("Firebase service account file not found at: {$credentialsPath}");
