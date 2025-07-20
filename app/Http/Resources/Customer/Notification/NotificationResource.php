@@ -28,6 +28,5 @@ class NotificationResource extends JsonResource
                     'payload_id'  => $this->payload_id ,
                     'created_at'  => $this->created_at->diffForHumans(),
                 ]; 
-
        }
 }

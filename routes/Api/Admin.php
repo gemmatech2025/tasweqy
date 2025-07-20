@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Api\Admin\Customer\ChatController;
 use App\Http\Controllers\Api\Admin\Customer\UserBlockController;
 
+use App\Http\Controllers\Api\Admin\Notification\NotificationController;
 
 
 Route::middleware(['set-locale'])->group(function () {
@@ -199,6 +200,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
         });
+
+
+        Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
+            Route::post('/push', 'pushNotifications');
+
+        });
+
+
+        
 
     });
 
