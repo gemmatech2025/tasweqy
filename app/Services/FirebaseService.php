@@ -22,7 +22,7 @@ class FirebaseService
 
     public function __construct()
     {
-        $credentialsPath = public_path('assets/taswiqi-c0b96-firebase-adminsdk-fbsvc-ee2b844627.json');
+        $credentialsPath = public_path('assets/taswiqi-c0b96-firebase-adminsdk-fbsvc-cdec13a5ec.json');
         Log::info($credentialsPath);
         if (!file_exists($credentialsPath)) {
             throw new \Exception("Firebase service account file not found at: {$credentialsPath}");
@@ -151,7 +151,7 @@ class FirebaseService
             $notificationTitle = $title[$locale] ?? $title['en'] ;
             $notificationBody  = $body[$locale] ?? $body['en'] ;
 
-            $this->sendNotification($fcmTokens , $notificationTitle, $notificationBody);
+            $this->sendNotification($fcmTokens , $notificationTitle, $notificationBody , $type , $payload);
 
             return true;
         } catch (\Throwable $e) {
@@ -166,12 +166,18 @@ class FirebaseService
 
 
 
-    public function sendNotification(array $deviceTokens, string $title, string $body): bool
+    public function sendNotification(array $deviceTokens, string $title, string $body , string $type = 'message' ,string $payload = '' ): bool
     {
         try {
             foreach ($deviceTokens as $token) {
+                // $message = FirebaseCloudMessage::withTarget('token', $token)
+                //     ->withNotification(Notification::create($title, $body));
                 $message = FirebaseCloudMessage::withTarget('token', $token)
-                    ->withNotification(Notification::create($title, $body));
+                ->withNotification(Notification::create($title, $body))
+                ->withData([
+                    'type'      => $type,
+                    'payload'   => $payload,
+                ]);
 
                 $this->messaging->send($message);
             }
