@@ -17,12 +17,15 @@ use App\Models\BrandCountry;
 use App\Models\ReferralLink;
 use App\Models\ReferralEarning;
 use App\Models\DiscountCode;
+use App\Models\BrandBlock;
+
 
 
 use App\Http\Resources\Admin\Brand\BrandIndexResource;
 use App\Http\Resources\Admin\Brand\BrandShowResource;
 use App\Http\Requests\Admin\Brand\BrandRequest;
 use App\Http\Resources\Admin\Brand\CustomerResource;
+use App\Http\Resources\Admin\Brand\BrandBlockResource;
 
 
 
@@ -282,6 +285,30 @@ class BrandController extends BaseController
             200,
             __('messages.success'),
             $data,
+            $pagination
+        );
+    }
+
+
+    public function getBrandBlocks(Request $request , $brand_id)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
+        $query =BrandBlock::where('brand_id' , $brand_id);
+        $data = $query->paginate($perPage, ['*'], 'page', $page); 
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            BrandBlockResource::collection($data),
             $pagination
         );
     }

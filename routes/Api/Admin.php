@@ -87,6 +87,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
             
 
+            Route::get('/get-brand-blocks/{brand_id}', 'getBrandBlocks');
+
             Route::get('/get-links/{brand_id}', 'getLinks');
 
             Route::get('/get-customers/{brand_id}', 'getCustomer');
@@ -209,7 +211,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/push', 'pushNotifications');
 
         });
-        
+
         Route::controller(BrandBlockController::class)->prefix('brand-blocks')->group(function () {
             Route::post('/', 'store');
         });
