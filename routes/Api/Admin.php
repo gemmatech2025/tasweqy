@@ -88,6 +88,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
             
 
+            Route::get('/get-links/{brand_id}', 'getLinks');
+
+            Route::get('/get-customers/{brand_id}', 'getCustomer');
+
             Route::get('/get-numbers', 'getNumbers');
 
 

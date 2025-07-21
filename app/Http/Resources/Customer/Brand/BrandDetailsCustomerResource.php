@@ -118,8 +118,8 @@ class BrandDetailsCustomerResource   extends JsonResource
 
             'google_drive_url' => $this->google_drive_url,
 
-            'referral_link_has_request' => $referralLinkRequest ? true :false,
-            'discount_code_has_request' => $disountCodeRequest ? true :false,
+            'referral_link_has_request' => $referralLinkRequest ? ['id' => $referralLinkRequest->id] :null,
+            'discount_code_has_request' => $disountCodeRequest ? ['id' => $referralLinkRequest->id] :null,
 
 
         ];
