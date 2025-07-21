@@ -30,7 +30,7 @@ class BrandBlockRequest extends FormRequest
                     'brand_id'  => 'required|exists:brands,id',
                     'type'      => 'required|in:block,unblock',
                     'images'    => 'required|array',
-                    'images.*'  => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+                    'images.*.image'  => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             ];
     }
 

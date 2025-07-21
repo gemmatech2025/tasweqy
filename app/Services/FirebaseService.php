@@ -39,7 +39,7 @@ class FirebaseService
     {
         try {
 
-        // $table->enum('type', [
+        // type =  [
         //     'withraw_issue',
         //     'withraw_success',
         //     'referral_link_added',
@@ -47,11 +47,23 @@ class FirebaseService
         //     'earning_added',
         //     'account_verified',
         //     'verification_rejected'
-        // ]);
+        // ];
 
         $title = [];
         $body = [];
         $image = 'notification_icon.png';
+        
+        // images =  [
+        //     'notifications/empty-wallet-add.png',
+        //     'notifications/empty-wallet-remove.png',
+        //     'notifications/empty-wallet-tick.png',
+        //     'notifications/link.png',
+        //     'notifications/shield-cross.png',
+        //     'notifications/shield-tick.png',
+        //     'notifications/ticket-discount.png'
+        // ];
+
+
 
 
         switch ($type) {
@@ -62,7 +74,7 @@ class FirebaseService
                 $body['ar'] = 'حدثت مشكلة أثناء محاولة سحب الأرباح. يرجى التحقق من التفاصيل.';
                 $body['en'] = 'There was an issue while trying to withdraw your earnings. Please check the details.';
 
-                $image = 'notification_icon.png';
+                $image = 'notifications/empty-wallet-remove.png';
                 break;
 
             case 'withraw_success':
@@ -71,7 +83,7 @@ class FirebaseService
 
                 $body['ar'] = 'تمت معالجة عملية السحب الخاصة بك بنجاح.';
                 $body['en'] = 'Your withdrawal has been successfully processed.';
-                $image = 'notification_icon.png';
+                $image = 'notifications/empty-wallet-add.png';
                 break;
 
             case 'referral_link_added':
@@ -80,7 +92,7 @@ class FirebaseService
 
                 $body['ar'] = 'تمت إضافة رابط الإحالة الخاص بك بنجاح.';
                 $body['en'] = 'Your referral link has been successfully added.';
-                $image = 'notification_icon.png';
+                $image = 'notifications/link.png';
 
                 break;
 
@@ -90,7 +102,7 @@ class FirebaseService
 
                 $body['ar'] = 'تمت إضافة كود الخصم الخاص بك بنجاح.';
                 $body['en'] = 'Your discount code has been successfully added.';
-                $image = 'notification_icon.png';
+                $image = 'notifications/ticket-discount.png';
 
                 break;
 
@@ -100,7 +112,7 @@ class FirebaseService
 
                 $body['ar'] = 'تمت إضافة أرباح جديدة إلى حسابك.';
                 $body['en'] = 'New earnings have been added to your account.';
-                $image = 'notification_icon.png';
+                $image = 'notifications/empty-wallet-add.png';
 
                 break;
 
@@ -110,7 +122,7 @@ class FirebaseService
 
                 $body['ar'] = 'تم التحقق من حسابك بنجاح. مرحبًا بك!';
                 $body['en'] = 'Your account has been successfully verified. Welcome!';
-                $image = 'notification_icon.png';
+                $image = 'notifications/shield-tick.png';
 
                 break;
 
@@ -120,7 +132,7 @@ class FirebaseService
 
                 $body['ar'] = 'تم رفض طلب التحقق من حسابك. يرجى إعادة المحاولة بعد مراجعة الملاحظات.';
                 $body['en'] = 'Your account verification request was rejected. Please try again after reviewing the feedback.';
-                $image = 'notification_icon.png';
+                $image = 'notifications/shield-cross.png';
 
                 break;
 

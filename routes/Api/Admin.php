@@ -18,11 +18,10 @@ use App\Http\Controllers\Api\Admin\Payment\WithdrawRequestController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Admin\Customer\CustomerController;
 use App\Http\Controllers\Api\Admin\Dashboard\DashboardController;
-
 use App\Http\Controllers\Api\Admin\Customer\ChatController;
 use App\Http\Controllers\Api\Admin\Customer\UserBlockController;
-
 use App\Http\Controllers\Api\Admin\Notification\NotificationController;
+use App\Http\Controllers\Api\Admin\Brand\BrandBlockController;
 
 
 Route::middleware(['set-locale'])->group(function () {
@@ -210,7 +209,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/push', 'pushNotifications');
 
         });
+        
+        Route::controller(BrandBlockController::class)->prefix('brand-blocks')->group(function () {
+            Route::post('/', 'store');
+        });
 
+
+        
 
         
 

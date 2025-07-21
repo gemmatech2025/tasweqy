@@ -169,7 +169,7 @@ public function index(Request $request)
         return [];
     }
 
-  public function store(Request $request)
+    public function store(Request $request)
     {
         $reqClass      = static::REQUEST;
         $effectiveRequest = $reqClass !== Request::class

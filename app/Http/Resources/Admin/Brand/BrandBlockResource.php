@@ -15,11 +15,16 @@ class BrandBlockResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                        => $customer->id,
-            'name'                      => $this->name,
-            'total_codes'               => $totalCodes,
-            'total_links'               => $totalLinks,
-            'total_earnings'            => $totalEarnings,
+            'id'                        => $this->id,
+            'type'                      => $this->type,
+            'images'                    => $this->images->map(function ($image){
+                return ['image' => asset($image->image)];
+            }),
+            'brand'                      => $this->brand->name,
+            'created_at'                 => $this->created_at?->format('F j, Y g:i A'),
+
+            // 'total_links'               => $totalLinks,
+            // 'total_earnings'            => $totalEarnings,
         ];       
     }
 }
