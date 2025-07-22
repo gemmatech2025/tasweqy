@@ -207,6 +207,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
         Route::controller(CustomerController::class)->prefix('customers')->group(function () {  
+            Route::get('/get-numbers', 'getNumbers');
             Route::get('/get-distinguished-customer', 'getDistinguishedCustomers');
             Route::get('/get-blocked-customer-details/{id}', 'getBlockedCustomerDetails');
             Route::get('/get-blocked-customers', 'getBlockedCustomers');
@@ -215,6 +216,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-referrals/{id}/{type}', 'getAllReferral');
             Route::get('/', 'getCustomers');
             Route::get('/{id}', 'show');
+
+
+            
         });
 
 

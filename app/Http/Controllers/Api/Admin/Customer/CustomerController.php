@@ -415,5 +415,32 @@ class CustomerController extends Controller
 }
 
 
+   public function getNumbers()
+    {
+        $totalCustomers = Customer::count();
+        $activecustomers = Customer::whereHas('user', function ($q) {
+                    $q->whereHas('referralEarnings');
+                })->count();
+
+        $inactiveCustomers = Customer::whereHas('user', function ($q) {
+            $q->whereDoesntHave('referralEarnings');
+        })->count();
+
+
+        $blockedCustomer = Customer::where('is_blocked' , true)->count();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'totalCustomers' => $totalCustomers,
+                'activecustomers' => $activecustomers,
+                'inactiveCustomers' => $inactiveCustomers,
+                'blockedCustomer' => $blockedCustomer,
+            ]
+        );
+    }
+
 
 }
