@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\FirebaseService;
 
+use App\Http\Resources\Admin\Payment\WithdrawRequestResource;
 
 class WithdrawRequestController extends Controller
 {
@@ -84,6 +85,50 @@ public function updateRequestStatus($request_id , $status)
         ]);
     }
 }
+
+    public function getAllRequests(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
+
+        $query = WithdrawRequest::query();
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            WithdrawRequestResource::collection($data)
+            ,
+            $pagination
+        );
+    }
+
+
+
+    public function show($id)
+    {
+        $request = WithdrawRequest::find($id);
+
+        if (!$request) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            new WithdrawRequestResource($request)
+        );
+
+
+    }
 
 
 

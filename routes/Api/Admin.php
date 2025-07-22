@@ -22,6 +22,11 @@ use App\Http\Controllers\Api\Admin\Customer\ChatController;
 use App\Http\Controllers\Api\Admin\Customer\UserBlockController;
 use App\Http\Controllers\Api\Admin\Notification\NotificationController;
 use App\Http\Controllers\Api\Admin\Brand\BrandBlockController;
+use App\Http\Controllers\Api\Admin\Padge\PadgeController;
+use App\Http\Controllers\Api\Admin\Setting\SettingController;
+
+
+
 
 
 Route::middleware(['set-locale'])->group(function () {
@@ -37,12 +42,37 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
       
 
+
+
+
+        Route::controller(SettingController::class)->prefix('settings')->group(function () {
+            Route::post('/update', 'updateSetting');
+            Route::get('/get-all', 'getAllSettings');
+
+            
+        });
+
+
         Route::controller(CountryController::class)->prefix('countries')->group(function () {
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
+        });
+
+
+
+        Route::controller(PadgeController::class)->prefix('padges')->group(function () {
+            
+            Route::get('/get-highest', 'getHighest');
+
+            Route::post('/', 'store');
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+
         });
 
 
@@ -156,6 +186,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(WithdrawRequestController::class)->prefix('withdraw-requests')->group(function () {
             Route::put('/update-status/{request_id}/{status}', 'updateRequestStatus');
+            Route::get('/', 'getAllRequests');
+            Route::get('/{id}', 'show');
+
+            
+
+            
         });
 
         Route::controller(ReferralRequestController::class)->prefix('referral-requests')->group(function () {

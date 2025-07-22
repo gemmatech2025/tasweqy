@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Admin\Brand;
+namespace App\Http\Requests\Admin\Padge;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class BrandRequest extends FormRequest
+class PadgeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +24,11 @@ class BrandRequest extends FormRequest
      */
 
 
-    public function rules(): array
+         public function rules(): array
     {
         
 
-
-        $rules = array();
+  $rules = array();
 
         switch ($this->method()) {
             case 'POST':
@@ -37,22 +37,13 @@ class BrandRequest extends FormRequest
                         'name.ar'                     => 'required|string|max:255',
                         'name.en'                     => 'required|string|max:255',
                         
-                        
                         'description'                 => 'required|array',
                         'description.ar'              => 'required|string|max:255',
                         'description.en'              => 'required|string|max:255',
-                        'email'                       => 'required|email|max:255',
-                        'phone'                       => 'required|numeric',
-                        'code'                        => 'required|numeric',
-
-                        
-                        'logo'                        => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                        'category_id'                 => 'required|exists:categories,id',
-                        'google_drive_url'            => 'nullable|url|max:255',
-
-                        'countries'                   => 'required|array',
-                        'countries.*.country_id'      => 'required|exists:countries,id',
-
+                     
+                        'image'                       => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                        'no_clients_from'             => 'required|numeric|lt:no_clients_to',
+                        'no_clients_to'               => 'required|numeric',
 
                     ];
                 break;
@@ -64,21 +55,12 @@ class BrandRequest extends FormRequest
                         'name.ar'                     => 'required|string|max:255',
                         'name.en'                     => 'required|string|max:255',
                         
-                        
                         'description'                 => 'required|sometimes|array',
                         'description.ar'              => 'required|string|max:255',
                         'description.en'              => 'required|string|max:255',
-                        'email'                       => 'required|sometimes|email|max:255',
-                        'phone'                       => 'required|sometimes|numeric',
-                        'code'                        => 'required|sometimes|numeric',
 
-                        
-                        'logo'                        => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                        'category_id'                 => 'required|sometimes|exists:categories,id',
-                        'google_drive_url'            => 'nullable|url|max:255',
-
-                        'countries'                   => 'required|sometimes|array',
-                        'countries.*.country_id'      => 'required|exists:countries,id',
+                        // 'no_clients_from'             => 'required|sometimes|numeric|lt:no_clients_to',
+                        'no_clients_to'               => 'required|sometimes|numeric',
                 ];
 
                 break;
@@ -86,9 +68,6 @@ class BrandRequest extends FormRequest
 
         return $rules;
     }
-
-
-
 
      protected function failedValidation(Validator $validator)
     {

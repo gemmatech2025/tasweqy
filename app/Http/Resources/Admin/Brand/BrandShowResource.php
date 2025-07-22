@@ -20,6 +20,9 @@ class BrandShowResource extends JsonResource
             'description'       => $this->getTranslations('description'),
             'logo'              => $this->logo ? asset($this->logo) :null,
             'total_marketers'   => $this->total_marketers,
+            'email'             => $this->email,
+            'phone'             => $this->phone,
+            'code'              => $this->code,
 
             'category_id'       => $this->category_id,
             'countries'         => $this->countries->map(function($country){

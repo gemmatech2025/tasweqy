@@ -18,6 +18,9 @@ class Brand extends Model
         'is_active',
         'google_drive_url',
         'total_marketers',
+        'email' ,
+        'phone' ,
+        'code'
     ];
 
 

@@ -21,13 +21,9 @@ class BrandBlockResource extends JsonResource
                 return ['image' => asset($image->image)];
             }),
             'reason'                      => $this->reason,
-
             'creator'                    => $this->creator->name,
             'brand'                      => $this->brand->name,
             'created_at'                 => $this->created_at?->format('F j, Y g:i A'),
-
-            // 'total_links'               => $totalLinks,
-            // 'total_earnings'            => $totalEarnings,
         ];       
     }
 }
