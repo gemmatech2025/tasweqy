@@ -43,9 +43,52 @@ class ReferralRequestController extends Controller
     {
 
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
+
+
+
+        $searchTerm = trim($request->input('searchTerm', ''));
+        $filters = $request->input('filter', []);
 
         $query =  ReferralRequest::query();
+
+        if ($searchTerm) {
+            $query->where('id', 'LIKE', "%$searchTerm%")
+            ->orWhereHas('user', function ($innerQuery) use ($searchTerm) {
+                    $innerQuery->where('name', 'LIKE', "%$searchTerm%");
+            })
+            ->orWhereHas('brand', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%$searchTerm%");
+            });
+        }
+
+
+                $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('referral_requests');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                $query->where($key, $value);
+            }
+        }
+
+
+
+
+
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [

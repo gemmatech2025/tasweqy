@@ -4,15 +4,10 @@ namespace App\Http\Resources\Admin\Customer;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
-
 use App\Http\Resources\UserResource;
-
-
 use App\Models\ReferralLink;
 use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
-
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 

@@ -275,10 +275,17 @@ class CustomerController extends Controller
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
-
-
+        $searchTerm = $request->input('searchTerm', '');
+        $filters = $request->input('filter', []);
         $query = Customer::where('is_blocked', true);
 
+        if ($searchTerm) {
+            $query->whereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+            });
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -381,41 +388,57 @@ class CustomerController extends Controller
     }
 
     public function getDistinguishedCustomers(Request $request)
-{
-    $page = $request->input('page', 1);
-    $perPage = $request->input('per_page', 10);
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $filters = $request->input('filter', []);
 
-    $query = Customer::select('customers.*')
-        ->join('users', 'users.id', '=', 'customers.user_id')
-        ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
-        ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings')
-        ->selectRaw('SUM(referral_earnings.total_clients) as total_clients')
-        ->groupBy('customers.id')
-        ->orderByDesc('total_earnings');
 
-    $customers = $query->paginate($perPage, ['*'], 'page', $page);
+        $query = Customer::select('customers.*')
+            ->join('users', 'users.id', '=', 'customers.user_id')
+            ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
+            ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings')
+            ->selectRaw('SUM(referral_earnings.total_clients) as total_clients')
+            ->groupBy('customers.id')
+            ->orderByDesc('total_earnings');
 
-    $data = $customers->map(function ($customer) {
-        return [
-            'id' => $customer->id,
-            'name' => $customer->user->name,
-            'email' => $customer->user->email,
-            'phone' => $customer->user->phone,
-            'code' => $customer->user->code,
-            'total_earnings' => $customer->total_earnings ?? 0,
-            'total_clients' => $customer->total_clients ?? 0,
+
+
+
+            if ($searchTerm) {
+                $query->whereHas('user', function ($q) use ($searchTerm) {
+                    $q->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+
+
+
+        $customers = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = $customers->map(function ($customer) {
+            return [
+                'id' => $customer->id,
+                'name' => $customer->user->name,
+                'email' => $customer->user->email,
+                'phone' => $customer->user->phone,
+                'code' => $customer->user->code,
+                'total_earnings' => $customer->total_earnings ?? 0,
+                'total_clients' => $customer->total_clients ?? 0,
+            ];
+        });
+
+        $pagination = [
+            'total' => $customers->total(),
+            'current_page' => $customers->currentPage(),
+            'per_page' => $customers->perPage(),
+            'last_page' => $customers->lastPage(),
         ];
-    });
 
-    $pagination = [
-        'total' => $customers->total(),
-        'current_page' => $customers->currentPage(),
-        'per_page' => $customers->perPage(),
-        'last_page' => $customers->lastPage(),
-    ];
-
-    return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
-}
+        return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
+    }
 
 
    public function getNumbers()

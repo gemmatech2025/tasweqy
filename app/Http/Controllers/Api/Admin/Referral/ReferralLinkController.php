@@ -50,39 +50,6 @@ class ReferralLinkController extends BaseController
 
 
 
-    // public function store(Request $request)
-    // {
-    //         $reqClass      = static::REQUEST;
-    //         $effectiveRequest = $reqClass !== Request::class
-    //             ? app($reqClass)
-    //             : $request;
-
-    //         $validated = method_exists($effectiveRequest, 'validated')
-    //             ? $effectiveRequest->validated()
-    //             : $effectiveRequest->all();
-
-    //         DB::beginTransaction();
-    //         try {
-    //                 ReferralLink::create([
-    //                     'brand_id'            => $request->brand_id,
-    //                     'link'                => $request->link,
-    //                     'earning_precentage'  => $link['earning_precentage'],
-    //                     'link_code'           => $link['link_code'],
-    //                 ]);
-                
-    //             DB::commit();
-    //             return jsonResponse(
-    //                 true, 201, __('messages.add_success'),
-    //             );
-    //     }catch (\Throwable $e) {
-    //             DB::rollBack();
-    //             return jsonResponse(false, 500, __('messages.general_message'), null, null, [
-    //                 'message' => $e->getMessage(),
-    //                 'file'    => $e->getFile(),
-    //                 'line'    => $e->getLine(),
-    //             ]);
-    //     }
-    // }
 
 
     public function storeList(ReferralLinkListRequest $request)
@@ -114,14 +81,53 @@ class ReferralLinkController extends BaseController
     public function index(Request $request)
     {
 
-        $searchTerm = trim($request->input('search', ''));
+        $searchTerm = trim($request->input('searchTerm', ''));
         $filters = $request->input('filter', []);
         $sortBy = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'asc');
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         
         $query = ReferralLink::query();
+
+    if ($searchTerm) {
+    $query->where('id', 'LIKE', "%$searchTerm%")
+        ->orWhere('link', 'LIKE', "%$searchTerm%")
+        ->orWhereHas('referralEarning', function ($q) use ($searchTerm) {
+            $q->whereHas('user', function ($innerQuery) use ($searchTerm) {
+                $innerQuery->where('name', 'LIKE', "%$searchTerm%");
+            });
+        })
+        ->orWhereHas('brand', function ($q) use ($searchTerm) {
+            $q->where('name', 'LIKE', "%$searchTerm%");
+        });
+}
+
+
+
+        $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('referral_links');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                $query->where($key, $value);
+            }
+        }
+
+
+
       
             
             $data = $query->paginate($perPage, ['*'], 'page', $page);

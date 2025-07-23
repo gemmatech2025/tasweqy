@@ -131,11 +131,31 @@ class DiscountCodeController extends BaseController
     public function index(Request $request)
     {
 
-        $searchTerm = trim($request->input('search', ''));
+        $searchTerm = trim($request->input('searchTerm', ''));
         $filters = $request->input('filter', []);
         $sortBy = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'asc');
         $query = $this->getModel()->with($this->getRelations());
+
+
+
+
+
+    if ($searchTerm) {
+    $query->where('id', 'LIKE', "%$searchTerm%")
+        ->orWhere('code', 'LIKE', "%$searchTerm%")
+        ->orWhereHas('referralEarning', function ($q) use ($searchTerm) {
+            $q->whereHas('user', function ($innerQuery) use ($searchTerm) {
+                $innerQuery->where('name', 'LIKE', "%$searchTerm%");
+            });
+        })
+        ->orWhereHas('brand', function ($q) use ($searchTerm) {
+            $q->where('name', 'LIKE', "%$searchTerm%");
+        });
+}
+
+
+
         $columns = \Schema::getColumnListing($this->getModel()->getTable());
         
 
@@ -180,7 +200,7 @@ class DiscountCodeController extends BaseController
 
         if ($this->indexPaginat()) {
             $page = $request->input('page', 1);
-            $perPage = $request->input('per_page', 20);
+            $perPage = $request->input('per_page', 10);
             $data = $query->paginate($perPage, ['*'], 'page', $page);
 
             $pagination = [

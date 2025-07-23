@@ -57,6 +57,7 @@ class ApprovalRequestController extends Controller
         }
 
 
+
         $filters = array_map(function ($value) {
         if (is_string($value)) {
                 $lower = strtolower($value);
@@ -70,6 +71,8 @@ class ApprovalRequestController extends Controller
         }, $filters);
 
         $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('account_verification_requests');
+
 
         foreach ($filters as $key => $value) {
             if (in_array($key, $columns)) {
