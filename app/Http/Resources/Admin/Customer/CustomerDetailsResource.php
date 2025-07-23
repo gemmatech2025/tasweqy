@@ -37,11 +37,11 @@ class CustomerDetailsResource extends JsonResource
             $key = $date->format('Y-m');
             $months->put($key, [
                 'month' => $date->translatedFormat('F'),
-                'total_earnings' => 0,
-                'total_clients' => 0,
+                'commissions' => 0,
+                'clients' => 0,
             ]);
         }
-
+// month: "يناير", commissions: 1200, clients: 45
         // Fetch referral earnings and group by month
         $referrals = ReferralEarning::where('user_id', $this->user->id)
             ->where('created_at', '>=', $startDate)
@@ -52,8 +52,8 @@ class CustomerDetailsResource extends JsonResource
         foreach ($referrals as $monthKey => $items) {
      $months->transform(function ($value, $key) use ($monthKey, $items) {
             if ($key === $monthKey) {
-                $value['total_earnings'] = (float) $items->sum('total_earnings');
-                $value['total_clients'] = (int) $items->sum('total_clients');
+                $value['commissions'] = (float) $items->sum('total_earnings');
+                $value['clients'] = (int) $items->sum('total_clients');
             }
             return $value;
         });
