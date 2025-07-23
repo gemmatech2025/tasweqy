@@ -52,6 +52,9 @@ class CustomerDetailsResource extends JsonResource
             'phone'       => $this->user->phone ,
             'code'        => $this->user->code ,
             'gender'      => $this->gender,
+            'email'       => $this->user->email,
+            'image'       => $this->user->image ? asset($this->user->image) : null,
+
             // 'birthdate'   => $this->birthdate,
             'birthdate' => $this->birthdate->format('F j, Y'),
 
