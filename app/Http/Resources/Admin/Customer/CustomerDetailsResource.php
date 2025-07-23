@@ -13,7 +13,8 @@ use App\Models\ReferralLink;
 use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
 
-
+use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 
 class CustomerDetailsResource extends JsonResource
 {
@@ -25,6 +26,48 @@ class CustomerDetailsResource extends JsonResource
     public function toArray(Request $request): array
     {
 
+        $locale = App::getLocale();
+        $now = Carbon::now();
+        $startDate = $now->copy()->subMonths(5)->startOfMonth();
+
+        // Create a base collection with the last 6 months
+        $months = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $date = $now->copy()->subMonths($i)->startOfMonth()->locale($locale);
+            $key = $date->format('Y-m');
+            $months->put($key, [
+                'month' => $date->translatedFormat('F'),
+                'total_earnings' => 0,
+                'total_clients' => 0,
+            ]);
+        }
+
+        // Fetch referral earnings and group by month
+        $referrals = ReferralEarning::where('user_id', $this->user->id)
+            ->where('created_at', '>=', $startDate)
+            ->get()
+            ->groupBy(fn($item) => Carbon::parse($item->created_at)->format('Y-m'));
+
+        // Update earnings and client counts
+        foreach ($referrals as $monthKey => $items) {
+     $months->transform(function ($value, $key) use ($monthKey, $items) {
+            if ($key === $monthKey) {
+                $value['total_earnings'] = (float) $items->sum('total_earnings');
+                $value['total_clients'] = (int) $items->sum('total_clients');
+            }
+            return $value;
+        });
+    }
+
+
+        $monthlyData = $months->values(); // Reindex
+
+        // Optional: Frontend-ready chart data
+        $chartData = [
+            'labels' => $monthlyData->pluck('month'),
+            'earnings' => $monthlyData->pluck('total_earnings'),
+            'clients' => $monthlyData->pluck('total_clients'),
+        ];
 
 
         $referralLinkCount = ReferralEarning::where('referrable_type', ReferralLink::class)
@@ -66,6 +109,7 @@ class CustomerDetailsResource extends JsonResource
             'discountCodeCount'      => $discountCodeCount,
             'totalEarning'      => $totalEarning,
             'totalClients'      => $totalClients,
+            'monthlyData'        =>$monthlyData,
 
 
         ];    

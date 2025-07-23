@@ -54,16 +54,17 @@ class CustomerController extends Controller
         $perPage = $request->input('per_page', 10);
         $searchTerm = $request->input('searchTerm', '');
         $filters = $request->input('filter', []);
+        $query = Customer::query();
 
-        $query =Customer::query();
-        if($searchTerm){
-            $query->whereHas('user' , function($q){
-                $q->where('name' , "LIKE" , "%$searchTerm%")
-                ->orWhere('email' , "LIKE" , "%$searchTerm%")
-                ->orWhere('phone' , "LIKE" , "%$searchTerm%");
-                
+        if ($searchTerm) {
+
+            $query->whereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
             });
         }
+
 
         $filters = array_map(function ($value) {
         if (is_string($value)) {
@@ -78,10 +79,22 @@ class CustomerController extends Controller
         }, $filters);
 
         $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('customers');
 
         foreach ($filters as $key => $value) {
             if (in_array($key, $columns)) {
+                if($key == 'status'){
+                    if($value == 'not_verified'){
+                        $query->where('is_verified', false)->where('is_blocked', false);
+                    }else if($value == 'blocked'){
+                        $query->where('is_blocked', true);
+                    }else if($value == 'verified'){
+                        $query->where('is_verified', true)->where('is_blocked', false);
+                    }
+                }else{
                 $query->where($key, $value);
+
+                }
             }
         }
 

@@ -42,16 +42,65 @@ class ApprovalRequestController extends Controller
     public function getRequests(Request $request)
     {
 
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $filters = $request->input('filter', []);
 
-    $result =   $this->searchService->search(
-        $request, AccountVerificationRequest::class, 
-        AccountVerificationRequestResource::class,
-        true,
-        ['name'], 
-        [] 
-        );
-    return $result;
+        $query =AccountVerificationRequest::query();
+        if($searchTerm){
+            $query->whereHas('user' , function($q) use($searchTerm){
+                $q->where('name' , "LIKE" , "%$searchTerm%")
+                ->orWhere('email' , "LIKE" , "%$searchTerm%")
+                ->orWhere('phone' , "LIKE" , "%$searchTerm%");
+            })->orWhere('name' ,  "LIKE" , "%$searchTerm%");
+        }
 
+
+        $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                $query->where($key, $value);
+            }
+        }
+
+
+
+
+
+    // $result =   $this->searchService->search(
+    //     $request, AccountVerificationRequest::class, 
+    //     AccountVerificationRequestResource::class,
+    //     true,
+    //     ['name'], 
+    //     [] 
+    //     );
+    // return $result;
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+
+         $pagination = [
+                'total' => $data->total(),
+                'current_page' => $data->currentPage(),
+                'per_page' => $data->perPage(),
+                'last_page' => $data->lastPage(),
+            ];
+
+
+        return jsonResponse(true, 200, __('messages.success' ),  AccountVerificationRequestResource::collection($data) ,$pagination);
     }
 
     public function show($id)

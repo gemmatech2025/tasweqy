@@ -38,15 +38,10 @@ class NotificationController extends Controller
         $user = User::find($request->user_id);
         
         if(!$user){
-            return jsonResponse(
-                        false,
-                        404,
-                        __('messages.user_not_found'),
-                    );
+            return jsonResponse(false, 404 , __('messages.user_not_found'));
         }
 
-
-            $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
+        $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
 
             $imagePath =  'notification_icon.png';
             if ($request->hasFile('image')) {
@@ -63,21 +58,16 @@ class NotificationController extends Controller
                 'payload_id'  => '0',
             ]);
 
-
-
             $locale = $user->locale;
-            $notificationTitle = $request->title[$locale] ?? $request->title['en'] ;
-            $notificationBody  = $request->body[$locale] ?? $request->body['en'] ;
+            $notificationTitle = $request->title[$locale] ?? $request->title['en'];
+            $notificationBody  = $request->body[$locale] ?? $request->body['en'];
 
-        
-        $this->firebaseService->sendNotification($tokens, $notificationTitle , $notificationBody  );
+            $this->firebaseService->sendNotification($tokens, $notificationTitle , $notificationBody);
+
         return jsonResponse(
             true,
             200,
             __('messages.added_successfully'),
         );
     }
-
-    
-
 }
