@@ -122,7 +122,7 @@ public function index(Request $request)
 
     if ($this->indexPaginat()) {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [

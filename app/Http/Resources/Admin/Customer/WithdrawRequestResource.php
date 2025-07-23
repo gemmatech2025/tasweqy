@@ -25,11 +25,23 @@ class WithdrawRequestResource extends JsonResource
 
         if ($this->withdrawable_type == 'App\Models\BankInfo') {
             $type = 'bank';
-            $info = $this->withdrawable->bank_name . ' - ' . $this->withdrawable->account_number;
+            $info =''; 
+            if($this->withdrawable){
+                $info = $this->withdrawable->bank_name . ' - ' . $this->withdrawable->account_number;
+            }else{
+                $info ='bank_info_deleted'; 
+            }
         } else {
 
             $type = 'paypal';
-            $info = $this->withdrawable->email;
+
+
+            $info =''; 
+            if($this->withdrawable){
+                $info = $this->withdrawable->email;
+            }else{
+                $info ='paypal_account_deleted'; 
+            }
         }
 
 

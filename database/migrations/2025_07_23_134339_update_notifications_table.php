@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_block_images', function (Blueprint $table) {
-            $table->dropForeign(['user_block_id']);
-            $table->foreign('user_block_id')
-                  ->references('id')
-                  ->on('user_blocks')
-                  ->onDelete('cascade');
+        Schema::table('notifications', function (Blueprint $table) {
+            $table->enum('type' ,['message' , 'push' ,'withraw_issue' , 'withraw_success' , 'referral_link_added' , 'discount_code_added' ,'earning_added' , 'account_verified' , 'verification_rejected' ])->change();
+            
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('user_block_images', function (Blueprint $table) {
+        Schema::table('notifications', function (Blueprint $table) {
             //
         });
     }

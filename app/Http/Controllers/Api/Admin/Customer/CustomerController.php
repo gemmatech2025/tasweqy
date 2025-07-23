@@ -51,8 +51,39 @@ class CustomerController extends Controller
     public function getCustomers(Request $request)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $filters = $request->input('filter', []);
+
         $query =Customer::query();
+        if($searchTerm){
+            $query->whereHas('user' , function($q){
+                $q->where('name' , "LIKE" , "%$searchTerm%")
+                ->orWhere('email' , "LIKE" , "%$searchTerm%")
+                ->orWhere('phone' , "LIKE" , "%$searchTerm%");
+                
+            });
+        }
+
+        $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                $query->where($key, $value);
+            }
+        }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -88,7 +119,7 @@ class CustomerController extends Controller
     public function getAllReferral(Request $request , $id , $type)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $customer = Customer::find($id); 
         
         if(!$customer){
@@ -130,7 +161,7 @@ class CustomerController extends Controller
     public function walletWithdrawRequests(Request $request , $id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $customer = Customer::find($id); 
         
         if(!$customer){
@@ -156,7 +187,7 @@ class CustomerController extends Controller
     public function getBrands(Request $request , $id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
 
         $customer = Customer::find($id); 
         
@@ -230,7 +261,7 @@ class CustomerController extends Controller
     public function getBlockedCustomers(Request $request)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
 
 
         $query = Customer::where('is_blocked', true);
@@ -336,51 +367,10 @@ class CustomerController extends Controller
         return jsonResponse(true, 200, __('messages.success'),$data);
     }
 
-
-    // public function getDistinguishedCustomers(Request $request)
-    // {
-    //     $page = $request->input('page', 1);
-    //     $perPage = $request->input('per_page', 20);
-    //     $query = Customer::select('customers.*')
-    //         ->join('users', 'users.id', '=', 'customers.user_id')
-    //         ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
-    //         ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings')
-    //         ->selectRaw('SUM(referral_earnings.total_clients) as total_clients')
-    //         ->groupBy('customers.id')
-    //         ->orderByDesc('total_earnings');
-    //     $data = $query->paginate($perPage, ['*'], 'page', $page)->map((function ($customer) {
-    //         // $firstJoin = ReferralEarning::where('user_id', $customer->user_id)
-    //         //     ->orderBy('created_at', 'asc')->first();
-    //         // $customer->first_join = $firstJoin ? $firstJoin->created_at->format('F j, Y g:i A') : null;
-    //         return [
-    //             'id' => $customer->id,
-    //             'name' => $customer->user->name,
-    //             'email' => $customer->user->email,
-    //             'phone' => $customer->user->phone,
-    //             'code' => $customer->user->code,
-    //             'total_earnings' => $customer->total_earnings ?? 0,
-    //             'total_clients' => $customer->total_clients ?? 0,
-    //         ];
-    //     }));
-
-
-
-
-    //      $pagination = [
-    //             'total' => $data->total(),
-    //             'current_page' => $data->currentPage(),
-    //             'per_page' => $data->perPage(),
-    //             'last_page' => $data->lastPage(),
-    //         ];
-
-
-    //     return jsonResponse(true, 200, __('messages.success' ),  $data ,$pagination);
-    // }
-
     public function getDistinguishedCustomers(Request $request)
 {
     $page = $request->input('page', 1);
-    $perPage = $request->input('per_page', 20);
+    $perPage = $request->input('per_page', 10);
 
     $query = Customer::select('customers.*')
         ->join('users', 'users.id', '=', 'customers.user_id')

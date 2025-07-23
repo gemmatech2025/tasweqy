@@ -116,7 +116,7 @@ class BrandController extends BaseController
         $sortBy = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'asc');
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $query =Brand::query();
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -141,7 +141,7 @@ class BrandController extends BaseController
     public function getCustomer(Request $request , $brand_id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $query =User::whereHas('customer')
         ->whereHas('referralEarnings' , function ($q) use($brand_id){
             $q->whereHas('referrable' ,function ($q2) use($brand_id){
@@ -211,7 +211,7 @@ class BrandController extends BaseController
     public function getCodes(Request $request , $brand_id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $query =DiscountCode::where('brand_id' , $brand_id);
 
 
@@ -252,7 +252,7 @@ class BrandController extends BaseController
     public function getLinks(Request $request , $brand_id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $query =ReferralLink::where('brand_id' , $brand_id);
 
         $allData = $query->paginate($perPage, ['*'], 'page', $page); 
@@ -293,7 +293,7 @@ class BrandController extends BaseController
     public function getBrandBlocks(Request $request , $brand_id)
     {
         $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 20);
+        $perPage = $request->input('per_page', 10);
         $query =BrandBlock::where('brand_id' , $brand_id);
         $data = $query->paginate($perPage, ['*'], 'page', $page); 
 

@@ -32,8 +32,16 @@ class PushNotificationRequest extends FormRequest
         
 
         return [
-            'user_id'                => 'required|exists:users,id',
-            'type'                   => ['required', Rule::in(['withraw_issue' , 'withraw_success' , 'referral_link_added' , 'discount_code_added' ,'earning_added' , 'account_verified' , 'verification_rejected'])],
+            'user_id'                      => 'required|exists:users,id',
+            'title'                        => 'required|array',
+            'title.ar'                     => 'required|string|max:255',
+            'title.en'                     => 'required|string|max:255',
+            'body'                         => 'required|array',
+            'body.ar'                      => 'required|string|max:255',
+            'body.en'                      => 'required|string|max:255',
+            'image'                        => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+            // 'type'                   => ['required', Rule::in(['withraw_issue' , 'withraw_success' , 'referral_link_added' , 'discount_code_added' ,'earning_added' , 'account_verified' , 'verification_rejected'])],
         ];
     }
 

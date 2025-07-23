@@ -132,7 +132,7 @@ class ApprovalRequestController extends Controller
         public function getApprovalRequestsByCustomerId(Request $request ,$customer_id)
         {
             $page = $request->input('page', 1);
-            $perPage = $request->input('per_page', 20);
+            $perPage = $request->input('per_page', 10);
 
 
 

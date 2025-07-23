@@ -178,12 +178,10 @@ class FirebaseService
 
 
 
-    public function sendNotification(array $deviceTokens, string $title, string $body , string $type = 'message' ,string $payload = '' ): bool
+    public function sendNotification(array $deviceTokens, string $title, string $body , string $type = 'pushed' ,string $payload = '' ): bool
     {
         try {
             foreach ($deviceTokens as $token) {
-                // $message = FirebaseCloudMessage::withTarget('token', $token)
-                //     ->withNotification(Notification::create($title, $body));
                 $message = FirebaseCloudMessage::withTarget('token', $token)
                 ->withNotification(Notification::create($title, $body))
                 ->withData([
@@ -203,6 +201,36 @@ class FirebaseService
             return false;
         }
     }
+
+
+
+
+    //  public function sendNormalNotification(array $deviceTokens, string $title, string $body ): bool
+    // {
+    //     try {
+    //         foreach ($deviceTokens as $token) {
+    //             // $message = FirebaseCloudMessage::withTarget('token', $token)
+    //             //     ->withNotification(Notification::create($title, $body));
+    //             $message = FirebaseCloudMessage::withTarget('token', $token)
+    //             ->withNotification(Notification::create($title, $body))
+    //             ->withData([
+    //                 'type'      => $type,
+    //                 'payload'   => $payload,
+    //             ]);
+
+    //             $this->messaging->send($message);
+    //         }
+
+    //         return true;
+    //     } catch (\Throwable $e) {
+    //         \Log::channel('firebase')->error('Error sending notification', [
+    //             'message' => $e->getMessage(),
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+    //         return false;
+    //     }
+    // }
+
 
 
 
@@ -229,7 +257,7 @@ class FirebaseService
             }
 
             if (!empty($tokens)) {
-                $this->sendNotification($tokens, 'New Message', $message);
+                $this->sendNotification($tokens, 'New Message', $message , 'message');
             }
 
             return Message::create($messageData);
