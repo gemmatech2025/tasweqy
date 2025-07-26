@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\Customer\Notification\NotificationController;
 use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralController;
 use App\Http\Controllers\Api\Admin\Brand\CategoryController;
-
+use App\Http\Controllers\Api\Customer\Auth\SocialAuthController;
 
 
 
@@ -68,6 +68,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
 
     Route::controller(CustomerController::class)->prefix('profile')->group(function () {
+      
+            Route::get('/toggle-notification', 'toggelNotification');
+
             Route::post('/update-profile', 'updateProfile');
             Route::post('/verify-phone', 'verifyPhoneOtp');
             Route::get('/get-profile', 'getMyData');
@@ -221,6 +224,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
        Route::controller(CategoryController::class)->prefix('categories')->group(function () {
             Route::get('/', 'index');
         });
+
+
+
+
+       Route::controller(SocialAuthController::class)->prefix('auth')->group(function () {
+            Route::get('/social-login', 'index');
+        });
+        
 
         
 });

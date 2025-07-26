@@ -221,6 +221,19 @@ class CustomerController extends Controller
 
 
 
+    public function toggelNotification()
+    {
+        $user = Auth::user();
+        
+        $user->is_notification_active = !$user->is_notification_active;
+        $user->save();
+                      
+        return jsonResponse( true ,  200 ,__('messages.sucess') ,  [ 'is_notification_active' => $user->is_notification_active] );        
+    }
+
+
+
+
     public function getMyData()
     {
         $user = Auth::user();

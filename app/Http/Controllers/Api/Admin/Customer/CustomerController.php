@@ -83,7 +83,11 @@ class CustomerController extends Controller
 
         foreach ($filters as $key => $value) {
             if (in_array($key, $columns)) {
-                if($key == 'status'){
+                $query->where($key, $value);
+            }
+
+
+             if($key == 'status'){
                     if($value == 'not_verified'){
                         $query->where('is_verified', false)->where('is_blocked', false);
                     }else if($value == 'blocked'){
@@ -91,11 +95,7 @@ class CustomerController extends Controller
                     }else if($value == 'verified'){
                         $query->where('is_verified', true)->where('is_blocked', false);
                     }
-                }else{
-                $query->where($key, $value);
-
                 }
-            }
         }
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);

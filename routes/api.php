@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Tracking\TrakingController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 
+use App\Http\Controllers\Api\Customer\Auth\SocialAuthController;
 
 
 Route::get('/user', function (Request $request) {
@@ -59,4 +60,16 @@ Route::controller(TrakingController::class)->prefix('event-tracker')->group(func
     Route::get('/track', 'trackPixel');
 
 });
+
+
+Route::controller(SocialAuthController::class)->prefix('auth')->group(function () {
+    Route::post('/social-login', 'socialLogin');
+    Route::get('/google/callback', 'googleCallback');
+    Route::get('/google/generat-url', 'getGoogleAuthUrl');
+
+    
+
+
+});
+
 

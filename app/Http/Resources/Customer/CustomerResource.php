@@ -36,6 +36,7 @@ class CustomerResource extends JsonResource
             'locale'              => $this->locale,
             'is_phone_verified'   => $this->phone_verified_at ? true : false,
             'is_email_verified'   => $this->email_verified_at ? true : false,
+            'is_notification_active'      => (bool) $this->is_notification_active,
 
             'is_2fa_enabled'      => (bool) $this->two_factor_secret,
             'is_2fa_confirmed'    => (bool) $this->two_factor_confirmed_at,

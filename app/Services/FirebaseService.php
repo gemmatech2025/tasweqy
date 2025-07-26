@@ -38,34 +38,10 @@ class FirebaseService
     public function handelNotification(User $user,$type,$payload): bool
     {
         try {
-
-        // type =  [
-        //     'withraw_issue',
-        //     'withraw_success',
-        //     'referral_link_added',
-        //     'discount_code_added',
-        //     'earning_added',
-        //     'account_verified',
-        //     'verification_rejected'
-        // ];
-
         $title = [];
         $body = [];
         $image = 'notification_icon.png';
         
-        // images =  [
-        //     'notifications/empty-wallet-add.png',
-        //     'notifications/empty-wallet-remove.png',
-        //     'notifications/empty-wallet-tick.png',
-        //     'notifications/link.png',
-        //     'notifications/shield-cross.png',
-        //     'notifications/shield-tick.png',
-        //     'notifications/ticket-discount.png'
-        // ];
-
-
-
-
         switch ($type) {
             case 'withraw_issue':
                 $title['ar'] = 'مشكلة في السحب';
@@ -163,7 +139,11 @@ class FirebaseService
             $notificationTitle = $title[$locale] ?? $title['en'] ;
             $notificationBody  = $body[$locale] ?? $body['en'] ;
 
-            $this->sendNotification($fcmTokens , $notificationTitle, $notificationBody , $type , $payload);
+
+            if($user->is_notification_active){
+                $this->sendNotification($fcmTokens , $notificationTitle, $notificationBody , $type , $payload);
+            }
+
 
             return true;
         } catch (\Throwable $e) {
@@ -202,38 +182,6 @@ class FirebaseService
         }
     }
 
-
-
-
-    //  public function sendNormalNotification(array $deviceTokens, string $title, string $body ): bool
-    // {
-    //     try {
-    //         foreach ($deviceTokens as $token) {
-    //             // $message = FirebaseCloudMessage::withTarget('token', $token)
-    //             //     ->withNotification(Notification::create($title, $body));
-    //             $message = FirebaseCloudMessage::withTarget('token', $token)
-    //             ->withNotification(Notification::create($title, $body))
-    //             ->withData([
-    //                 'type'      => $type,
-    //                 'payload'   => $payload,
-    //             ]);
-
-    //             $this->messaging->send($message);
-    //         }
-
-    //         return true;
-    //     } catch (\Throwable $e) {
-    //         \Log::channel('firebase')->error('Error sending notification', [
-    //             'message' => $e->getMessage(),
-    //             'trace' => $e->getTraceAsString(),
-    //         ]);
-    //         return false;
-    //     }
-    // }
-
-
-
-
     public function sendChatMessage(string $message, string $userId, string $toUserId = null)
     {
         $messageData = [
@@ -248,16 +196,24 @@ class FirebaseService
         try {
 
             $tokens = [];
+            $user = null;
             if (!$toUserId) {
                 $tokens = FcmToken::whereHas('user', function ($query) {
                     $query->where('role', 'admin');
                 })->pluck('fcm_token')->toArray();
             } else {
+                $user = User::find($toUserI);
                 $tokens = FcmToken::where('user_id', $toUserId)->pluck('fcm_token')->toArray();
             }
 
             if (!empty($tokens)) {
-                $this->sendNotification($tokens, 'New Message', $message , 'message');
+                if($user){
+                    if($user->is_notification_active){
+                        $this->sendNotification($tokens, 'New Message', $message , 'message');
+                    }
+                }else{
+                    $this->sendNotification($tokens, 'New Message', $message , 'message');
+                }
             }
 
             return Message::create($messageData);
@@ -271,8 +227,4 @@ class FirebaseService
             ];
         }
     }
-
-
- 
-
 }
