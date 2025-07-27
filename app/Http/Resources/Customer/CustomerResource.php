@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Models\ReferralEarning;
+use Illuminate\Support\Str;
 
 class CustomerResource extends JsonResource
 {
