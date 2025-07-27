@@ -108,6 +108,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         
         Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+            
+            Route::get('/get-all', 'getAllForSellect');
+
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');

@@ -51,6 +51,26 @@ class CategoryController extends BaseController
         return true;
     }
 
+    public function getAllForSellect()
+    {
+        $categories = Category::all()->map(function($category){
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'image' => $category->image ? asset($category->image) : null,
+            ];
+        });
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            $categories
+        );
+    }
+
+
 
 
     
