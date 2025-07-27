@@ -90,8 +90,47 @@ public function updateRequestStatus($request_id , $status)
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 20);
+        $searchTerm = trim($request->input('searchTerm', ''));
+        $filters = $request->input('filter', []);
 
         $query = WithdrawRequest::query();
+
+
+
+        if ($searchTerm) {
+            $query->where('id', 'LIKE', "%{$searchTerm}%" )
+            ->orWhereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%" );
+                });
+        }
+
+        $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('withdraw_requests');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                $query->where($key, $value);
+            }else if($key == 'type'){
+                if($value == 'paypal'){
+                    $query->where('withdrawable_type', 'App\Models\PaypalAccount');
+                }else if($value == 'bank'){
+                    $query->where('withdrawable_type', 'App\Models\BankInfo');
+                }
+            }
+        }
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [

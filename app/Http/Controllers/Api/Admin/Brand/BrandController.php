@@ -111,13 +111,55 @@ class BrandController extends BaseController
 
     public function index(Request $request)
     {
-        $searchTerm = trim($request->input('search', ''));
+        $searchTerm = trim($request->input('searchTerm', ''));
         $filters = $request->input('filter', []);
-        $sortBy = $request->input('sort_by', 'id');
-        $sortOrder = $request->input('sort_order', 'asc');
+        // $sortBy = $request->input('sort_by', 'id');
+        // $sortOrder = $request->input('sort_order', 'asc');
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
         $query =Brand::query();
+
+
+
+        if ($searchTerm) {
+            $query->where('name', 'LIKE', "%{$searchTerm}%" )
+            ->orWhere('description', 'LIKE', "%{$searchTerm}%" )
+            ->orWhere('id', 'LIKE', "%{$searchTerm}%" )
+            ->orWhereHas('category', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%" );
+                });
+        }
+
+
+
+        $filters = array_map(function ($value) {
+        if (is_string($value)) {
+                $lower = strtolower($value);
+                return match ($lower) {
+                    'true' => 1,
+                    'false' => 0,
+                    default => is_numeric($value) ? $value + 0 : $value,
+                };
+            }
+            return $value;
+        }, $filters);
+
+        $filters = array_filter($filters, fn($value) => $value !== null && $value !== '');
+        $columns = \Schema::getColumnListing('brands');
+
+        foreach ($filters as $key => $value) {
+            if (in_array($key, $columns)) {
+                // dd($filters);
+                $query->where($key, $value);
+            }
+        }
+
+
+
+
+
+
+
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [

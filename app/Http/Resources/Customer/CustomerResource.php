@@ -32,7 +32,9 @@ class CustomerResource extends JsonResource
             'phone'               => $this->phone,
             'code'                => $this->code,
             'email'               => $this->email,
-            'image'               => $this->image ? asset($this->image) : null,
+            'image' => (Str::startsWith($this->image, ['http://', 'https://'])) ? $this->image : ($this->image ? asset($this->image) : null),
+
+            // 'image'               => $this->image ? asset($this->image) : null,
             'locale'              => $this->locale,
             'is_phone_verified'   => $this->phone_verified_at ? true : false,
             'is_email_verified'   => $this->email_verified_at ? true : false,

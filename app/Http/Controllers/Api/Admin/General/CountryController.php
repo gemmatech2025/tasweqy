@@ -48,18 +48,18 @@ class CountryController extends BaseController
     {
 
 
-        $countries = Country::all();
+        $countries = Country::all()->map(function($country){
+            return['id' => $country->id , 'name' => $country->name];
+        });
 
 
         return jsonResponse(
         true,
         200,
         __('messages.success'),
-        (static::RESOURCE)::collection($countries)
+        $countries
+        // (static::RESOURCE)::collection($countries)
         );
-
-
-
     }
 
 

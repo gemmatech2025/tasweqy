@@ -91,7 +91,8 @@ class CustomerDetailsResource extends JsonResource
             'code'        => $this->user->code ,
             'gender'      => $this->gender,
             'email'       => $this->user->email,
-            'image'       => $this->user->image ? asset($this->user->image) : null,
+            // 'image'       => $this->user->image ? asset($this->user->image) : null,
+            'image' => (Str::startsWith($this->user->image, ['http://', 'https://'])) ? $this->user->image : ($this->user->image ? asset($this->user->image) : null),
 
             // 'birthdate'   => $this->birthdate,
             'birthdate' => $this->birthdate->format('F j, Y'),
