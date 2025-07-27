@@ -54,6 +54,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
         Route::controller(CountryController::class)->prefix('countries')->group(function () {
+            
+            Route::get('/get-all', 'getAllForSellect');
+
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');

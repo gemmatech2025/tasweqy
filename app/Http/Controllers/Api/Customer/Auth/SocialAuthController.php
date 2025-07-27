@@ -215,6 +215,7 @@ public function socialLogin(Request $request)
         $customer = User::updateOrCreate(
             ['email' => $email],
             [
+                'email_verified_at' => now(),
                 'name'              => $name ?? '',
                 $provider . '_id'   => $providerId,
                 'image'             => $avatar ?? '',
@@ -226,13 +227,10 @@ public function socialLogin(Request $request)
         // Generate token
         $token = $customer->createToken('customer_token', ['*'])->plainTextToken;
 
-        // return response()->json([
-            
-        // ]);
 
-                return jsonResponse( true ,  200 ,__('messages.authanticated_successfully') ,
-                ['token' => $token,
-            'customer' => $customer] );    
+        return jsonResponse( true ,  200 ,__('messages.authanticated_successfully') ,
+        ['token' => $token,
+        'customer' => $customer] );    
 
 
     } catch (\Exception $e) {
