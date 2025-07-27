@@ -37,6 +37,13 @@ Route::middleware(['set-locale'])->group(function () {
     Route::post('add-new-password-forgot-password', [AuthController::class, 'addNewPasswordForgetPassword']);
 
 
+
+    Route::controller(SocialAuthController::class)->prefix('auth')->group(function () {
+        Route::post('/social-login', 'socialLogin');
+    });
+        
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
 
 
@@ -228,10 +235,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-       Route::controller(SocialAuthController::class)->prefix('auth')->group(function () {
-            Route::get('/social-login', 'index');
-        });
-        
 
         
 });
