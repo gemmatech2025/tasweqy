@@ -34,13 +34,21 @@ class BrandDetailsCustomerResource   extends JsonResource
         ->map(function ($referralLink) {
         $earning = $referralLink->referralEarning;
 
+
+        if($earning){
+            if($earning->socialMediaPlatform && !$earning->social_media_set){
+                $earning->social_media_set = true;
+                $earning->save();
+            }
+        }
+
         return [
             
-                'social_media_set' => $earning?->social_media_set ?? false,
-                'earning_id'       => $earning?->id ?? null,
-                'total_earnings'   => $earning?->total_earnings ?? 0,
-                'total_clients'    => $earning?->total_clients ?? 0,
-                'socialMediaPlatform' => $earning && $earning->socialMediaPlatform
+                'social_media_set'    => $earning?->social_media_set ?? false,
+                'earning_id'          => $earning?->id ?? null,
+                'total_earnings'      => $earning?->total_earnings ?? 0,
+                'total_clients'       => $earning?->total_clients ?? 0,
+                'socialMediaPlatform' => $earning && $earning?->socialMediaPlatform
                     ? [
                         'id'   => $earning->socialMediaPlatform->id,
                         'name' => $earning->socialMediaPlatform->name
@@ -69,12 +77,19 @@ class BrandDetailsCustomerResource   extends JsonResource
             ->map(function ($discountCode) {
             $earning = $discountCode->referralEarning;
 
+            if($earning){
+                if($earning->socialMediaPlatform && !$earning->social_media_set){
+                    $earning->social_media_set = true;
+                    $earning->save();
+                }
+            }
+
             return [
-                'social_media_set'       => $earning?->social_media_set ?? false,
-                'earning_id'       => $earning?->id ?? null,
-                'total_earnings'   => $earning?->total_earnings ?? 0,
-                'total_clients'    => $earning?->total_clients ?? 0,
-                'socialMediaPlatform' => $earning && $earning->socialMediaPlatform
+                'social_media_set'      => $earning?->social_media_set ?? false,
+                'earning_id'            => $earning?->id ?? null,
+                'total_earnings'        => $earning?->total_earnings ?? 0,
+                'total_clients'         => $earning?->total_clients ?? 0,
+                'socialMediaPlatform'   => $earning && $earning?->socialMediaPlatform
                     ? [
                         'id'   => $earning->socialMediaPlatform->id,
                         'name' => $earning->socialMediaPlatform->name

@@ -285,4 +285,23 @@ class BrandController extends Controller
         );
     }
 
+
+    public function removeSocialMediaPlatform($earning_id)
+    {
+        $referralEarning = ReferralEarning::find($earning_id);
+        if (!$referralEarning) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+        
+        $referralEarning->social_media_platform_id = false;
+        $referralEarning->social_media_set = false;
+        $referralEarning->save();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+        );
+    }
+
 }
