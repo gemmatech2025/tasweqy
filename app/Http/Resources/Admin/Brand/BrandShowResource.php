@@ -23,6 +23,7 @@ class BrandShowResource extends JsonResource
             'email'             => $this->email,
             'phone'             => $this->phone,
             'code'              => $this->code,
+            'google_drive_url'              => $this->google_drive_url,
 
             'category_id'       => $this->category_id,
             'countries'         => $this->countries->map(function($country){
