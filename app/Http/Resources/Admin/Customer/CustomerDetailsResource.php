@@ -10,6 +10,7 @@ use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
 class CustomerDetailsResource extends JsonResource
 {
