@@ -177,6 +177,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-my-brands', 'getMyBrands');
             Route::get('/get-brand-by-id/{brand_id}', 'getBrandById');
             Route::put('/update-social-platform/{earning_id}/{platform_id}', 'addSocialMediaPlatform');
+            Route::put('/remove-social-platform/{earning_id}', 'removeSocialMediaPlatform');
+
+            
 
 
         });
