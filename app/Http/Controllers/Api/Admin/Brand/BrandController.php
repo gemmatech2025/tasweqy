@@ -121,14 +121,26 @@ class BrandController extends BaseController
 
 
 
+        // if ($searchTerm) {
+        //     $query->where('name', 'LIKE', "%{$searchTerm}%" )
+        //     ->orWhere('description', 'LIKE', "%{$searchTerm}%" )
+        //     ->orWhere('id', 'LIKE', "%{$searchTerm}%" )
+        //     ->orWhereHas('category', function ($q) use ($searchTerm) {
+        //         $q->where('name', 'LIKE', "%{$searchTerm}%" );
+        //         });
+        // }
+
         if ($searchTerm) {
-            $query->where('name', 'LIKE', "%{$searchTerm}%" )
-            ->orWhere('description', 'LIKE', "%{$searchTerm}%" )
-            ->orWhere('id', 'LIKE', "%{$searchTerm}%" )
-            ->orWhereHas('category', function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', "%{$searchTerm}%" );
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('id', 'LIKE', "%{$searchTerm}%")
+                ->orWhereHas('category', function ($q2) use ($searchTerm) {
+                    $q2->where('name', 'LIKE', "%{$searchTerm}%");
                 });
+            });
         }
+
 
 
 
