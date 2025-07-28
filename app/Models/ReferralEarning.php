@@ -14,13 +14,15 @@ class ReferralEarning extends Model
         'referrable_id',
         'total_clients',
         'user_id',
-        'social_media_set'
+        'social_media_set',
 
     ];
 
     protected $casts = [
-        'total_earnings' => 'decimal:2',
-        'total_clients' => 'integer',
+        'total_earnings'    => 'decimal:2',
+        'total_clients'     => 'integer',
+        'social_media_set'  => 'boolean',
+
     ];
 
     public function socialMediaPlatform()
