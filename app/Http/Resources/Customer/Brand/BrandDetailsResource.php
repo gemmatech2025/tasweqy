@@ -38,8 +38,8 @@ class BrandDetailsResource extends JsonResource
             'description'    => $this->description,
             'category'       => $this->category->name,
             'logo'           => $this->logo ? asset($this->logo) : null,
-            'highestReferralLink'           => $highestReferralLink->earning_precentage,
-            'highestDiscountCode'           => $highestDiscountCode->earning_precentage,
+            'highestReferralLink'           => $highestReferralLink ? $highestReferralLink->earning_precentage : 0,
+            'highestDiscountCode'           => $highestDiscountCode ? $highestDiscountCode->earning_precentage : 0,
             'total_marketeers'              => $DiscountCodeCount + $ReferralLinkCount
 
 
