@@ -11,6 +11,8 @@ use App\Models\ReferralLink;
 use App\Models\ReferralRequest;
 use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
+use App\Models\SocialMediaPlatform;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -271,8 +273,14 @@ class BrandController extends Controller
             return jsonResponse(false, 404, __('messages.not_found'));
         }
 
+
+
         if($platform_id != 'none'){
-            $referralEarning->social_media_platform_id = $platform_id;
+            $social = SocialMediaPlatform::find($platform_id);
+            if (!$social) {
+                return jsonResponse(false, 404, __('messages.social_media_not_found'));
+            }
+            $referralEarning->social_media_platform_id = $social->id;
         }
 
         $referralEarning->social_media_set = true;
