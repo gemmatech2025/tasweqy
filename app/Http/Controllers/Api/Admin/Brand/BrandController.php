@@ -118,17 +118,7 @@ class BrandController extends BaseController
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
         $query =Brand::query();
-
-
-
-        // if ($searchTerm) {
-        //     $query->where('name', 'LIKE', "%{$searchTerm}%" )
-        //     ->orWhere('description', 'LIKE', "%{$searchTerm}%" )
-        //     ->orWhere('id', 'LIKE', "%{$searchTerm}%" )
-        //     ->orWhereHas('category', function ($q) use ($searchTerm) {
-        //         $q->where('name', 'LIKE', "%{$searchTerm}%" );
-        //         });
-        // }
+        
 
         if ($searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
