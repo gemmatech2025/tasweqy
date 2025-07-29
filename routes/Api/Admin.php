@@ -122,6 +122,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
             
+            Route::get('/get-all-brands', 'getAll');
 
             Route::get('/get-brand-blocks/{brand_id}', 'getBrandBlocks');
 
