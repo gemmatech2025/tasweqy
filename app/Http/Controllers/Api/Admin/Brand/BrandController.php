@@ -182,6 +182,28 @@ class BrandController extends BaseController
  
     
 
+    public function getAll()
+    {
+        $brands =Brand::all()->map(function ($brand){
+            return ['id' => $brand->id ,'name' => $brand->name];
+        });
+        
+
+
+
+
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            $brands
+        );
+    }
+ 
+    
+
     public function getCustomer(Request $request , $brand_id)
     {
         $page = $request->input('page', 1);
