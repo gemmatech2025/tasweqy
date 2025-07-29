@@ -142,17 +142,19 @@ class DiscountCodeController extends BaseController
 
 
     if ($searchTerm) {
-    $query->where('id', 'LIKE', "%$searchTerm%")
-        ->orWhere('code', 'LIKE', "%$searchTerm%")
-        ->orWhereHas('referralEarning', function ($q) use ($searchTerm) {
-            $q->whereHas('user', function ($innerQuery) use ($searchTerm) {
-                $innerQuery->where('name', 'LIKE', "%$searchTerm%");
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('id', 'LIKE', "%$searchTerm%")
+                    ->orWhere('code', 'LIKE', "%$searchTerm%")
+                    ->orWhereHas('referralEarning', function ($q2) use ($searchTerm) {
+                        $q2->whereHas('user', function ($innerQuery) use ($searchTerm) {
+                            $innerQuery->where('name', 'LIKE', "%$searchTerm%");
+                        });
+                    })
+                    ->orWhereHas('brand', function ($q2) use ($searchTerm) {
+                        $q2->where('name', 'LIKE', "%$searchTerm%");
+                    });
             });
-        })
-        ->orWhereHas('brand', function ($q) use ($searchTerm) {
-            $q->where('name', 'LIKE', "%$searchTerm%");
-        });
-}
+    }
 
 
 
@@ -181,14 +183,14 @@ class DiscountCodeController extends BaseController
 
 
 
-        if (!empty($searchTerm)) {
-            $searchableFields = $this->getSearchableFields();
-            $query->where(function ($q) use ($searchableFields, $searchTerm) {
-                foreach ($searchableFields as $field) {
-                    $q->orWhere($field, 'LIKE', "%{$searchTerm}%");
-                }
-            });
-        }
+        // if (!empty($searchTerm)) {
+        //     $searchableFields = $this->getSearchableFields();
+        //     $query->where(function ($q) use ($searchableFields, $searchTerm) {
+        //         foreach ($searchableFields as $field) {
+        //             $q->orWhere($field, 'LIKE', "%{$searchTerm}%");
+        //         }
+        //     });
+        // }
 
         if ($sortBy && $sortOrder) {
             $query->orderBy($sortBy, $sortOrder);
@@ -198,7 +200,6 @@ class DiscountCodeController extends BaseController
             }
         }
 
-        if ($this->indexPaginat()) {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 10);
             $data = $query->paginate($perPage, ['*'], 'page', $page);
@@ -217,14 +218,7 @@ class DiscountCodeController extends BaseController
                 (static::RESOURCE)::collection($data),
                 $pagination
             );
-        }
-
-        return jsonResponse(
-            true,
-            200,
-            __('messages.success'),
-            (static::RESOURCE)::collection($query->get())
-        );
+     
     }
 
 
