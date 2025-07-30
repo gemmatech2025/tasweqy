@@ -388,9 +388,6 @@ public function index(Request $request)
         'interaction'   => 'in:all,most_liked,most_commented,most_shared',
     ]);
 
-
-
-
     $searchTerm   = trim($request->input('search', ''));
     $contentType  = $request->input('content_type', 'all'); // 'all', 'image', 'video'
     $from_date    = $request->input('from_date');
