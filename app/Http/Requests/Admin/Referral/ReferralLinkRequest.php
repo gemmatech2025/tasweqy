@@ -44,6 +44,7 @@ class ReferralLinkRequest extends FormRequest
             case 'PATCH':
             case 'PUT':
                 $rules +=  [
+                        'brand_id'            => 'required|exists:brands,id',
                         'link'                => 'required|url|max:255',
                         'earning_precentage'  => 'required|numeric|min:1|max:99',
                         'link_code'           => 'required|string|max:255',
