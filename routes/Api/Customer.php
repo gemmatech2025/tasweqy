@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Admin\Brand\CategoryController;
 use App\Http\Controllers\Api\Customer\Auth\SocialAuthController;
 
 
+use App\Http\Controllers\Api\Admin\Notification\NotificationController as AdminNotificationController;
 
 use App\Http\Controllers\Api\Customer\Chat\ChatController;
 
@@ -236,6 +237,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/', 'index');
         });
 
+       Route::controller(AdminNotificationController::class)->prefix('notifications')->group(function () {
+            Route::post('/push', 'pushNotificationTesting');
+        });
 
 
 
