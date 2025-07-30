@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use App\Services\UploadFilesService;
 use App\Services\FirebaseService;
 use App\Http\Requests\Admin\Notification\PushNotificationRequest;
+use App\Http\Requests\Admin\Notification\PushNotificationTestingRequest;
 
 
 class NotificationController extends Controller
@@ -64,6 +65,48 @@ class NotificationController extends Controller
 
             $this->firebaseService->sendNotification($tokens, $notificationTitle , $notificationBody);
 
+        return jsonResponse(
+            true,
+            200,
+            __('messages.added_successfully'),
+        );
+    }
+
+
+
+
+    public function pushNotificationTesting(PushNotificationTestingRequest $request){
+
+
+        $user = User::find($request->user_id);
+        
+        if(!$user){
+            return jsonResponse(false, 404 , __('messages.user_not_found'));
+        }
+
+        // $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
+
+        //     $imagePath =  'notification_icon.png';
+        //     if ($request->hasFile('image')) {
+        //         $image = $request->file('image');
+        //         $imagePath = $this->uploadFilesService->uploadImage($image , 'notifications');
+        //     }
+
+        //     $notification = Notification::create([
+        //         'user_id'     => $user->id,
+        //         'title'       => $request->title,
+        //         'body'        => $request->body,
+        //         'image'       => $imagePath,
+        //         'type'        => 'push',
+        //         'payload_id'  => '0',
+        //     ]);
+
+        //     $locale = $user->locale;
+        //     $notificationTitle = $request->title[$locale] ?? $request->title['en'];
+        //     $notificationBody  = $request->body[$locale] ?? $request->body['en'];
+
+
+            $this->firebaseService->handelNotification($user, $request->type , $request->payload);
         return jsonResponse(
             true,
             200,
