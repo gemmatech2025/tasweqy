@@ -42,6 +42,7 @@ class DiscountCodeRequest extends FormRequest
             case 'PATCH':
             case 'PUT':
                 $rules +=  [
+                        'brand_id'            => 'required|exists:brands,id',
                         'code'                => 'required|string|max:255',
                         'earning_precentage'  => 'required|numeric|min:1|max:99',
                 ];
