@@ -24,6 +24,8 @@ class ReferralLinkResource extends JsonResource
         return [
             'id'                    => $this->id,
             'brand'                 => $this->brand->name,
+            'brand_id'                 => $this->brand_id,
+
             'status'                => $this->status,
             'created_at'            => $this->created_at ? $this->created_at->format('F j, Y g:i A') : null,
 
