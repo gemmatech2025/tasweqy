@@ -168,6 +168,8 @@ class WalletController extends Controller
         $orderBy = $request->input('sort_by', 'newest'); // total_client - earnings
         $socialMediaPlatform = $request->input('socialMediaPlatform', ''); 
         $source = $request->input('source', ''); // referral_link - discount_code
+        $earningOrder = $request->input('earningOrder', ''); // total_client - earnings
+        $earning_order = $request->input('earning_order', ''); // 'asc' , 'desc' 
 
 
         $user = Auth::user();
@@ -202,6 +204,15 @@ class WalletController extends Controller
         }else{
             $query->orderBy('created_at', 'desc');
         }
+
+
+
+        if($earning_order == 'desc' || $earning_order == 'asc'){
+            $query->orderBy('total_earnings', $earning_order);
+        }
+
+
+
 
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
