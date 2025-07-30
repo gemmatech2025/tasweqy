@@ -27,6 +27,27 @@ use App\Http\Controllers\Api\Admin\Setting\SettingController;
 
 
 
+      Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
+
+        
+            Route::get('/get-numbers', 'getReferralLinksNumbers');
+
+
+            Route::put('/update-status/{id}', 'updateStatus');
+
+            Route::get('/export-template', 'exportReferralLinksTemplate');
+            Route::post('/import-data', 'importReferralLinks');
+            Route::post('/store-list', 'storeList');
+            
+            Route::post('/', 'store');
+
+            
+            Route::delete('/{id}', 'delete');
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+
+        });
 
 
 Route::middleware(['set-locale'])->group(function () {
@@ -142,27 +163,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-      Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
-
-        
-            Route::get('/get-numbers', 'getReferralLinksNumbers');
-
-
-            Route::put('/update-status/{id}', 'updateStatus');
-
-            Route::get('/export-template', 'exportReferralLinksTemplate');
-            Route::post('/import-data', 'importReferralLinks');
-            Route::post('/store-list', 'storeList');
-            
-            Route::post('/', 'store');
-
-            
-            Route::delete('/{id}', 'delete');
-            Route::get('/', 'index');
-            Route::get('/{id}', 'show');
-            Route::put('/{id}', 'update');
-
-        });
 
 
         Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
