@@ -11,7 +11,8 @@ use App\Http\Controllers\Api\Customer\Payment\PayPalAccountController;
 use App\Http\Controllers\Api\Customer\Community\PostController;
 use App\Http\Controllers\Api\Customer\Community\PostCommentController;
 use App\Http\Controllers\Api\Customer\Wallet\WithdrawRequestController;
-use App\Http\Controllers\Api\Admin\General\CountryController;
+use App\Http\Controllers\Api\Customer\General\CountryController;
+
 use App\Http\Controllers\Api\Customer\Referral\ReferralRequestController;
 use App\Http\Controllers\Api\Customer\Brand\BrandController;
 use App\Http\Controllers\Api\Customer\Wallet\WalletController;
