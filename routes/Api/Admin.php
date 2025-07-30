@@ -27,7 +27,23 @@ use App\Http\Controllers\Api\Admin\Setting\SettingController;
 
 
 
-      Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
+
+
+
+Route::middleware(['set-locale'])->group(function () {
+
+Route::post('login', [AuthController::class, 'login']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+
+
+
+
+        Route::middleware(['role:admin'])->group(function () {
+
+
+
+            Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
 
         
             Route::get('/get-numbers', 'getReferralLinksNumbers');
@@ -48,18 +64,6 @@ use App\Http\Controllers\Api\Admin\Setting\SettingController;
             Route::put('/{id}', 'update');
 
         });
-
-
-Route::middleware(['set-locale'])->group(function () {
-
-Route::post('login', [AuthController::class, 'login']);
-
-Route::middleware(['auth:sanctum'])->group(function () {
-
-
-
-
-        Route::middleware(['role:admin'])->group(function () {
 
       
 
