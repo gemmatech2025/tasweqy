@@ -17,20 +17,34 @@ class NotificationController extends Controller
 
 
 
-    public function getMyNotifications()
-    {
+  public function getMyNotifications(Request $request)
+{
+    $page = $request->input('page', 1);
+    $perPage = $request->input('per_page', 20);
 
-        $user = Auth::user();
-        $notifications = Notification::where('user_id' , $user->id)->get();
-        // ->where('user_id' , $user->id)
+    $user = Auth::user();
 
-        return jsonResponse(
-            true,
-            200,
-            __('messages.success'),
-            NotificationResource::collection($notifications)
-        );
-    }
+    $notifications = Notification::where('user_id', $user->id)
+                                 ->orderBy('created_at', 'desc');
+
+    $data = $notifications->paginate($perPage, ['*'], 'page', $page);
+
+    $pagination = [
+        'total' => $data->total(),
+        'current_page' => $data->currentPage(),
+        'per_page' => $data->perPage(),
+        'last_page' => $data->lastPage(),
+    ];
+
+    return jsonResponse(
+        true,
+        200,
+        __('messages.success'),
+        NotificationResource::collection($data),  
+        $pagination
+    );
+}
+
 
     public function deleteNotification($id)
     {
