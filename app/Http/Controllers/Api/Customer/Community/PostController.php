@@ -384,7 +384,7 @@ public function index(Request $request)
         'from_date'     => 'nullable|date_format:Y-m-d',
         'to_date'       => 'nullable|date_format:Y-m-d',
         'sort_order'    => 'in:asc,desc',
-        'content_type'  => 'in:all,image,video',
+        'content_type'  => 'in:all,image,video,text_only',
         'interaction'   => 'in:all,most_liked,most_commented,most_shared',
     ]);
 
