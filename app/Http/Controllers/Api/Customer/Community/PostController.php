@@ -389,7 +389,7 @@ public function index(Request $request)
     ]);
 
     $searchTerm   = trim($request->input('search', ''));
-    $contentType  = $request->input('content_type', 'all'); // 'all', 'image', 'video'
+    $contentType  = $request->input('content_type', 'all'); // 'all', 'image', 'video' , 'text_only'
     $from_date    = $request->input('from_date');
     $to_date      = $request->input('to_date');
     $interaction  = $request->input('interaction', 'all'); // 'most_liked', 'most_commented', 'most_shared'
@@ -420,7 +420,10 @@ public function index(Request $request)
         $query->whereHas('medias', function ($q) use ($contentType) {
             $q->where('type', $contentType);
         });
+    }else if($contentType == 'text_only'){
+        $query->whereDoesntHave('medias');
     }
+
 
     if ($interaction === 'most_liked') {
         $query->withCount('likes')->orderBy('likes_count', 'desc');

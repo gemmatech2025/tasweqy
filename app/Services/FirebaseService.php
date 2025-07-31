@@ -165,11 +165,15 @@ class FirebaseService
                 $message = FirebaseCloudMessage::withTarget('token', $token)
                 ->withNotification(Notification::create($title, $body))
                 ->withData([
-                   'data' =>[
                     'type'      => $type,
                     'payload'   => $payload,
-                   ]
                 ]);
+                // ->withData([
+                //    'data' =>[
+                //     'type'      => $type,
+                //     'payload'   => $payload,
+                //    ]
+                // ]);
 
                 $this->messaging->send($message);
             }
