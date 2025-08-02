@@ -11,6 +11,7 @@ use App\Models\WithdrawRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Services\FirebaseService;
+use App\Services\CustomerWalletService;
 
 use App\Http\Resources\Admin\Payment\WithdrawRequestResource;
 
@@ -18,11 +19,14 @@ class WithdrawRequestController extends Controller
 {
 
     protected $firebaseService = null;
+     protected $customerWalletService =null;
+
     public function __construct()
     {
         $this->firebaseService = new FirebaseService();
-    }
+        $this->customerWalletService = new CustomerWalletService();
 
+    }
 
 
 public function updateRequestStatus($request_id , $status)
