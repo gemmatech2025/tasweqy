@@ -503,26 +503,35 @@ class CustomerController extends Controller
             });
         }
 
-        if($payment_status){
-            if($payment_status == 'qualified'){
-                $query->where('total_balance' ,'>=',$limit->value  );
-            }else if($payment_status == 'disqualified'){
-                $query->where('total_balance' ,'>=',$limit->value  );
+        if ($payment_status) {
+            if ($payment_status == 'qualified') {
+                $query->where('total_balance', '>=', $limit->value);
+            } else if ($payment_status == 'disqualified') {
+                $query->where('total_balance', '<', $limit->value);
             }
         }
 
 
+
         $customers = $query->paginate($perPage, ['*'], 'page', $page);
 
-        $data = $customers->map(function ($customer) {
+        $data = $customers->map(function ($customer) use($limit) {
+            $totalEarnings = ReferralEarning::where('user_id' ,$customer->user_id)->sum('total_earnings');
+            $withdrawn_amount = WithdrawRequest::where('user_id' ,$customer->user_id)->where('status' ,'approved')->sum('total');
+            $customer->total_balance =  $totalEarnings -  $withdrawn_amount;
+            $customer->save();
+
             return [
                 'id' => $customer->id,
                 'name' => $customer->user->name,
                 'email' => $customer->user->email,
                 'phone' => $customer->user->phone,
                 'code' => $customer->user->code,
-                'total_earnings' => $customer->total_earnings ?? 0,
-                'total_clients' => $customer->total_clients ?? 0,
+                'withdrawn_amount' => $withdrawn_amount,
+                'total_balance' => $customer->total_balance,
+                'total_earnings' => $totalEarnings ?? 0,
+                'can_withdraw' => $customer->total_balance > $limit->value,
+
             ];
         });
 
