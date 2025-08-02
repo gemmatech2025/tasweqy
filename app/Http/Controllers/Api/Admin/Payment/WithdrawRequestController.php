@@ -51,7 +51,7 @@ public function updateRequestStatus($request_id , $status)
             return jsonResponse(false, 400, __('messages.user_dose_not_have_enough_earnings'));
         }
         $this->firebaseService->handelNotification($model->user, 'withraw_success' , $model->id );
-        $this->customerWalletService->withdrawFromCustomer($model->total ,$customer);
+        $this->customerWalletService->withdrawFromCustomer($model->total ,$customer , $model->id);
     }
     }else if ($status == 'rejected'){
         if($status != 'approved' && $model->status == 'approved'){
