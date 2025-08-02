@@ -469,4 +469,65 @@ class CustomerController extends Controller
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function getCustomersWithBalance(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $filters = $request->input('payment_status', []);
+
+
+        $query = Customer::query();
+
+
+
+
+        if ($searchTerm) {
+            $query->whereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+
+
+        $customers = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = $customers->map(function ($customer) {
+            return [
+                'id' => $customer->id,
+                'name' => $customer->user->name,
+                'email' => $customer->user->email,
+                'phone' => $customer->user->phone,
+                'code' => $customer->user->code,
+                'total_earnings' => $customer->total_earnings ?? 0,
+                'total_clients' => $customer->total_clients ?? 0,
+            ];
+        });
+
+        $pagination = [
+            'total' => $customers->total(),
+            'current_page' => $customers->currentPage(),
+            'per_page' => $customers->perPage(),
+            'last_page' => $customers->lastPage(),
+        ];
+
+        return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
+    }
+
+
 }
