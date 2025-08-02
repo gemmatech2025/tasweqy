@@ -16,6 +16,7 @@ use App\Models\ReferralLink;
 use App\Models\UserBlock;
 use App\Models\ReferralEarning;
 use App\Models\Brand;
+use App\Models\WalletTransaction;
 
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\General\CountryRequest;
@@ -544,6 +545,101 @@ class CustomerController extends Controller
 
         return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
     }
+
+
+
+    public function getCustomersWaletTransactions(Request $request , $customer_id)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $type = $request->input('type', ''); // 'withdraw','referral_link_earnings','discount_code_earnings'
+
+        $customer = Customer::find($customer_id);        
+        if(!$customer){
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }     
+        
+        
+
+        $query = WalletTransaction::where('user_id' , $customer->user_id);
+
+        if ($searchTerm) {
+            $query->where('code', 'LIKE', "%{$searchTerm}%");
+        }
+
+        if ($type) {
+            if ($type == 'withdraw') {
+                $query->where('type', 'withdraw');
+            }else if ($type == 'referral_link_earnings') {
+                $query->where('type', 'referral_link');
+            }else if ($type == 'discount_code_earnings') {
+                $query->where('type', 'discount_code');
+            }
+        }
+
+
+        $transactions = $query->paginate($perPage, ['*'], 'page', $page);
+        $totalEarnings = ReferralEarning::where('user_id' ,$customer->user_id)->sum('total_earnings');
+        $withdrawn_amount = WithdrawRequest::where('user_id' ,$customer->user_id)->where('status' ,'approved')->sum('total');
+        $customer->total_balance = $totalEarnings -$withdrawn_amount;
+        $customer->save();
+        $data['customer_info'] = [
+            'id' =>$customer->id ,
+            'name' => $customer->user->name ,
+            'totalEarnings' => $totalEarnings ,
+            'withdrawn_amount' => $withdrawn_amount,
+            'total_balance' => $customer->total_balance,
+
+        ]; 
+
+
+        $data['transactions'] = $transactions->map(function ($transaction) {
+    $transatable = $transaction->transatable;
+
+    $withdraw_method = null;
+
+    if ($transaction->type === 'withdraw' && $transatable) {
+        $withdraw_method = $transatable->withdrawable_type === 'App\Models\PaypalAccount' ? 'paypal' : 'bank';
+    }
+
+    return [
+        'id' => $transaction->id,
+        'code' => $transaction->code,
+
+        'name' => $transaction->created_at->format('F j, Y g:i A'), // fixed typo from create_at to created_at
+        'type' => $transaction->type,
+        'total' => $transaction->amount,
+        'withdraw_method' => $withdraw_method,
+    ];
+});
+
+        // $data['transactions'] = $transactions->map(function ($transaction)  {
+        //     $transatable = $transaction->transatable;
+
+           
+
+        //     return [
+        //         'id' => $transaction->id,
+        //         'name' => $transaction->created_at->format('F j, Y g:i A'),
+        //         'type' => $transaction->type,
+        //         'total' => $transaction->total,
+
+        //         'withdraw_method' => $transaction->type == 'withdraw'? $transatable->withdrawable_type == 'App\Models\PaypalAccount'? 'paypal' : 'bank': null,
+                
+        //     ];
+        // });
+
+        $pagination = [
+            'total' => $transactions->total(),
+            'current_page' => $transactions->currentPage(),
+            'per_page' => $transactions->perPage(),
+            'last_page' => $transactions->lastPage(),
+        ];
+
+        return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
+    }
+
 
 
 }
