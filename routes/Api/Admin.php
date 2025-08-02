@@ -219,6 +219,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(CustomerController::class)->prefix('customers')->group(function () {  
             
+            Route::get('/get-customer-wallet-transactions/{customer_id}', 'getCustomersWaletTransactions');
             Route::get('/get-customers-with-balance', 'getCustomersWithBalance');
             Route::get('/get-numbers', 'getNumbers');
             Route::get('/get-distinguished-customer', 'getDistinguishedCustomers');

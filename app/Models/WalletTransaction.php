@@ -33,7 +33,7 @@ class WalletTransaction extends Model
     
 
 
-    public function transatable(): MorphTo
+    public function transatable()
     {
         return $this->morphTo();
     }
