@@ -7,16 +7,21 @@ use App\Http\Controllers\BasController\BaseController;
 
 use Illuminate\Http\Request;
 use App\Services\WhatsAppOtpService;
+
 use App\Models\Customer;
+use App\Models\WithdrawRequest;
+use App\Models\Setting;
+use App\Models\DiscountCode;
+use App\Models\ReferralLink;
+use App\Models\UserBlock;
+use App\Models\ReferralEarning;
+use App\Models\Brand;
+
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\General\CountryRequest;
 use App\Http\Resources\Admin\Customer\AccountVerificationRequestResource;
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Auth;
-
-use App\Models\WithdrawRequest;
-
-
 
 use App\Http\Requests\Admin\Customer\UpdateAccountApprovalRequest;
 use App\Http\Resources\Admin\Customer\CustomerResource;
@@ -27,13 +32,10 @@ use App\Http\Resources\Admin\Customer\BrandResource;
 
 
 
-use App\Models\DiscountCode;
-use App\Models\ReferralLink;
-use App\Models\UserBlock;
 
 
-use App\Models\ReferralEarning;
-use App\Models\Brand;
+
+
 
 
 class CustomerController extends Controller
@@ -487,13 +489,11 @@ class CustomerController extends Controller
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
         $searchTerm = $request->input('searchTerm', '');
-        $filters = $request->input('payment_status', []);
-
+        $payment_status = $request->input('payment_status', ''); // 'qualified','disqualified'
 
         $query = Customer::query();
-
-
-
+        $limit = Setting::where('key' , 'max_withdraw_amount')->first();
+        // dd($limit->value > 200);
 
         if ($searchTerm) {
             $query->whereHas('user', function ($q) use ($searchTerm) {
@@ -503,6 +503,13 @@ class CustomerController extends Controller
             });
         }
 
+        if($payment_status){
+            if($payment_status == 'qualified'){
+                $query->where('total_balance' ,'>=',$limit->value  );
+            }else if($payment_status == 'disqualified'){
+                $query->where('total_balance' ,'>=',$limit->value  );
+            }
+        }
 
 
         $customers = $query->paginate($perPage, ['*'], 'page', $page);
