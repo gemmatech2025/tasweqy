@@ -17,10 +17,12 @@ return new class extends Migration
             $table->json('description')->nullable();
             $table->string('logo')->nullable();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            // $table->decimal('discount_code_earning' , 4 ,2);
-            // $table->decimal('referral_link_earning' , 4 ,2);
+            $table->string('email');          
+            $table->string('phone');          
+            $table->string('code');  
             $table->integer('total_marketers')->default(0);
-
+            $table->string('google_drive_url')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

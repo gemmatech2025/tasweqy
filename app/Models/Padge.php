@@ -20,8 +20,9 @@ class Padge extends Model
 
     public $translatable = ['name', 'description'];
 
-    // protected $casts = [
-    //     'name' => 'array',
-    //     'description' => 'array',
-    // ];
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
 }

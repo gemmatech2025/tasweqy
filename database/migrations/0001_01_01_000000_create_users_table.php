@@ -39,6 +39,10 @@ return new class extends Migration
                 // ->after('two_factor_recovery_codes')
                 ->nullable();
 
+            $table->boolean('is_notification_active')->default(true);
+            $table->string('google_id')->nullable();
+            $table->string('facebook_id')->nullable();
+
 
             $table->timestamps();
         });

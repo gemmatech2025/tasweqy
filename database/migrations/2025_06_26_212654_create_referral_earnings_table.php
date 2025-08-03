@@ -17,6 +17,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('social_media_platforms')
                 ->nullOnDelete();
+            $table->boolean('social_media_set')->default(false);
 
             $table->decimal('total_earnings' , 10 ,2)->default(0);
             $table->morphs('referrable');
