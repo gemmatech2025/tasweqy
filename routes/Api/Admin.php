@@ -93,8 +93,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(PadgeController::class)->prefix('padges')->group(function () {
             
-            Route::get('/get-highest', 'getHighest');
+            Route::get('/get-numbers', 'getNumbers');
 
+            Route::get('/update-customer-padges', 'updateCustomers');
+            Route::get('/get-highest', 'getHighest');
             Route::post('/', 'store');
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');

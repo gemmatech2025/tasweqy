@@ -56,15 +56,15 @@ class TrakingController extends Controller
 
         $referral=null;
         if($referral_type == 'referral_link'){
-            $referral = ReferralLink::where('link_code' ,$refCode )->first();
+            $referral = ReferralLink::where('link_code' ,$refCode)->whereHas('referralEarning')->where('status' , 'active')->first();
         }else if($referral_type == 'discount_code'){
-            $referral = DiscountCode::where('code' ,$refCode )->first();
+            $referral = DiscountCode::where('code' ,$refCode)->whereHas('referralEarning')->where('status' , 'active')->first();
         }else{
             return response()->json('', 422); 
         }
 
         if(!$referral){
-            return response()->json('', 404); 
+            return response()->json('referral_code_or_link_not_found_or_expired', 404); 
         }
 
 
