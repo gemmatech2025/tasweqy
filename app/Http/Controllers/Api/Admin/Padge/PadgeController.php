@@ -12,12 +12,14 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Padge;
 use App\Http\Resources\Admin\Padge\PadgeResource;
 use App\Http\Requests\Admin\Padge\PadgeRequest;
+use App\Http\Resources\Admin\Padge\PadgeShowResource;
+
 
 class PadgeController extends BaseController
 {
 
     protected const RESOURCE = PadgeResource::class;
-    protected const RESOURCE_SHOW = PadgeResource::class;
+    protected const RESOURCE_SHOW = PadgeShowResource::class;
     protected const REQUEST = PadgeRequest::class;
 
     public function model()
@@ -233,5 +235,33 @@ class PadgeController extends BaseController
         (static::RESOURCE)::collection($query->get())
     );
 }
+   public function getNumbers()
+    {
+        $totalPadges = Padge::count();
+        $activecustomers = Customer::whereHas('user', function ($q) {
+                    $q->whereHas('referralEarnings');
+                })->count();
+
+        $inactiveCustomers = Customer::whereHas('user', function ($q) {
+            $q->whereDoesntHave('referralEarnings');
+        })->count();
+
+
+        $blockedCustomer = Customer::where('is_blocked' , true)->count();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'totalCustomers' => $totalCustomers,
+                'activecustomers' => $activecustomers,
+                'inactiveCustomers' => $inactiveCustomers,
+                'blockedCustomer' => $blockedCustomer,
+            ]
+        );
+    }
+
+
 
 }

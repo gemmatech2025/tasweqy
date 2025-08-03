@@ -594,7 +594,7 @@ class CustomerController extends Controller
         ]; 
 
 
-        $data['transactions'] = $transactions->map(function ($transaction) {
+        $data['transactions_data']['transactions'] = $transactions->map(function ($transaction) {
     $transatable = $transaction->transatable;
 
     $withdraw_method = null;
@@ -636,8 +636,9 @@ class CustomerController extends Controller
             'per_page' => $transactions->perPage(),
             'last_page' => $transactions->lastPage(),
         ];
+        $data['transactions_data']['meta']=$pagination;
 
-        return jsonResponse(true, 200, __('messages.success'), $data, $pagination);
+        return jsonResponse(true, 200, __('messages.success'), $data);
     }
 
 

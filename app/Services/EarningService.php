@@ -10,7 +10,8 @@ use App\Models\TrackingEvent;
 use App\Models\ReferralLink;
 use App\Models\DiscountCode;
 use App\Models\ReferralEarning;
-
+use App\Models\Padge;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Str;
 use App\Services\FirebaseService;
@@ -28,6 +29,12 @@ class EarningService
 
     public function recordAnEvent($amount  ,TrackingEvent $trackingEvent)
     {
+
+        DB::beginTransaction();
+
+        try{
+
+        
     
         $trackable         = $trackingEvent->trackable;
         $precentage        = $trackable->earning_precentage;
@@ -70,13 +77,33 @@ class EarningService
         );
 
 
+        $totalClients = ReferralEarning::where('user_id' ,$customer->user_id )->sum('total_clients');
+
+        $padge = Padge::where('no_clients_from' , '<=' , $totalClients)
+        ->where('no_clients_to' , '>=' , $totalClients)->first();
+
+        if($padge){
+            $customer->padge_id = $padge->id;
+        }
         $customer->total_balance -= $valueToBeAdded;
         $customer->save();
         $referralEarning->save();
 
 
         return ['status' => true];
+
+        }
+         catch (\Throwable $e) {
+            DB::rollBack();
+            return ['status'=>false , 'reason' => $e->getMessage() , 'event' , $trackingEvent];
+            // [
+            //     'message' => $e->getMessage(),
+            //     'file'    => $e->getFile(),
+            //     'line'    => $e->getLine(),
+            // ]);
+        
     }
+}
 
 
 }

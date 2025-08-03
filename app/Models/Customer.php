@@ -16,7 +16,8 @@ class Customer extends Model
         'gender',
         'total_balance',
         'is_verified',
-        'is_blocked'
+        'is_blocked',
+        'padge_id'
     ];
 
 
@@ -39,8 +40,15 @@ class Customer extends Model
     }
 
 
-    public function customer()
+    // public function customer()
+    // {
+    //     return $this->hasOne(Customer::class);
+    // }
+
+
+    public function padge()
     {
-        return $this->hasOne(Customer::class);
+        return $this->belongsTo(Padge::class ,'padge_id');
     }
+
 }

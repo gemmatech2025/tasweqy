@@ -80,7 +80,7 @@ class TrakingController extends Controller
 
         if($result['status'] == false){
             Log::error($result);
-            return response()->json('', 500); 
+            return response()->json($result, 500); 
         }
 
         
