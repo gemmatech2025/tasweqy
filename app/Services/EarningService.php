@@ -77,6 +77,7 @@ class EarningService
         );
 
 
+
         $totalClients = ReferralEarning::where('user_id' ,$customer->user_id )->sum('total_clients');
 
         $padge = Padge::where('no_clients_from' , '<=' , $totalClients)
@@ -84,12 +85,21 @@ class EarningService
 
         if($padge){
             $customer->padge_id = $padge->id;
+        }else{
+            $lastPadge = Padge::orderByDesc('no_clients_to')->first();
+            if($lastPadge){
+                if($lastPadge->no_clients_to <= $totalClients){
+                    $customer->padge_id = $lastPadge->id;
+                }            
+            }
+
         }
+
         $customer->total_balance -= $valueToBeAdded;
         $customer->save();
         $referralEarning->save();
 
-
+        DB::commit();
         return ['status' => true];
 
         }

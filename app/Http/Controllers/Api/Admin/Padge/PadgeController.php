@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Padge;
+use App\Models\ReferralEarning;
+use App\Models\Customer;
 use App\Http\Resources\Admin\Padge\PadgeResource;
 use App\Http\Requests\Admin\Padge\PadgeRequest;
 use App\Http\Resources\Admin\Padge\PadgeShowResource;
@@ -157,6 +159,46 @@ class PadgeController extends BaseController
             );
     }
 
+    public function updateCustomers()
+    {
+
+
+        $customers = Customer::all();
+        foreach($customers as $customer){
+        $totalClients = ReferralEarning::where('user_id' ,$customer->user_id )->sum('total_clients');
+                $padge = Padge::where('no_clients_from' , '<=' , $totalClients)
+                ->where('no_clients_to' , '>=' , $totalClients)->first();
+
+                if($padge){
+                    $customer->padge_id = $padge->id;
+                }else{
+                    $lastPadge = Padge::orderByDesc('no_clients_to')->first();
+                    if($lastPadge){
+                        if($lastPadge->no_clients_to <= $totalClients){
+                            $customer->padge_id = $lastPadge->id;
+                        }            
+                    }
+
+                }
+
+                 $customer->save();
+        }
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+
+        );
+        
+    }
+
+
+
+
+
+
     public function index(Request $request)
 {
 
@@ -238,26 +280,22 @@ class PadgeController extends BaseController
    public function getNumbers()
     {
         $totalPadges = Padge::count();
-        $activecustomers = Customer::whereHas('user', function ($q) {
-                    $q->whereHas('referralEarnings');
-                })->count();
-
-        $inactiveCustomers = Customer::whereHas('user', function ($q) {
-            $q->whereDoesntHave('referralEarnings');
-        })->count();
 
 
-        $blockedCustomer = Customer::where('is_blocked' , true)->count();
+        $padges = Padge::all();
+        $data =[];
+        foreach($padges as $padge){
+            $customersCount = Customer::where('padge_id' , $padge->id )->count();
+            $data [] = ['padge' => $padge->name ,'image' => $padge->image ? asset($padge->image) :null , 'no_customers' => $customersCount];
+        }
 
         return jsonResponse(
             true,
             200,
             __('messages.success'),
             [
-                'totalCustomers' => $totalCustomers,
-                'activecustomers' => $activecustomers,
-                'inactiveCustomers' => $inactiveCustomers,
-                'blockedCustomer' => $blockedCustomer,
+                'totalPadges' => $totalPadges,
+                'padges_info' =>  $data
             ]
         );
     }
