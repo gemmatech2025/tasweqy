@@ -607,7 +607,7 @@ class CustomerController extends Controller
         'id' => $transaction->id,
         'code' => $transaction->code,
 
-        'name' => $transaction->created_at->format('F j, Y g:i A'), // fixed typo from create_at to created_at
+        'created_at' => $transaction->created_at->format('F j, Y g:i A'), // fixed typo from create_at to created_at
         'type' => $transaction->type,
         'total' => $transaction->amount,
         'withdraw_method' => $withdraw_method,
