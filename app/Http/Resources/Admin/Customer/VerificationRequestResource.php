@@ -26,10 +26,10 @@ class VerificationRequestResource extends JsonResource
             'front_image' => asset($this->front_image),
             'back_image'  => $this->back_image ? asset($this->back_image) : null,
             'status'      => $this->status,
-            'type'        => $this->type,
+            'name'        => $this->user->name,
 
             'reason'      => $this->reason,
-            'admin' => $this->approver ? [ 'id' => $this->approver->id, 'name' => $this->approver->name,]:null,
+            'admin' => $this->approver ?  $this->approver->name:null,
             'created_at'  => $this->created_at->format('F j, Y g:i A'),
         ];    
     }
