@@ -103,7 +103,7 @@ class ApprovalRequestController extends Controller
             ];
 
 
-        return jsonResponse(true, 200, __('messages.success' ),  AccountVerificationRequestResource::collection($data) ,$pagination);
+        return jsonResponse(true, 200, __('messages.success' ),  VerificationRequestResource::collection($data) ,$pagination);
     }
 
     public function show($id)

@@ -35,6 +35,8 @@ class AccountVerificationRequestResource extends JsonResource
                 'email'                 => $this->user->email ,
                 'status'                => $this->status,
                 'reason'                => $this->reason,
+                'type'        => $this->type,
+
                 'admin' => $this->whenLoaded('approver', function () {
                     return [
                             'id'   => $this->approver->id,
