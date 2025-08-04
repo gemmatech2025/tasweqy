@@ -22,6 +22,8 @@ return new class extends Migration
             $table->decimal('total_balance' , 10,2)->default(0);
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_blocked')->default(false);
+            $table->unsignedBigInteger('padge_id')->nullable();
+            $table->foreign('padge_id')->references('id')->on('padges')->onDelete('set null');
 
             $table->timestamps();
         });

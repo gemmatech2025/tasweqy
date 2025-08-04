@@ -113,4 +113,29 @@ class NotificationController extends Controller
             __('messages.added_successfully'),
         );
     }
+
+
+
+        public function getMyNotifications(Request $request){
+
+
+        $user = User::find($request->user_id);
+        
+        if(!$user){
+            return jsonResponse(false, 404 , __('messages.user_not_found'));
+        }
+
+        $notifications = Notification::where();
+
+
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.added_successfully'),
+        );
+    }
+
+
 }
