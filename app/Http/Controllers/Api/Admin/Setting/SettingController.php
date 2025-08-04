@@ -44,10 +44,14 @@ class SettingController extends Controller
         DB::beginTransaction();
     
         try {
-       
-            foreach ($request->settings as $setting) {
+
+            if($request->settings){
+ foreach ($request->settings as $setting) {
                 Setting::updateOrCreate(['key' => $setting['key']], ['value' => $setting['value']]);
             }
+            }
+       
+           
             $image_path = '';
             if ($request->hasFile('logo')) {
 

@@ -26,7 +26,7 @@ class SettingRequest extends FormRequest
 
         return [
 
-            'settings'                           => 'required|array',
+            'settings'                           => 'nullable|array',
             'settings.*.key'                     => 'required|in:site_name_ar,site_name_en,site_email,default_language,max_withdraw_amount|max:255',
             'settings.*.value'                   => 'required|string|max:255',
             
