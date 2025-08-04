@@ -39,15 +39,19 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 use App\Services\UploadFilesService;
+use App\Services\FirebaseService;
 
 
 class CustomerController extends Controller
 {
 
     protected $uploadFilesService = null;
+    protected $firebaseService = null;
+
     public function __construct()
     {
         $this->uploadFilesService = new UploadFilesService();
+        $this->firebaseService = new FirebaseService();
 
     }
 
@@ -86,54 +90,36 @@ class CustomerController extends Controller
                 $image = $request->file('image');
                 $imagePath = $this->uploadFilesService->uploadImage($image , 'users');
             }
-    
 
             if($customer){
 
                 if ($request->phone && $request->phone != $customer->phone) {
-                    $user->phone_verified_at = null; // Reset phone verification if phone changed
+                    $user->phone_verified_at = null; 
                     $user->phone = $request->phone;
                     $user->code = $request->code ?? $user->code;
                 }
 
-                // Get the allowed customer fields from the request
                 $customerData = $request->only('country_id', 'birthdate', 'gender', 'phone', 'code');
-
-                // dd($customer);
-
-                // Update customer with the provided data
                 $customer->update($customerData);
-
-                // $customer->country_id = $request->country_id;
-                // $customer->birthdate = $request->birthdate;
-                // $customer->gender = $request->gender;
-                // $user->phone = $request->phone;
-                // $user->code = $request->code;
-                // $customer->save();
             }else{
 
                 $customer = Customer::create([
                     'country_id'     => $request->country_id,
                     'birthdate'      => $request->birthdate,
                     'gender'         => $request->gender,
-                    'user_id'        => $user->id,
-
-                
+                    'user_id'        => $user->id,                
                 ]);
                 $user->phone = $request->phone;
                 $user->code = $request->code;
             }
 
             $user->image =$imagePath;
-
             $user->save();
-
-
             if(!$user->phone_verified_at){
 
                 $result = $this->sendPhoneOtp($request->code .$request->phone , $user->id);
 
-            DB::commit();
+                DB::commit();
 
                 if($result){
                     return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_please_send_otp_on_your_whatsapp') ,
@@ -312,6 +298,7 @@ class CustomerController extends Controller
                 'approved'       => '0'
            ]);
 
+            $this->firebaseService->sendAdminNotification('verification_request_added', $approvalRequest->id ,  $user);
 
             return jsonResponse( true ,  200 ,__('messages.updated_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
 
@@ -338,6 +325,10 @@ class CustomerController extends Controller
                 'user_id'        => $user->id,
   
             ]);
+
+
+            $this->firebaseService->sendAdminNotification('verification_request_added', $approvalRequest->id ,  $user);
+
 
             return jsonResponse( true ,  200 ,__('messages.created_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
         }

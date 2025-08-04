@@ -26,6 +26,7 @@ use App\Http\Requests\Customer\Wallet\WithdrawRequestRequest;
 use App\Http\Requests\Customer\Wallet\UpdateWithdrawRequestRequest;
 
 use App\Services\CustomerWalletService;
+use App\Services\FirebaseService;
 
 class WithdrawRequestController extends BaseController
 {
@@ -37,10 +38,13 @@ class WithdrawRequestController extends BaseController
 
     
     protected $customerWalletService =null;
+    protected $firebaseService =null;
+
     public function __construct()
     {
         $this->model = $this->model();
         $this->customerWalletService = new CustomerWalletService();
+        $this->firebaseService = new FirebaseService();
 
     }
 
@@ -107,13 +111,12 @@ class WithdrawRequestController extends BaseController
 
 
                 if(!$paypal){
-                $paypal =PaypalAccount::create([
-                                'email'                 => $request->email,
-                                'user_id'               => Auth::id(),
-                            ]);
+                    $paypal = PaypalAccount::create([
+                                    'email'                 => $request->email,
+                                    'user_id'               => Auth::id(),
+                                ]);
+                    }
                 }
-                }
-                
                 
                 $model = $paypal->withdrawRequests()->create([
                 'user_id' => Auth::id(),
@@ -121,9 +124,8 @@ class WithdrawRequestController extends BaseController
                 ]);
 
             }
-
-        
-
+            $user =Auth::user();
+            $this->firebaseService->sendAdminNotification('withdraw_request_added', $model->id ,  $user);
             DB::commit();
 
             return jsonResponse(

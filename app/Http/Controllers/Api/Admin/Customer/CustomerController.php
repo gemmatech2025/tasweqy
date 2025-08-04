@@ -614,22 +614,6 @@ class CustomerController extends Controller
     ];
 });
 
-        // $data['transactions'] = $transactions->map(function ($transaction)  {
-        //     $transatable = $transaction->transatable;
-
-           
-
-        //     return [
-        //         'id' => $transaction->id,
-        //         'name' => $transaction->created_at->format('F j, Y g:i A'),
-        //         'type' => $transaction->type,
-        //         'total' => $transaction->total,
-
-        //         'withdraw_method' => $transaction->type == 'withdraw'? $transatable->withdrawable_type == 'App\Models\PaypalAccount'? 'paypal' : 'bank': null,
-                
-        //     ];
-        // });
-
         $pagination = [
             'total' => $transactions->total(),
             'current_page' => $transactions->currentPage(),
@@ -639,6 +623,37 @@ class CustomerController extends Controller
         $data['transactions_data']['meta']=$pagination;
 
         return jsonResponse(true, 200, __('messages.success'), $data);
+    }
+
+
+
+
+
+    public function getNumbersForReports()
+    {
+        $totalCustomers = Customer::count();
+        $activecustomers = Customer::whereHas('user', function ($q) {
+                    $q->whereHas('referralEarnings');
+                })->count();
+
+        $inactiveCustomers = Customer::whereHas('user', function ($q) {
+            $q->whereDoesntHave('referralEarnings');
+        })->count();
+
+
+        $blockedCustomer = Customer::where('is_blocked' , true)->count();
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            [
+                'totalCustomers' => $totalCustomers,
+                'activecustomers' => $activecustomers,
+                'inactiveCustomers' => $inactiveCustomers,
+                'blockedCustomer' => $blockedCustomer,
+            ]
+        );
     }
 
 
