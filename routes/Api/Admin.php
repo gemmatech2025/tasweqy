@@ -265,6 +265,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
             Route::post('/push', 'pushNotifications');
+            Route::get('/', 'getMyNotifications');
+
+            
 
         });
 

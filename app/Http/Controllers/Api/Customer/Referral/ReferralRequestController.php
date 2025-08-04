@@ -23,6 +23,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ReferralLinksImport;
 use App\Exports\ReferralLinksExportTemplate;
 use Illuminate\Support\Facades\Auth;
+use App\Services\FirebaseService;
 
 class ReferralRequestController extends BaseController
 {
@@ -43,8 +44,14 @@ class ReferralRequestController extends BaseController
     {
         return ['user_id' => Auth::id()];
     }
+    protected $firebaseService = null;
 
+    public function __construct()
+    {
+        $this->firebaseService = new FirebaseService();
+        $this->model = $this->model();
 
+    }
 
 
     public function store(Request $request)
@@ -81,6 +88,9 @@ class ReferralRequestController extends BaseController
             $model = $this->getModel()->create(array_merge($baseData, ...$images));
 
             $this->storeChildren($model, $effectiveRequest);
+            $user = Auth::user();
+            $this->firebaseService->sendAdminNotification('referral_request_added', $model->id ,  $user);
+
 
             DB::commit();
 

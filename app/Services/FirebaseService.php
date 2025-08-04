@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\FcmToken;
 use App\Models\Notification as MyNotification;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Auth;
@@ -188,6 +189,103 @@ class FirebaseService
         }
     }
 
+//     public function sendChatMessage(string $message, string $userId, string $toUserId = null)
+//     {
+//         $messageData = [
+//             'message' => $message,
+//             'user_id' => $userId,
+//             'to_user_id' => $toUserId,
+//             'media' => null,
+//             'is_read' => false,
+//             'read_at' => null,
+//         ];
+
+//         try {
+
+//             $tokens = [];
+//             $user = null;
+//             $sender = User::find($userId); 
+//             $senderName = $sender?->name ?? 'مستخدم';
+
+//             if (!$toUserId) {
+//                 $tokens = FcmToken::whereHas('user', function ($query) {
+//                     $query->where('role', 'admin');
+//                 })->pluck('fcm_token')->toArray();
+//             } else {
+//                 $user = User::find($toUserI);
+//                 $tokens = FcmToken::where('user_id', $toUserId)->pluck('fcm_token')->toArray();
+//             }
+
+//             if (!empty($tokens)) {
+//                 if($user){
+//                     if($user->is_notification_active){
+//                         $locale = $user->locale;
+//             $notificationTitle = $title[$locale] ?? $title['en'] ;
+//             $notificationBody  = $body[$locale] ?? $body['en'] ;
+
+//                         $this->sendNotification($tokens, $notificationTitle, $notificationBody, 'message');
+//                     }
+
+                     
+
+//                 }else{
+
+//                     $locale = 'ar';
+//             $setting = Setting::where('key' , 'default_language')->first();
+
+//             if($setting){
+//                 $locale = $setting->value;
+//             }
+//             $notificationTitle = $title[$locale] ?? $title['ar'] ;
+//             $notificationBody  = $body[$locale]  ?? $body['ar'] ;
+
+
+
+//                     $this->sendNotification($tokens, $notificationTitle, $notificationBody , 'message');
+//                 }
+//             }
+//             $image = 'notifications/chat.png';
+
+
+//             $message =Message::create($messageData);
+
+
+//             if($user){
+//                     $notification = MyNotification::create([
+//                         'user_id'     => $user->id,
+//                         'title'       => $title,
+//                         'body'        => $body,
+//                         'image'       => $image,
+//                         'type'        => 'message',
+//                         'payload_id'  => $message->id,
+//                     ]);
+
+                     
+
+//                 }else{
+// $notification = MyNotification::create([
+//                         'user_id'     => null,
+//                         'title'       => $title,
+//                         'body'        => $body,
+//                         'image'       => $image,
+//                         'type'        => 'message',
+//                         'payload_id'  => $message->id,
+//                     ]);                }
+
+            
+
+
+//             return $message;
+//         } catch (\Exception $e) {
+//             Log::error('Error saving message to SQL database: ' . $e->getMessage());
+
+//             return [
+//                             'message' => $e->getMessage(),
+//                             'file'    => $e->getFile(),
+//                             'line'    => $e->getLine(),
+//             ];
+//         }
+//     }
     public function sendChatMessage(string $message, string $userId, string $toUserId = null)
     {
         $messageData = [
@@ -200,37 +298,161 @@ class FirebaseService
         ];
 
         try {
-
             $tokens = [];
             $user = null;
+            $sender = User::find($userId);
+            $senderName = $sender?->name ?? 'مستخدم';
+
             if (!$toUserId) {
                 $tokens = FcmToken::whereHas('user', function ($query) {
                     $query->where('role', 'admin');
                 })->pluck('fcm_token')->toArray();
             } else {
-                $user = User::find($toUserI);
+                $user = User::find($toUserId); 
                 $tokens = FcmToken::where('user_id', $toUserId)->pluck('fcm_token')->toArray();
             }
 
+            $title = [
+                'ar' => "رسالة جديدة من {$senderName}",
+                'en' => "New message from {$senderName}",
+            ];
+            $body = [
+                'ar' => 'لديك رسالة جديدة: "' . $message . '"',
+                'en' => 'You have a new message: "' . $message . '"',
+            ];
+            $image = 'notifications/chat.png';
+
             if (!empty($tokens)) {
-                if($user){
-                    if($user->is_notification_active){
-                        $this->sendNotification($tokens, 'New Message', $message , 'message');
+                if ($user) {
+                    if ($user->is_notification_active) {
+                        $locale = $user->locale;
+                        $notificationTitle = $title[$locale] ?? $title['en'];
+                        $notificationBody  = $body[$locale] ?? $body['en'];
+
+                        $this->sendNotification($tokens, $notificationTitle, $notificationBody, 'message');
                     }
-                }else{
-                    $this->sendNotification($tokens, 'New Message', $message , 'message');
+                } else {
+                    $locale = 'ar';
+                    $setting = Setting::where('key', 'default_language')->first();
+                    if ($setting) {
+                        $locale = $setting->value;
+                    }
+                    $notificationTitle = $title[$locale] ?? $title['ar'];
+                    $notificationBody  = $body[$locale] ?? $body['ar'];
+
+                    $this->sendNotification($tokens, $notificationTitle, $notificationBody, 'message');
                 }
             }
 
-            return Message::create($messageData);
+            $message = Message::create($messageData);
+
+            MyNotification::create([
+                'user_id'     => $user?->id,
+                'title'       => $title,
+                'body'        => $body,
+                'image'       => $image,
+                'type'        => 'message',
+                'payload_id'  => $message->id,
+            ]);
+
+            return $message;
         } catch (\Exception $e) {
             Log::error('Error saving message to SQL database: ' . $e->getMessage());
 
             return [
-                            'message' => $e->getMessage(),
-                            'file'    => $e->getFile(),
-                            'line'    => $e->getLine(),
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
             ];
+        }
+    }
+
+
+
+    public function sendAdminNotification($type , $payload , User $user): bool
+    {
+        try {
+        $title = [];
+        $body = [];
+        $image = 'notification_icon.png';
+
+        $marketerName = $user->name;
+        switch ($type) {
+            case 'withdraw_request_added':
+                $title['ar'] = 'تم إرسال طلب سحب';
+                $title['en'] = 'Withdraw Request Sent';
+
+                $body['ar'] = 'تم إرسال طلب سحب من المسوق ' . $marketerName . '.';
+                $body['en'] = 'A withdrawal request has been submitted by marketer ' . $marketerName . '.';
+
+                $image = 'notifications/empty-wallet-add.png';
+                break;
+
+            case 'verification_request_added':
+                $title['ar'] = 'تم إرسال طلب التحقق';
+                $title['en'] = 'Verification Request Sent';
+
+                $body['ar'] = 'تم إرسال طلب تحقق من المسوق ' . $marketerName . '.';
+                $body['en'] = 'A verification request has been submitted by marketer ' . $marketerName . '.';
+
+                $image = 'notifications/shield-tick.png';
+                break;
+
+            case 'referral_request_added':
+                $title['ar'] = 'تم إرسال طلب الإحالة';
+                $title['en'] = 'Referral Request Sent';
+
+                $body['ar'] = 'تم إرسال طلب إحالة من المسوق ' . $marketerName . '.';
+                $body['en'] = 'A referral request has been submitted by marketer ' . $marketerName . '.';
+
+                $image = 'notifications/link.png';
+                break;
+
+            default:
+                $title['ar'] = 'إشعار';
+                $title['en'] = 'Notification';
+
+                $body['ar'] = 'لديك إشعار جديد.';
+                $body['en'] = 'You have a new notification.';
+
+                $image = 'notification_icon.png';
+                break;
+        }
+
+
+            $tokens = FcmToken::whereHas('user', function ($query) {
+                    $query->where('role', 'admin');
+                })->pluck('fcm_token')->toArray();
+
+            $notification = MyNotification::create([
+                'user_id'     => null,
+                'title'       => $title,
+                'body'        => $body,
+                'image'       => $image,
+                'type'        => $type,
+                'payload_id'  => $payload,
+            ]);
+
+
+            $locale = 'ar';
+            $setting = Setting::where('key' , 'default_language')->first();
+
+            if($setting){
+                $locale = $setting->value;
+            }
+            $notificationTitle = $title[$locale] ?? $title['ar'] ;
+            $notificationBody  = $body[$locale]  ?? $body['ar'] ;
+
+
+                $this->sendNotification($fcmTokens , $notificationTitle, $notificationBody , $type , $payload);
+            
+            return true;
+        } catch (\Throwable $e) {
+            \Log::channel('firebase')->error('Error sending notification', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return false;
         }
     }
 }

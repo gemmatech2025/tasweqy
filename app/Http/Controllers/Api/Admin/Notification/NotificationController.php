@@ -16,7 +16,7 @@ use App\Services\UploadFilesService;
 use App\Services\FirebaseService;
 use App\Http\Requests\Admin\Notification\PushNotificationRequest;
 use App\Http\Requests\Admin\Notification\PushNotificationTestingRequest;
-
+use App\Http\Resources\Admin\Notification\NotificationResource;
 
 class NotificationController extends Controller
 {
@@ -84,28 +84,6 @@ class NotificationController extends Controller
             return jsonResponse(false, 404 , __('messages.user_not_found'));
         }
 
-        // $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
-
-        //     $imagePath =  'notification_icon.png';
-        //     if ($request->hasFile('image')) {
-        //         $image = $request->file('image');
-        //         $imagePath = $this->uploadFilesService->uploadImage($image , 'notifications');
-        //     }
-
-        //     $notification = Notification::create([
-        //         'user_id'     => $user->id,
-        //         'title'       => $request->title,
-        //         'body'        => $request->body,
-        //         'image'       => $imagePath,
-        //         'type'        => 'push',
-        //         'payload_id'  => '0',
-        //     ]);
-
-        //     $locale = $user->locale;
-        //     $notificationTitle = $request->title[$locale] ?? $request->title['en'];
-        //     $notificationBody  = $request->body[$locale] ?? $request->body['en'];
-
-
             $this->firebaseService->handelNotification($user, $request->type , $request->payload);
         return jsonResponse(
             true,
@@ -116,24 +94,32 @@ class NotificationController extends Controller
 
 
 
-        public function getMyNotifications(Request $request){
+    public function getMyNotifications(Request $request){
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+
+        $query = Notification::where('user_id' , null);
 
 
-        $user = User::find($request->user_id);
-        
-        if(!$user){
-            return jsonResponse(false, 404 , __('messages.user_not_found'));
-        }
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
 
-        $notifications = Notification::where();
 
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
 
 
 
         return jsonResponse(
             true,
             200,
-            __('messages.added_successfully'),
+            __('messages.success'),
+            NotificationResource::collection($data),
+            $pagination
         );
     }
 
