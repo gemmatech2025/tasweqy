@@ -30,7 +30,7 @@ class SettingRequest extends FormRequest
             'settings.*.key'                     => 'required|in:site_name_ar,site_name_en,site_email,default_language,max_withdraw_amount|max:255',
             'settings.*.value'                   => 'required|string|max:255',
             
-            'logo'                               => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'logo'                               => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:2048',
 
         ];
     }
