@@ -8,6 +8,7 @@ use App\Http\Controllers\BasController\BaseController;
 use Illuminate\Http\Request;
 use App\Services\WhatsAppOtpService;
 
+use App\Models\User;
 use App\Models\Customer;
 use App\Models\WithdrawRequest;
 use App\Models\Setting;
@@ -655,6 +656,38 @@ class CustomerController extends Controller
             ]
         );
     }
+
+
+
+
+    public function getAllForDropDown(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $searchTerm = $request->input('searchTerm', '');
+        $query = User::where('role' , 'customer');
+
+        if ($searchTerm) {
+
+            $query->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
+        }
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $users =  $data->map(function ($user){
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'completed_profile' => $user->customer ? true :false ,
+
+            ];
+        });
+
+
+        return jsonResponse(true, 200, __('messages.success' ),  $users);
+    }
+
 
 
 
