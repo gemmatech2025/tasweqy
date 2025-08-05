@@ -32,45 +32,113 @@ class NotificationController extends Controller
     }
 
 
+    public function pushNotifications(PushNotificationRequest $request)
+    {
+        $tokens = [];
+        $users = [];
+            // dd($request->target );
 
-    public function pushNotifications(PushNotificationRequest $request){
-
-
-        $user = User::find($request->user_id);
-        
-        if(!$user){
-            return jsonResponse(false, 404 , __('messages.user_not_found'));
-        }
-
-        $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
-
-            $imagePath =  'notification_icon.png';
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imagePath = $this->uploadFilesService->uploadImage($image , 'notifications');
+        if ($request->target == 'all_users') {
+            $users = User::where('role', 'customer')->get();
+            $tokens = FcmToken::whereIn('user_id', $users->pluck('id'))->pluck('fcm_token')->toArray();
+        } else {
+            if (!$request->users) {
+                return jsonResponse(false, 404, __('messages.user_ids_is_required'));
             }
 
+            $users = User::whereIn('id', $request->users)->get();
+
+            $tokens = FcmToken::whereIn('user_id', $request->users)->pluck('fcm_token')->toArray();
+        }
+
+        $imagePath = 'notification_icon.png';
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = $this->uploadFilesService->uploadImage($image, 'notifications');
+        }
+
+        foreach ($users as $user) {
             $notification = Notification::create([
-                'user_id'     => $user->id,
-                'title'       => $request->title,
-                'body'        => $request->body,
-                'image'       => $imagePath,
-                'type'        => 'push',
-                'payload_id'  => '0',
+                'user_id'    => $user->id,
+                'title'      => $request->title,
+                'body'       => $request->body,
+                'image'      => $imagePath,
+                'type'       => 'push',
+                'payload_id' => 0,
             ]);
 
-            $locale = $user->locale;
+            $locale = $user->locale ?? 'en';
             $notificationTitle = $request->title[$locale] ?? $request->title['en'];
             $notificationBody  = $request->body[$locale] ?? $request->body['en'];
 
-            $this->firebaseService->sendNotification($tokens, $notificationTitle , $notificationBody);
+            $userTokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
+            $this->firebaseService->sendNotification($userTokens, $notificationTitle, $notificationBody);
+        }
 
-        return jsonResponse(
-            true,
-            200,
-            __('messages.added_successfully'),
-        );
+        return jsonResponse(true, 200, __('messages.added_successfully'));
     }
+
+
+
+    // public function pushNotifications(PushNotificationRequest $request){
+
+
+    //     // $user = User::find($request->user_id);
+        
+    //     // if(!$user){
+    //     //     return jsonResponse(false, 404 , __('messages.user_not_found'));
+    //     // }
+
+    //     //  'target'                       => 'required|in:all_users,given_ids',
+    //     //  'users'                        => 'nullable|array',
+    //     //  'users.*'                      => 'required|exists:users,id',
+    //     $tokens = [];    
+    //     if($request->target == 'all_users'){
+    //         $tokens = FcmToken::whereHas('user',function($q){
+    //             $q->where('role' , 'customer');
+    //         })->pluck('fcm_token')->toArray();
+    //     }else{
+    //         if(!$request->users){
+    //             return jsonResponse(false, 404 , __('messages.user_ids_is_required'));
+    //         }
+
+    //         $tokens = FcmToken::whereIn('user_id' ,$request->users)->pluck('fcm_token')->toArray();
+
+
+    //         foreach($request->users as $user_id){
+
+    //         }
+    //     }
+
+    //     // $tokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
+
+    //         $imagePath =  'notification_icon.png';
+    //         if ($request->hasFile('image')) {
+    //             $image = $request->file('image');
+    //             $imagePath = $this->uploadFilesService->uploadImage($image , 'notifications');
+    //         }
+
+    //         $notification = Notification::create([
+    //             'user_id'     => $user->id,
+    //             'title'       => $request->title,
+    //             'body'        => $request->body,
+    //             'image'       => $imagePath,
+    //             'type'        => 'push',
+    //             'payload_id'  => '0',
+    //         ]);
+
+    //         $locale = $user->locale;
+    //         $notificationTitle = $request->title[$locale] ?? $request->title['en'];
+    //         $notificationBody  = $request->body[$locale] ?? $request->body['en'];
+
+    //         $this->firebaseService->sendNotification($tokens, $notificationTitle , $notificationBody);
+
+    //     return jsonResponse(
+    //         true,
+    //         200,
+    //         __('messages.added_successfully'),
+    //     );
+    // }
 
 
 
