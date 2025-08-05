@@ -222,6 +222,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::controller(CustomerController::class)->prefix('customers')->group(function () {  
 
 
+            Route::get('/get-reports', 'getNumbersForReports');
             
             Route::get('/get-customers-for-dropdown', 'getAllForDropDown');
             

@@ -31,14 +31,7 @@ use App\Http\Resources\Admin\Customer\CustomerDetailsResource;
 use App\Http\Resources\Admin\Customer\ReferralEarningResource;
 use App\Http\Resources\Admin\Customer\WithdrawRequestResource;
 use App\Http\Resources\Admin\Customer\BrandResource;
-
-
-
-
-
-
-
-
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -632,29 +625,101 @@ class CustomerController extends Controller
 
     public function getNumbersForReports()
     {
+
+        $now = Carbon::now();
+        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+
+
         $totalCustomers = Customer::count();
         $activecustomers = Customer::whereHas('user', function ($q) {
                     $q->whereHas('referralEarnings');
                 })->count();
+        $totalEarnings = ReferralEarning::sum('total_earnings');
+        $totalClients  = ReferralEarning::sum('total_clients');
+        $totalBrands = Brand::count();
 
-        $inactiveCustomers = Customer::whereHas('user', function ($q) {
-            $q->whereDoesntHave('referralEarnings');
-        })->count();
+
+        $lastMonthCustomers = Customer::where('created_at', '<=', $endOfLastMonth)->count();
+        $lastMonthActiveCustomers = Customer::whereHas('user', function ($q) use ($endOfLastMonth) {
+            $q->whereHas('referralEarnings', function ($q2) use ($endOfLastMonth) {
+                $q2->where('created_at', '<=', $endOfLastMonth);
+            });
+        })->where('created_at', '<=', $endOfLastMonth)->count();
+
+        $lastMonthEarnings = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_earnings');
+        $lastMonthClients  = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_clients');
+        $lastMonthBrands = Brand::where('created_at', '<=', $endOfLastMonth)->count();
 
 
-        $blockedCustomer = Customer::where('is_blocked' , true)->count();
+        $totalCustomersGross  = $this->calculatePercentageChange($totalCustomers  , $lastMonthCustomers);
+        $activecustomersGross = $this->calculatePercentageChange($activecustomers , $lastMonthActiveCustomers);
+        $totalEarningsGross   = $this->calculatePercentageChange($totalEarnings   , $lastMonthEarnings);
+        $totalClientsGross    = $this->calculatePercentageChange($totalClients    , $lastMonthClients);
+        $totalBrandsGross     = $this->calculatePercentageChange($totalBrands     , $lastMonthBrands);
+
+
+
+        $topCustomers = Customer::select('customers.*')
+        ->join('users', 'users.id', '=', 'customers.user_id')
+        ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
+        ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings, SUM(referral_earnings.total_clients) as total_clients')
+        ->groupBy('customers.id')
+        ->orderByDesc('total_earnings')
+        ->take(5)
+        ->get()->map(function ($customer) {
+            return [
+                'name' => $customer->user->name,
+                'email' => $customer->user->email,
+                'image' => $customer->user->image,
+                'total_clients' => $customer->total_clients ?? 0,
+                'total_earnings' => $customer->total_earnings ?? 0  ,
+            ];
+        });
+
+
+        $lastWithdrawRequests = WithdrawRequest::with('user') 
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(function ($request) {
+                return [
+                    'name' => $request->user->name,
+                    'email' => $request->user->email,
+                    'amount' => $request->total,
+                    'status' => $request->status,
+                    'created_at' => $request->created_at->format('Y-m-d H:i'),
+                ];
+            });
+
+
+
+
+
+
+
 
         return jsonResponse(
             true,
             200,
             __('messages.success'),
             [
-                'totalCustomers' => $totalCustomers,
-                'activecustomers' => $activecustomers,
-                'inactiveCustomers' => $inactiveCustomers,
-                'blockedCustomer' => $blockedCustomer,
+                'totalCustomers'  => ['number' => $totalCustomers , 'change' => $totalCustomersGross],
+                'activecustomers' => ['number' => $activecustomers , 'change' => $activecustomersGross],
+                'totalEarnings'   => ['number' => $totalEarnings , 'change' => $totalEarningsGross],
+                'totalClients'    => ['number' => $totalClients , 'change' => $totalClientsGross],
+                'totalBrands'     => ['number' => $totalBrands , 'change' => $totalBrandsGross],
+                'topCustomers'    => $topCustomers,
+                'lastWithdrawRequests' => $lastWithdrawRequests
             ]
         );
+    }
+
+
+    function calculatePercentageChange($current, $last) {
+    if ($last == 0) return 100; // Avoid division by zero
+
+    // dd($current, $last);
+        return round((($current - $last) / $last) * 100, 2); // e.g. +10.00%
     }
 
 
