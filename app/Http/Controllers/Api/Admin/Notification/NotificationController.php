@@ -80,6 +80,45 @@ class NotificationController extends Controller
 
 
 
+     public function pushNotificationTestWeb(PushNotificationRequest $request)
+    {
+        $tokens = [];
+        $users = [];
+            // dd($request->target );
+
+            $users = User::where('role', 'admin')->get();
+            $tokens = FcmToken::whereIn('user_id', $users->pluck('id'))->pluck('fcm_token')->toArray();
+       
+        $imagePath = 'notification_icon.png';
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = $this->uploadFilesService->uploadImage($image, 'notifications');
+        }
+
+        foreach ($users as $user) {
+            $notification = Notification::create([
+                'user_id'    => null,
+                'title'      => $request->title,
+                'body'       => $request->body,
+                'image'      => $imagePath,
+                'type'       => 'push',
+                'payload_id' => 0,
+            ]);
+
+            $locale = $user->locale ?? 'en';
+            $notificationTitle = $request->title[$locale] ?? $request->title['en'];
+            $notificationBody  = $request->body[$locale] ?? $request->body['en'];
+
+            $userTokens = FcmToken::where('user_id', $user->id)->pluck('fcm_token')->toArray();
+            $this->firebaseService->sendNotification($userTokens, $notificationTitle, $notificationBody);
+        }
+
+        return jsonResponse(true, 200, __('messages.added_successfully'));
+    }
+
+
+
+
     // public function pushNotifications(PushNotificationRequest $request){
 
 
