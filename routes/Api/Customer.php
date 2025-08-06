@@ -37,6 +37,7 @@ Route::middleware(['set-locale'])->group(function () {
     Route::post('send-forget-password-otp', [AuthController::class, 'sendForgetPasswordOtp']);
     Route::post('verify-forget-password-otp', [AuthController::class, 'verifyOtpForgetPassword']);
     Route::post('add-new-password-forgot-password', [AuthController::class, 'addNewPasswordForgetPassword']);
+    Route::post('/platform/version', [CustomerController::class, 'getVersion']);
 
 
 
@@ -55,6 +56,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
     Route::post('/user/locale', [CustomerController::class, 'updateLocale']);
+
+
+    
     Route::post('logout', [AuthController::class, 'logout']);
     Route::delete('delete-profile', [AuthController::class, 'deleteProfile']);
     Route::put('change-old-password', [AuthController::class, 'changeOldPassword']);
@@ -77,6 +81,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
 
     Route::controller(CustomerController::class)->prefix('profile')->group(function () {
+
+
+
+      
       
             Route::get('/toggle-notification', 'toggelNotification');
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Otp;
 use App\Models\Customer;
+use App\Models\Setting;
 
 use App\Models\Country;
 use App\Models\AccountVerificationRequest;
@@ -32,7 +33,7 @@ use App\Http\Requests\Customer\Profile\UpdateProfileRequest;
 use App\Http\Requests\Customer\Profile\VerifyOtpRequest;
 use App\Http\Requests\Customer\Profile\RequestAccountApprovalRequest;
 use App\Http\Requests\Customer\Profile\UpdateLocalRequest;
-
+use App\Http\Requests\Customer\Profile\VerifyVersionRequest;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -222,11 +223,7 @@ class CustomerController extends Controller
 
     public function getMyData()
     {
-        $user = Auth::user();
-        // $customer = Customer::where('user_id' , $user->id)->first();
-        // if(!$customer){
-        //     return jsonResponse( true ,  404 ,__('messages.customer_not_found_complete_profile') , null,null,[] );        
-        // }                       
+        $user = Auth::user();                   
         return jsonResponse( true ,  200 ,__('messages.sucess') , new CustomerResource($user) );        
     }
 
@@ -251,7 +248,6 @@ class CustomerController extends Controller
 
         $approvalRequest = AccountVerificationRequest::where('user_id' , $user->id)
         ->where('type' , $request->type)
-        // ->where('approved' , '0')
         ->first();
 
         $customer = $user->customer;
@@ -456,16 +452,30 @@ class CustomerController extends Controller
 
         ];
 
-
-
-        return jsonResponse( true ,  200 ,
-        __('messages.created_successfully') ,
-        $data);        
-
-
-
-
+        return jsonResponse( true ,  200 , __('messages.created_successfully') ,$data);        
     }
 
 
+    public function getVersion(VerifyVersionRequest $request)
+    {
+
+        $setting = null; 
+        if($request->platform == 'android') {
+            $setting = Setting::where('key' , 'android_app_version')->first();
+        }else if($request->platform == 'ios') {
+            $setting = Setting::where('key' , 'ios_app_version')->first();
+        }else{
+            return jsonResponse( false ,  422 ,__('messages.invalid_platform'));         
+        }
+
+        if(!$setting){
+            return jsonResponse( false ,  500 ,__('messages.general_error_message'));         
+        }
+
+        if($setting->value == $request->version){
+            return jsonResponse( true ,  200 ,__('messages.success') , ['up_to_date' => true]);         
+        }
+
+        return jsonResponse( true ,  200 ,__('messages.success') , ['up_to_date' => false , 'currenct_version' => $setting->value ]);                          
+    }
 }
