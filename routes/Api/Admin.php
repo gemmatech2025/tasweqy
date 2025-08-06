@@ -272,11 +272,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/push', 'pushNotifications');
             Route::get('/', 'getMyNotifications');
             Route::post('/push/testing', 'pushNotificationTestWeb');
-
-            
-
-            
-
         });
 
         Route::controller(BrandBlockController::class)->prefix('brand-blocks')->group(function () {
