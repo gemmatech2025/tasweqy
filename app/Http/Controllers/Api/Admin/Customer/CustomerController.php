@@ -623,8 +623,10 @@ class CustomerController extends Controller
 
 
 
-    public function getNumbersForReports()
+    public function getNumbersForReports(Request $request)
     {
+
+        $filter = $request->input('page', 'this_year'); // 'this_year' , 'this_month' , 'this_week' , 'today'
 
         $now = Carbon::now();
         $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
@@ -670,7 +672,7 @@ class CustomerController extends Controller
             return [
                 'name' => $customer->user->name,
                 'email' => $customer->user->email,
-                'image' => $customer->user->image,
+                'image' => $customer->user->image ? asset( $customer->user->image) : null,
                 'total_clients' => $customer->total_clients ?? 0,
                 'total_earnings' => $customer->total_earnings ?? 0  ,
             ];
@@ -691,13 +693,6 @@ class CustomerController extends Controller
                 ];
             });
 
-
-
-
-
-
-
-
         return jsonResponse(
             true,
             200,
@@ -716,10 +711,8 @@ class CustomerController extends Controller
 
 
     function calculatePercentageChange($current, $last) {
-    if ($last == 0) return 100; // Avoid division by zero
-
-    // dd($current, $last);
-        return round((($current - $last) / $last) * 100, 2); // e.g. +10.00%
+    if ($last == 0) return 100; 
+        return round((($current - $last) / $last) * 100, 2); 
     }
 
 
