@@ -16,6 +16,8 @@ class SettingsSeeder extends Seeder
             ['key' => 'default_language',             'value' => 'en'],
             ['key' => 'logo',                         'value' => 'logo.png'],
             ['key' => 'max_withdraw_amount',          'value' => '100'],
+            ['key' => 'ios_app_version',              'value' => 'v1'],
+            ['key' => 'android_app_version',          'value' => 'v1'],
             
         ];
 
