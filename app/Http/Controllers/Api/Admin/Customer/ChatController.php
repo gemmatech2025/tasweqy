@@ -58,7 +58,7 @@ class ChatController extends Controller
 
     public function getMessagesByUserId(Request $request ,$user_id)
     {
-        $customer = Customer::find($user_id);
+        $customer = User::find($user_id);
 
         if (!$customer) {
             return jsonResponse(false, 404, __('messages.customer_not_found'));
