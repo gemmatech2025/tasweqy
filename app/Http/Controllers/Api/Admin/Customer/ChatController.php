@@ -156,8 +156,37 @@ class ChatController extends Controller
             return jsonResponse(
                 true, 203, __('messages.success'),
             );
-        }
+    }
 
 
+    // public function deleteChat($user_id)
+    // {
+    //       $customer = User::find($user_id);
+
+    //     if (!$customer) {
+    //         return jsonResponse(false, 404, __('messages.customer_not_found'));
+    //     }
+    //     $messages = Message::where('user_id', $customer->id)
+    //         ->orWhere('to_user_id', $customer->id)->delete();
+        
+    //     return jsonResponse(
+    //             true, 203, __('messages.success'),
+    //         );
+    // }
+
+public function deleteChat($user_id)
+{
+    $customer = User::find($user_id);
+
+    if (!$customer) {
+        return jsonResponse(false, 404, __('messages.customer_not_found'));
+    }
+
+    $deleted = Message::where('user_id', $customer->id)
+        ->orWhere('to_user_id', $customer->id)
+        ->delete();
+
+    return jsonResponse(true, 200, __('messages.delete_success'), ['messages_deleted' => $deleted]);
+}
 
 }
