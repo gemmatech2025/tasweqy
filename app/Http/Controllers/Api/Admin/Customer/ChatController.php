@@ -144,6 +144,20 @@ class ChatController extends Controller
             );
         }
 
+    public function deleteMessage($message_id)
+    {
+        $message = Message::find($message_id);
+        if (!$message) {
+            return jsonResponse(false, 404, __('messages.message_not_found'));
+        }
+
+        $message->delete();
+
+            return jsonResponse(
+                true, 203, __('messages.success'),
+            );
+        }
+
 
 
 }
