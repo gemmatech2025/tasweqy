@@ -18,14 +18,17 @@ class MessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if($this->to_user_id == auth()->user()->id) {               
-            $this->markAsRead();
+        $user = auth()->user();
+        if($user){
+            if(($this->to_user_id == $user->id) || ($user->role == 'admin' && $this->to_user_id == null)) {               
+                $this->markAsRead();
+            }
         }
-
+        
         return [
             'id'             => $this->id,
             'message'        => $this->message,
-            'is_mine'        => auth()->user() ? auth()->user()->id == $this->user->id ? true :false:false,      
+            'is_mine'        => $user ? $user->id == $this->user->id ? true :false:false,      
             'created_since' => $this->created_at->diffForHumans(),
             'is_read'        => $this->is_read,
         ];
