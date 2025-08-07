@@ -251,6 +251,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
         Route::controller(ChatController::class)->prefix('chat')->group(function () {
+            
+            Route::post('/send-message-testing', 'sendMessageTesting');
             Route::post('/send-message', 'sendMessage');
             Route::get('/get-messages-by-user/{user_id}', 'getMessagesByUserId');
             Route::get('/get-chats', 'getChats');

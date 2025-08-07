@@ -50,11 +50,11 @@ class ChatController extends Controller
         if (!$result) {
             return jsonResponse(false, 500, __('messages.error_sending_message') );
         }
-            return jsonResponse(
-                true, 201, __('messages.add_success'),
-                $result
-            );
-        }
+        return jsonResponse(
+            true, 201, __('messages.add_success'),
+            $result
+        );
+    }
 
     public function getMessagesByUserId(Request $request ,$user_id)
     {
@@ -86,8 +86,8 @@ class ChatController extends Controller
                 'last_page' => $data->lastPage(),
             ];
 
-    return jsonResponse(true, 200, __('messages.add_success'),MessageResource::collection($data) ,  $pagination);    
-}
+        return jsonResponse(true, 200, __('messages.add_success'),MessageResource::collection($data) ,  $pagination);    
+    }
 
 
 
@@ -123,6 +123,26 @@ class ChatController extends Controller
             }
     return jsonResponse(true, 200, __('messages.success'),$chats);    
     }
+
+
+
+
+    public function sendMessageTesting(MessageRequest $request)
+    {
+        $user = Auth::user();
+        $customer = Customer::find($request->customer_id);
+        if (!$customer) {
+            return jsonResponse(false, 404, __('messages.customer_not_found'));
+        }
+        $result = $this->firebaseService->sendChatMessage($request->message , $customer->user_id);
+        if (!$result) {
+            return jsonResponse(false, 500, __('messages.error_sending_message') );
+        }
+            return jsonResponse(
+                true, 201, __('messages.add_success'),
+                $result
+            );
+        }
 
 
 
