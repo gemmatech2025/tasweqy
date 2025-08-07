@@ -70,8 +70,8 @@ class ChatController extends Controller
 
 
 
-        $messages = Message::where('user_id', $customer->user_id)
-            ->orWhere('to_user_id', $customer->user_id)
+        $messages = Message::where('user_id', $customer->id)
+            ->orWhere('to_user_id', $customer->id)
             ->orderBy('created_at', 'desc');
 
         $data = $messages->paginate($perPage, ['*'], 'page', $page);
