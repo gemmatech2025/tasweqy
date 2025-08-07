@@ -254,6 +254,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             // deleteMessage($message_id)
             Route::delete('/delete-message/{message_id}', 'deleteMessage');
 
+            Route::delete('/delete-chat/{user_id}', 'deleteChat');
+
             Route::post('/send-message-testing', 'sendMessageTesting');
             Route::post('/send-message', 'sendMessage');
             Route::get('/get-messages-by-user/{user_id}', 'getMessagesByUserId');
