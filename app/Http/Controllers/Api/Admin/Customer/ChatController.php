@@ -42,11 +42,11 @@ class ChatController extends Controller
     public function sendMessage(MessageRequest $request)
     {
         $user = Auth::user();
-        $customer = Customer::find($request->customer_id);
+        $customer = User::find($request->customer_id);
         if (!$customer) {
             return jsonResponse(false, 404, __('messages.customer_not_found'));
         }
-        $result = $this->firebaseService->sendChatMessage($request->message , $user->id , $customer->user_id);
+        $result = $this->firebaseService->sendChatMessage($request->message , $user->id , $customer->id);
         if (!$result) {
             return jsonResponse(false, 500, __('messages.error_sending_message') );
         }
@@ -130,11 +130,11 @@ class ChatController extends Controller
     public function sendMessageTesting(MessageRequest $request)
     {
         $user = Auth::user();
-        $customer = Customer::find($request->customer_id);
+        $customer = User::find($request->customer_id);
         if (!$customer) {
             return jsonResponse(false, 404, __('messages.customer_not_found'));
         }
-        $result = $this->firebaseService->sendChatMessage($request->message , $customer->user_id);
+        $result = $this->firebaseService->sendChatMessage($request->message , $customer->id);
         if (!$result) {
             return jsonResponse(false, 500, __('messages.error_sending_message') );
         }
