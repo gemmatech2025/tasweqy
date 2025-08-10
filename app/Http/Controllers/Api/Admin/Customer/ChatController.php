@@ -77,6 +77,12 @@ class ChatController extends Controller
         $data = $messages->paginate($perPage, ['*'], 'page', $page);
 
 
+         $messages = $data->getCollection()->reverse()->values();
+
+    // Replace the paginator's collection with the reversed one
+    $data->setCollection($messages);
+
+
 
 
          $pagination = [
