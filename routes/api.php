@@ -17,6 +17,7 @@ Route::controller(ReferralLinkController::class)->prefix('refferral')->group(fun
             Route::get('/export-template', 'exportReferralLinksTemplate');
 
 });
+Route::post('/handel-callback', [WhatsappController::class, 'handelWhatsappCallback']);
 
 
 

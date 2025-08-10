@@ -82,9 +82,12 @@ public function sendMessageToWhatsapp($sessionId ,$phoneNumber, $body)
     public function startSession($sessionName)
     {
     try {
+
+
+
         $id = $this->generateRandomText(6);
         $response = Http::post("{$this->nodeServiceUrl}sessions/add", [
-            'callback' => env('WHATSAPPWEB_CALLBACK_URL', 'https://backend.hayatak.gemmawhats.com/api/handel-callback'),
+            'callback' => env('WHATSAPPWEB_CALLBACK_URL', 'https://back-tasweqy.gemmawhats.com/api/handel-callback'),
             "id"           => $id ,
             "isLegacy"     => 1
         ]);
