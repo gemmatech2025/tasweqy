@@ -205,10 +205,15 @@ class NotificationController extends Controller
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
 
-        $query = Notification::where('user_id' , null);
+        $query = Notification::where('user_id' , null)
+        ->orderBy('created_at', 'desc');
 
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+
+        $query = $data->getCollection()->reverse()->values();
+        $data->setCollection($query);
 
 
 
