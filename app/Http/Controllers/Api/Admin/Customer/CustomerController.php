@@ -623,97 +623,222 @@ class CustomerController extends Controller
 
 
 
+    // public function getNumbersForReports(Request $request)
+    // {
+
+    //     $filter = $request->input('page', 'this_year'); // 'this_year' , 'this_month' , 'this_week' , 'today'
+
+    //     $now = Carbon::now();
+    //     $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+
+
+    //     $totalCustomers = Customer::count();
+    //     $activecustomers = Customer::whereHas('user', function ($q) {
+    //                 $q->whereHas('referralEarnings');
+    //             })->count();
+    //     $totalEarnings = ReferralEarning::sum('total_earnings');
+    //     $totalClients  = ReferralEarning::sum('total_clients');
+    //     $totalBrands = Brand::count();
+
+
+    //     $lastMonthCustomers = Customer::where('created_at', '<=', $endOfLastMonth)->count();
+    //     $lastMonthActiveCustomers = Customer::whereHas('user', function ($q) use ($endOfLastMonth) {
+    //         $q->whereHas('referralEarnings', function ($q2) use ($endOfLastMonth) {
+    //             $q2->where('created_at', '<=', $endOfLastMonth);
+    //         });
+    //     })->where('created_at', '<=', $endOfLastMonth)->count();
+
+    //     $lastMonthEarnings = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_earnings');
+    //     $lastMonthClients  = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_clients');
+    //     $lastMonthBrands = Brand::where('created_at', '<=', $endOfLastMonth)->count();
+
+
+    //     $totalCustomersGross  = $this->calculatePercentageChange($totalCustomers  , $lastMonthCustomers);
+    //     $activecustomersGross = $this->calculatePercentageChange($activecustomers , $lastMonthActiveCustomers);
+    //     $totalEarningsGross   = $this->calculatePercentageChange($totalEarnings   , $lastMonthEarnings);
+    //     $totalClientsGross    = $this->calculatePercentageChange($totalClients    , $lastMonthClients);
+    //     $totalBrandsGross     = $this->calculatePercentageChange($totalBrands     , $lastMonthBrands);
+
+
+
+    //     $topCustomers = Customer::select('customers.*')
+    //     ->join('users', 'users.id', '=', 'customers.user_id')
+    //     ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
+    //     ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings, SUM(referral_earnings.total_clients) as total_clients')
+    //     ->groupBy('customers.id')
+    //     ->orderByDesc('total_earnings')
+    //     ->take(5)
+    //     ->get()->map(function ($customer) {
+    //         return [
+    //             'name' => $customer->user->name,
+    //             'email' => $customer->user->email,
+    //             'image' => $customer->user->image ? asset( $customer->user->image) : null,
+    //             'total_clients' => $customer->total_clients ?? 0,
+    //             'total_earnings' => $customer->total_earnings ?? 0  ,
+    //         ];
+    //     });
+
+
+    //     $lastWithdrawRequests = WithdrawRequest::with('user') 
+    //         ->latest()
+    //         ->take(5)
+    //         ->get()
+    //         ->map(function ($request) {
+    //             return [
+    //                 'name' => $request->user->name,
+    //                 'email' => $request->user->email,
+    //                 'amount' => $request->total,
+    //                 'status' => $request->status,
+    //                 'created_at' => $request->created_at->format('Y-m-d H:i'),
+    //             ];
+    //         });
+
+    //     return jsonResponse(
+    //         true,
+    //         200,
+    //         __('messages.success'),
+    //         [
+    //             'totalCustomers'  => ['number' => $totalCustomers , 'change' => $totalCustomersGross],
+    //             'activecustomers' => ['number' => $activecustomers , 'change' => $activecustomersGross],
+    //             'totalEarnings'   => ['number' => $totalEarnings , 'change' => $totalEarningsGross],
+    //             'totalClients'    => ['number' => $totalClients , 'change' => $totalClientsGross],
+    //             'totalBrands'     => ['number' => $totalBrands , 'change' => $totalBrandsGross],
+    //             'topCustomers'    => $topCustomers,
+    //             'lastWithdrawRequests' => $lastWithdrawRequests
+    //         ]
+    //     );
+    // }
+
+
+    // function calculatePercentageChange($current, $last) {
+    // if ($last == 0) return 100; 
+    //     return round((($current - $last) / $last) * 100, 2); 
+    // }
+
+
     public function getNumbersForReports(Request $request)
-    {
+{
+    $filter = $request->input('filter', 'this_year'); // 'this_year', 'this_month', 'this_week', 'today'
 
-        $filter = $request->input('page', 'this_year'); // 'this_year' , 'this_month' , 'this_week' , 'today'
+    $now = Carbon::now();
 
-        $now = Carbon::now();
-        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+    switch ($filter) {
+        case 'this_year':
+            $currentStart = $now->copy()->startOfYear();
+            $currentEnd   = $now->copy()->endOfYear();
+            $lastStart    = $now->copy()->subYear()->startOfYear();
+            $lastEnd      = $now->copy()->subYear()->endOfYear();
+            break;
 
+        case 'this_month':
+            $currentStart = $now->copy()->startOfMonth();
+            $currentEnd   = $now->copy()->endOfMonth();
+            $lastStart    = $now->copy()->subMonth()->startOfMonth();
+            $lastEnd      = $now->copy()->subMonth()->endOfMonth();
+            break;
 
-        $totalCustomers = Customer::count();
-        $activecustomers = Customer::whereHas('user', function ($q) {
-                    $q->whereHas('referralEarnings');
-                })->count();
-        $totalEarnings = ReferralEarning::sum('total_earnings');
-        $totalClients  = ReferralEarning::sum('total_clients');
-        $totalBrands = Brand::count();
+        case 'this_week':
+            $currentStart = $now->copy()->startOfWeek();
+            $currentEnd   = $now->copy()->endOfWeek();
+            $lastStart    = $now->copy()->subWeek()->startOfWeek();
+            $lastEnd      = $now->copy()->subWeek()->endOfWeek();
+            break;
 
+        case 'today':
+            $currentStart = $now->copy()->startOfDay();
+            $currentEnd   = $now->copy()->endOfDay();
+            $lastStart    = $now->copy()->subDay()->startOfDay();
+            $lastEnd      = $now->copy()->subDay()->endOfDay();
+            break;
 
-        $lastMonthCustomers = Customer::where('created_at', '<=', $endOfLastMonth)->count();
-        $lastMonthActiveCustomers = Customer::whereHas('user', function ($q) use ($endOfLastMonth) {
-            $q->whereHas('referralEarnings', function ($q2) use ($endOfLastMonth) {
-                $q2->where('created_at', '<=', $endOfLastMonth);
+        default: // fallback
+            $currentStart = $now->copy()->startOfYear();
+            $currentEnd   = $now->copy()->endOfYear();
+            $lastStart    = $now->copy()->subYear()->startOfYear();
+            $lastEnd      = $now->copy()->subYear()->endOfYear();
+            break;
+    }
+
+    $totalCustomers = Customer::whereBetween('created_at', [$currentStart, $currentEnd])->count();
+    $activecustomers = Customer::whereBetween('created_at', [$currentStart, $currentEnd])
+        ->whereHas('user', function ($q) use ($currentStart, $currentEnd) {
+            $q->whereHas('referralEarnings', function ($q2) use ($currentStart, $currentEnd) {
+                $q2->whereBetween('created_at', [$currentStart, $currentEnd]);
             });
-        })->where('created_at', '<=', $endOfLastMonth)->count();
+        })->count();
+    $totalEarnings = ReferralEarning::whereBetween('created_at', [$currentStart, $currentEnd])->sum('total_earnings');
+    $totalClients  = ReferralEarning::whereBetween('created_at', [$currentStart, $currentEnd])->sum('total_clients');
+    $totalBrands = Brand::whereBetween('created_at', [$currentStart, $currentEnd])->count();
 
-        $lastMonthEarnings = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_earnings');
-        $lastMonthClients  = ReferralEarning::where('created_at', '<=', $endOfLastMonth)->sum('total_clients');
-        $lastMonthBrands = Brand::where('created_at', '<=', $endOfLastMonth)->count();
+    $lastCustomers = Customer::whereBetween('created_at', [$lastStart, $lastEnd])->count();
+    $lastActiveCustomers = Customer::whereBetween('created_at', [$lastStart, $lastEnd])
+        ->whereHas('user', function ($q) use ($lastStart, $lastEnd) {
+            $q->whereHas('referralEarnings', function ($q2) use ($lastStart, $lastEnd) {
+                $q2->whereBetween('created_at', [$lastStart, $lastEnd]);
+            });
+        })->count();
 
+    $lastEarnings = ReferralEarning::whereBetween('created_at', [$lastStart, $lastEnd])->sum('total_earnings');
+    $lastClients  = ReferralEarning::whereBetween('created_at', [$lastStart, $lastEnd])->sum('total_clients');
+    $lastBrands = Brand::whereBetween('created_at', [$lastStart, $lastEnd])->count();
 
-        $totalCustomersGross  = $this->calculatePercentageChange($totalCustomers  , $lastMonthCustomers);
-        $activecustomersGross = $this->calculatePercentageChange($activecustomers , $lastMonthActiveCustomers);
-        $totalEarningsGross   = $this->calculatePercentageChange($totalEarnings   , $lastMonthEarnings);
-        $totalClientsGross    = $this->calculatePercentageChange($totalClients    , $lastMonthClients);
-        $totalBrandsGross     = $this->calculatePercentageChange($totalBrands     , $lastMonthBrands);
+    $totalCustomersGross  = $this->calculatePercentageChange($totalCustomers,  $lastCustomers);
+    $activecustomersGross = $this->calculatePercentageChange($activecustomers, $lastActiveCustomers);
+    $totalEarningsGross   = $this->calculatePercentageChange($totalEarnings,   $lastEarnings);
+    $totalClientsGross    = $this->calculatePercentageChange($totalClients,    $lastClients);
+    $totalBrandsGross     = $this->calculatePercentageChange($totalBrands,     $lastBrands);
 
-
-
-        $topCustomers = Customer::select('customers.*')
+    $topCustomers = Customer::select('customers.*')
         ->join('users', 'users.id', '=', 'customers.user_id')
         ->leftJoin('referral_earnings', 'referral_earnings.user_id', '=', 'users.id')
         ->selectRaw('SUM(referral_earnings.total_earnings) as total_earnings, SUM(referral_earnings.total_clients) as total_clients')
+        ->whereBetween('customers.created_at', [$currentStart, $currentEnd])
         ->groupBy('customers.id')
         ->orderByDesc('total_earnings')
         ->take(5)
-        ->get()->map(function ($customer) {
+        ->get()
+        ->map(function ($customer) {
             return [
                 'name' => $customer->user->name,
                 'email' => $customer->user->email,
-                'image' => $customer->user->image ? asset( $customer->user->image) : null,
+                'image' => $customer->user->image ? asset($customer->user->image) : null,
                 'total_clients' => $customer->total_clients ?? 0,
-                'total_earnings' => $customer->total_earnings ?? 0  ,
+                'total_earnings' => $customer->total_earnings ?? 0,
             ];
         });
 
+    $lastWithdrawRequests = WithdrawRequest::with('user')
+        ->whereBetween('created_at', [$currentStart, $currentEnd])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(function ($request) {
+            return [
+                'name' => $request->user->name,
+                'email' => $request->user->email,
+                'amount' => $request->total,
+                'status' => $request->status,
+                'created_at' => $request->created_at->format('Y-m-d H:i'),
+            ];
+        });
 
-        $lastWithdrawRequests = WithdrawRequest::with('user') 
-            ->latest()
-            ->take(5)
-            ->get()
-            ->map(function ($request) {
-                return [
-                    'name' => $request->user->name,
-                    'email' => $request->user->email,
-                    'amount' => $request->total,
-                    'status' => $request->status,
-                    'created_at' => $request->created_at->format('Y-m-d H:i'),
-                ];
-            });
+    return jsonResponse(true, 200, __('messages.success'), [
+        'totalCustomers'  => ['number' => $totalCustomers , 'change' => $totalCustomersGross],
+        'activecustomers' => ['number' => $activecustomers , 'change' => $activecustomersGross],
+        'totalEarnings'   => ['number' => $totalEarnings , 'change' => $totalEarningsGross],
+        'totalClients'    => ['number' => $totalClients , 'change' => $totalClientsGross],
+        'totalBrands'     => ['number' => $totalBrands , 'change' => $totalBrandsGross],
+        'topCustomers'    => $topCustomers,
+        'lastWithdrawRequests' => $lastWithdrawRequests
+    ]);
+}
 
-        return jsonResponse(
-            true,
-            200,
-            __('messages.success'),
-            [
-                'totalCustomers'  => ['number' => $totalCustomers , 'change' => $totalCustomersGross],
-                'activecustomers' => ['number' => $activecustomers , 'change' => $activecustomersGross],
-                'totalEarnings'   => ['number' => $totalEarnings , 'change' => $totalEarningsGross],
-                'totalClients'    => ['number' => $totalClients , 'change' => $totalClientsGross],
-                'totalBrands'     => ['number' => $totalBrands , 'change' => $totalBrandsGross],
-                'topCustomers'    => $topCustomers,
-                'lastWithdrawRequests' => $lastWithdrawRequests
-            ]
-        );
+function calculatePercentageChange($current, $last) {
+    if ($last == 0) {
+        return $current > 0 ? 100 : 0; // avoid division by zero
     }
-
-
-    function calculatePercentageChange($current, $last) {
-    if ($last == 0) return 100; 
-        return round((($current - $last) / $last) * 100, 2); 
-    }
+    return round((($current - $last) / $last) * 100, 2);
+}
 
 
 
