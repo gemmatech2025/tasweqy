@@ -6,8 +6,9 @@ use App\Http\Controllers\Api\Tracking\TrakingController;
 use App\Http\Controllers\Api\Admin\Referral\ReferralLinkController;
 
 use App\Http\Controllers\Api\Customer\Auth\SocialAuthController;
+use App\Http\Controllers\Api\Admin\WhatsappController;
 
-
+ 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
