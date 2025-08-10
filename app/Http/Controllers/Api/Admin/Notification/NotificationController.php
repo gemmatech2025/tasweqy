@@ -80,7 +80,7 @@ class NotificationController extends Controller
 
 
 
-     public function pushNotificationTestWeb(PushNotificationRequest $request)
+    public function pushNotificationTestWeb(PushNotificationRequest $request)
     {
         $tokens = [];
         $users = [];
@@ -229,6 +229,21 @@ class NotificationController extends Controller
             $pagination
         );
     }
+
+
+    public function getNotReadedNotificationsCount(){
+        $count = Notification::where('user_id' , null)->where('is_read' , false)->count();
+
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            ['count' => $count]
+        );
+    }
+
 
 
 }

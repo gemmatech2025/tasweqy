@@ -275,6 +275,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
         Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
+            
+            Route::get('/get-unreaded-count', 'getNotReadedNotificationsCount');
+
             Route::post('/push', 'pushNotifications');
             Route::get('/', 'getMyNotifications');
             Route::post('/push/testing', 'pushNotificationTestWeb');
