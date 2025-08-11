@@ -45,19 +45,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
             Route::controller(ReferralLinkController::class)->prefix('referral-link')->group(function () {
 
+
+                
+            Route::get('/get-not-reserved', 'getNotReserved');
         
             Route::get('/get-numbers', 'getReferralLinksNumbers');
-
-
             Route::put('/update-status/{id}', 'updateStatus');
-
             Route::get('/export-template', 'exportReferralLinksTemplate');
             Route::post('/import-data', 'importReferralLinks');
             Route::post('/store-list', 'storeList');
-            
             Route::post('/', 'store');
-
-            
             Route::delete('/{id}', 'delete');
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
