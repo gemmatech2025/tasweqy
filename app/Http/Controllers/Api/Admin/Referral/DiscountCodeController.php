@@ -302,6 +302,50 @@ class DiscountCodeController extends BaseController
         );
     }
 
+
+
+
+    public function getNotReserved(Request $request)
+    {
+
+        $searchTerm = trim($request->input('searchTerm', ''));
+
+        $query = DiscountCode::whereDoesntHave('referralEarning');
+        if ($searchTerm) {
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('id', 'LIKE', "%$searchTerm%")
+                        ->orWhere('code', 'LIKE', "%$searchTerm%");
+                });
+        }
+
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $codes = $data->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'code' => $item->code,
+            ];
+        });
+
+        $pagination = [
+            'total' => $data->total(),
+            'current_page' => $data->currentPage(),
+            'per_page' => $data->perPage(),
+            'last_page' => $data->lastPage(),
+        ];
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            $codes,
+            $pagination
+        );
+     
+    }
+
     
 
 }
