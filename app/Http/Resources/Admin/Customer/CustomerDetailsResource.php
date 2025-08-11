@@ -86,6 +86,7 @@ class CustomerDetailsResource extends JsonResource
 
         return [
             'id'          => $this->id,
+            'user_id'          => $this->user_id,
             'name'        => $this->user->name,
             'country'     => $this->country? $this->country->name : null,
             'phone'       => $this->user->phone ,
