@@ -270,6 +270,24 @@ class NotificationController extends Controller
     }
 
 
+        public function deleteReaded(){
+
+
+        $notification = Notification::where('user_id' , null)->where('is_read' , false)->delete();
+        
+        
+        // $notification->delete();
+
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            ['deleted_count' => $notification]
+        );
+    }
+
+
 
 
 }
