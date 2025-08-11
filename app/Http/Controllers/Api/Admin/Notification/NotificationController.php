@@ -273,7 +273,7 @@ class NotificationController extends Controller
         public function deleteReaded(){
 
 
-        $notification = Notification::where('user_id' , null)->where('is_read' , false)->delete();
+        $notification = Notification::where('user_id' , null)->where('is_read' , true)->delete();
         
         
         // $notification->delete();
