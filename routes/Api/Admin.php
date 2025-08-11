@@ -280,6 +280,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
             Route::get('/get-unreaded-count', 'getNotReadedNotificationsCount');
 
+            Route::delete('/delete/{notification_id}', 'delete');
+
             Route::post('/push', 'pushNotifications');
             Route::get('/', 'getMyNotifications');
             Route::post('/push/testing', 'pushNotificationTestWeb');
