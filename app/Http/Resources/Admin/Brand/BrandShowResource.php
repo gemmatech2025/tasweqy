@@ -22,6 +22,8 @@ class BrandShowResource extends JsonResource
             'total_marketers'   => $this->total_marketers,
             'email'             => $this->email,
             'phone'             => $this->phone,
+            'is_active'             => $this->is_active,
+
             'code'              => $this->code,
             'google_drive_url'              => $this->google_drive_url,
 
