@@ -136,29 +136,72 @@ public function deleteSession($id){
 }
 
 
-
 public function getSessions(Request $request)
 {
     $sessions = WhatsappSession::query();
 
     $name = $request->input('name', '');
-    $page =$request->input('page', 1);
+    $page = $request->input('page', 1);
     $perPage = $request->input('per_page', 20);
 
     if ($name) {
         $sessions->where('session_name', 'like', '%' . $name . '%');
     }
 
-        $data = $sessions->paginate($perPage, ['*'], 'page', $page);
+    $data = $sessions->paginate($perPage, ['*'], 'page', $page);
 
-         return jsonResponse(
-                    true,
-                    200,
-                    __('messages.fetch_successful'),
-                         $data,
+    $pagination = [
+        'total' => $data->total(),
+        'current_page' => $data->currentPage(),
+        'per_page' => $data->perPage(),
+        'last_page' => $data->lastPage(),
+    ];
 
+    return jsonResponse(
+        true,
+        200,
+        __('messages.fetch_successful'),
+        $data->items(), 
+        $pagination    
     );
 }
+
+
+// public function getSessions(Request $request)
+// {
+//     $sessions = WhatsappSession::query();
+
+//     $name = $request->input('name', '');
+//     $page =$request->input('page', 1);
+//     $perPage = $request->input('per_page', 20);
+
+//     if ($name) {
+//         $sessions->where('session_name', 'like', '%' . $name . '%');
+//     }
+
+//         $data = $sessions->paginate($perPage, ['*'], 'page', $page);
+
+
+
+//         //  $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+//         $pagination = [
+//             'total' => $data->total(),
+//             'current_page' => $data->currentPage(),
+//             'per_page' => $data->perPage(),
+//             'last_page' => $data->lastPage(),
+//         ];
+
+
+//          return jsonResponse(
+//                     true,
+//                     200,
+//                     __('messages.fetch_successful'),
+//         $data->items(),
+//                          $pagination
+
+//     );
+// }
 
 public function getSessionDetails($id)
 {
