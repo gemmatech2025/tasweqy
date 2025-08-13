@@ -12,13 +12,15 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\Admin\General\CountryRequest;
 use App\Http\Resources\Admin\General\CountryResource;
+use App\Http\Resources\Admin\General\CountryShowResource;
+
 
 class CountryController extends BaseController
 {
 
 
     protected const RESOURCE = CountryResource::class;
-    protected const RESOURCE_SHOW = CountryResource::class;
+    protected const RESOURCE_SHOW = CountryShowResource::class;
     protected const REQUEST = CountryRequest::class;
 
     public function model()
