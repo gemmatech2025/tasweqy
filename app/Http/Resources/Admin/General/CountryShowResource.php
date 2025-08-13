@@ -5,7 +5,7 @@ namespace App\Http\Resources\Admin\General;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CountryResource extends JsonResource
+class CountryShowResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,7 @@ class CountryResource extends JsonResource
     {
         return [
             'id'   => $this->id,
-            'name' => $this->name,
+            'name'  => $this->getTranslations('name'),
             'code' => $this->code,
             'image' => $this->image ? asset($this->image) :null ,
 
