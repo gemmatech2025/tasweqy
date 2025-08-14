@@ -22,7 +22,9 @@ class BrandShowResource extends JsonResource
             'total_marketers'   => $this->total_marketers,
             'email'             => $this->email,
             'phone'             => $this->phone,
-            'is_active'             => $this->is_active,
+            'is_active'         => $this->is_active,
+            'default_link_earning' => $this->default_link_earning,
+            'default_code_earning' => $this->default_code_earning,
 
             'code'              => $this->code,
             'google_drive_url'              => $this->google_drive_url,
@@ -34,5 +36,8 @@ class BrandShowResource extends JsonResource
 
             'created_at'        => $this->created_at?->toDateTimeString(),
             'updated_at'        => $this->updated_at?->toDateTimeString(),
-        ];      }
+        ];
+
+                  
+    }
 }

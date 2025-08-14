@@ -46,6 +46,8 @@ class BrandIndexResource extends JsonResource
             'highest_discount_code'     => $highestDiscountCode ? $highestDiscountCode->earning_precentage : null,
             'ReferralLinkCount'         => $ReferralLinkCount,
             'DiscountCodeCount'         => $DiscountCodeCount,
+            'default_link_earning' => $this->default_link_earning,
+            'default_code_earning' => $this->default_code_earning,
 
             'category'                  => $this->category->name,
             'created_at'                => $this->created_at?->format('F j, Y g:i A'),

@@ -45,7 +45,9 @@ class BrandRequest extends FormRequest
                         'phone'                       => 'required|numeric',
                         'code'                        => 'required|numeric',
 
-                        
+                        'default_link_earning'        => 'required|numeric',
+                        'default_code_earning'        => 'required|numeric',
+         
                         'logo'                        => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                         'category_id'                 => 'required|exists:categories,id',
                         'google_drive_url'            => 'nullable|url|max:255',
@@ -71,6 +73,10 @@ class BrandRequest extends FormRequest
                         'email'                       => 'required|sometimes|email|max:255',
                         'phone'                       => 'required|sometimes|numeric',
                         'code'                        => 'required|sometimes|numeric',
+
+
+                        'default_link_earning'        => 'required|sometimes|numeric',
+                        'default_code_earning'        => 'required|sometimes|numeric',
 
                         
                         'logo'                        => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',

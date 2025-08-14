@@ -114,6 +114,13 @@ class CustomerController extends Controller
                 $user->code = $request->code;
             }
 
+
+            if($request->name ){
+                $user->name = $request->name;
+            }
+
+
+
             $user->image =$imagePath;
             $user->save();
             if(!$user->phone_verified_at){
