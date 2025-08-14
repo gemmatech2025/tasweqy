@@ -449,9 +449,11 @@ class CustomerController extends Controller
         
         }
 
+
+
         $data = [
-            'referral_link' => $referralLink ? new ReferralEarningResource($referralLink) : null,
-            'descount_code' => $descountcode ? new ReferralEarningResource($descountcode) : null,
+            'referral_link' => $referralLink ? $referralLink->referalble ? new ReferralEarningResource($referralLink) : null : null,
+            'descount_code' => $descountcode ? $descountcode->referalble ? new ReferralEarningResource($descountcode) : null : null,
             'chart_points'  => $intervals,
             'total_balance' => $customer->total_balance,
             'total_earning' => $total_earnings,
