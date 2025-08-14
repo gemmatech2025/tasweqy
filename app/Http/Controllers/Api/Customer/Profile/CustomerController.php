@@ -477,7 +477,7 @@ $discountCode = ReferralEarning::query()
             // 'descount_code' => $descountcode ? $descountcode->referalble ? new ReferralEarningResource($descountcode) : null : null,
             
             'referral_link' => $referralLink ?  new ReferralEarningResource($referralLink)  : null,
-            'descount_code' => $descountcode ?  new ReferralEarningResource($descountcode)  : null,
+            'descount_code' => $discountCode ?  new ReferralEarningResource($discountCode)  : null,
             'chart_points'  => $intervals,
             'total_balance' => $customer->total_balance,
             'total_earning' => $total_earnings,
