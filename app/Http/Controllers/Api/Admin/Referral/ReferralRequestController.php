@@ -89,7 +89,7 @@ class ReferralRequestController extends Controller
 
 
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),

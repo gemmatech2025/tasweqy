@@ -135,7 +135,7 @@ public function updateRequestStatus($request_id , $status)
             }
         }
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),

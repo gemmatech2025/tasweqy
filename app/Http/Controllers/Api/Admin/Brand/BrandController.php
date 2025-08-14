@@ -162,7 +162,7 @@ class BrandController extends BaseController
 
 
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),
@@ -214,7 +214,7 @@ class BrandController extends BaseController
         });
 
 
-        $allData = $query->paginate($perPage, ['*'], 'page', $page); 
+        $allData = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page); 
         $data = $allData->map(function ($user) use($brand_id){        
         $totalCodes = ReferralEarning::where('user_id' , $user->id)
         ->where('referrable_type' , 'App\\Models\\DiscountCode')
@@ -279,7 +279,7 @@ class BrandController extends BaseController
         $query =DiscountCode::where('brand_id' , $brand_id);
 
 
-        $allData = $query->paginate($perPage, ['*'], 'page', $page); 
+        $allData = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page); 
         $data = $allData->map(function ($code) {      
             $earning = $code->referralEarning;
       
@@ -319,7 +319,7 @@ class BrandController extends BaseController
         $perPage = $request->input('per_page', 10);
         $query =ReferralLink::where('brand_id' , $brand_id);
 
-        $allData = $query->paginate($perPage, ['*'], 'page', $page); 
+        $allData = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page); 
         $data = $allData->map(function ($link) {      
         $earning = $link->referralEarning;
       
@@ -359,7 +359,7 @@ class BrandController extends BaseController
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
         $query =BrandBlock::where('brand_id' , $brand_id);
-        $data = $query->paginate($perPage, ['*'], 'page', $page); 
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page); 
 
         $pagination = [
             'total' => $data->total(),

@@ -252,7 +252,7 @@ class PadgeController extends BaseController
     if ($this->indexPaginat()) {
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 10);
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),

@@ -209,7 +209,7 @@ class NotificationController extends Controller
         ->orderBy('created_at', 'desc');
 
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
 
         $query = $data->getCollection()->reverse()->values();

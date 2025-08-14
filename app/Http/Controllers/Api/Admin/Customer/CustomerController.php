@@ -95,7 +95,7 @@ class CustomerController extends Controller
                 }
         }
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
 
          $pagination = [
@@ -140,7 +140,7 @@ class CustomerController extends Controller
 
         if($type == 'referral_link'){
             $query = $user->referralEarnings()->where('referrable_type' ,ReferralLink::class)->orderByDesc('created_at');
-            $data = $query->paginate($perPage, ['*'], 'page', $page);
+            $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
             $pagination = [
                 'total' => $data->total(),
                 'current_page' => $data->currentPage(),
@@ -151,7 +151,7 @@ class CustomerController extends Controller
             return jsonResponse(true, 200, __('messages.success' ), ReferralEarningResource::collection($data) ,$pagination);
         }elseif($type == 'discount_code'){
             $query = $user->referralEarnings()->where('referrable_type' ,DiscountCode::class)->orderByDesc('created_at');
-            $data = $query->paginate($perPage, ['*'], 'page', $page);
+            $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
             $pagination = [
                 'total' => $data->total(),
                 'current_page' => $data->currentPage(),
@@ -180,7 +180,7 @@ class CustomerController extends Controller
 
      
             $query = WithdrawRequest::where('user_id' ,$customer->user->id)->orderByDesc('created_at');
-            $data = $query->paginate($perPage, ['*'], 'page', $page);
+            $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
             $pagination = [
                 'total' => $data->total(),
                 'current_page' => $data->currentPage(),
@@ -222,7 +222,7 @@ class CustomerController extends Controller
 
 
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         foreach ($data as $brand) {
 
@@ -284,7 +284,7 @@ class CustomerController extends Controller
             });
         }
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),
@@ -413,7 +413,7 @@ class CustomerController extends Controller
 
 
 
-        $customers = $query->paginate($perPage, ['*'], 'page', $page);
+        $customers = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $data = $customers->map(function ($customer) {
             return [
@@ -508,7 +508,7 @@ class CustomerController extends Controller
 
 
 
-        $customers = $query->paginate($perPage, ['*'], 'page', $page);
+        $customers = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $data = $customers->map(function ($customer) use($limit) {
             $totalEarnings = ReferralEarning::where('user_id' ,$customer->user_id)->sum('total_earnings');
@@ -573,7 +573,7 @@ class CustomerController extends Controller
         }
 
 
-        $transactions = $query->paginate($perPage, ['*'], 'page', $page);
+        $transactions = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
         $totalEarnings = ReferralEarning::where('user_id' ,$customer->user_id)->sum('total_earnings');
         $withdrawn_amount = WithdrawRequest::where('user_id' ,$customer->user_id)->where('status' ,'approved')->sum('total');
         $customer->total_balance = $totalEarnings -$withdrawn_amount;
@@ -857,7 +857,7 @@ function calculatePercentageChange($current, $last) {
                 ->orWhere('phone', 'LIKE', "%{$searchTerm}%");
         }
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
         $users =  $data->map(function ($user){
             return [
                 'id' => $user->id,
