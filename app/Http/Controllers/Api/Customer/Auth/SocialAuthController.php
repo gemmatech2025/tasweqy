@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 
 
 use App\Models\User;
+use App\Models\Customer;
 
 
 use Illuminate\Support\Facades\Hash;
@@ -223,6 +224,8 @@ public function socialLogin(Request $request)
                 'role'              => 'customer',
             ]
         );
+
+        $customer_object = Customer::updateOrCreate(['user_id' => $user->id]);
 
         // Generate token
         $token = $customer->createToken('customer_token', ['*'])->plainTextToken;
