@@ -92,7 +92,7 @@ class ApprovalRequestController extends Controller
     //     [] 
     //     );
     // return $result;
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
 
          $pagination = [
@@ -195,7 +195,7 @@ class ApprovalRequestController extends Controller
         
         }
             $requests = AccountVerificationRequest::where('user_id', $customer->user_id); 
-            $data = $requests->paginate($perPage, ['*'], 'page', $page);
+            $data = $requests->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
             $pagination = [
                     'total' => $data->total(),

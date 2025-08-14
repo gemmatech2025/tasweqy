@@ -156,7 +156,7 @@ class UserBlockController extends BaseController
 
         $query = UserBlock::where('customer_id', $id);
 
-        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        $data = $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         $pagination = [
             'total' => $data->total(),
