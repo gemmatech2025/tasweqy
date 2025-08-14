@@ -415,23 +415,32 @@ class CustomerController extends Controller
 
 
 
-$referralLink = ReferralEarning::query()
-    ->where('referral_earnings.user_id', $user->id) 
-    ->where('referral_earnings.referrable_type', (new ReferralLink)->getMorphClass())
-    ->leftJoin('referral_links', 'referral_links.id', '=', 'referral_earnings.referrable_id')
-    ->whereNotNull('referral_links.id')
-    ->orderByDesc('referral_earnings.total_earnings') 
-    ->select('referral_earnings.*')
-    ->first();
+        $referralLink = ReferralEarning::query()
+            ->where('user_id', $user->id)
+            ->where('referrable_type', ReferralLink::class)
+            ->whereHas('referrable')
+            ->with('referrable.brand')
+            ->orderByDesc('total_earnings')
+            ->first();
 
-$discountCode = ReferralEarning::query()
-    ->where('referral_earnings.user_id', $user->id) 
-    ->where('referral_earnings.referrable_type', (new DiscountCode)->getMorphClass())
-    ->leftJoin('discount_codes', 'discount_codes.id', '=', 'referral_earnings.referrable_id')
-    ->whereNotNull('discount_codes.id')
-    ->orderByDesc('referral_earnings.total_earnings') 
-    ->select('referral_earnings.*')
-    ->first();
+
+// $discountCode = ReferralEarning::query()
+//     ->where('referral_earnings.user_id', $user->id) 
+//     ->where('referral_earnings.referrable_type', (new DiscountCode)->getMorphClass())
+//     ->leftJoin('discount_codes', 'discount_codes.id', '=', 'referral_earnings.referrable_id')
+//     ->whereNotNull('discount_codes.id')
+//     ->orderByDesc('referral_earnings.total_earnings') 
+//     ->select('referral_earnings.*')
+//     ->first();
+
+
+            $discountCode = ReferralEarning::query()
+            ->where('user_id', $user->id)
+            ->where('referrable_type', DiscountCode::class)
+            ->whereHas('referrable')
+            ->with('referrable.brand')
+            ->orderByDesc('total_earnings')
+            ->first();
 
 
         $total_earnings = ReferralEarning::where('user_id', $user->id)
