@@ -25,7 +25,10 @@ class ReferralEarningResource extends JsonResource
 
 
         if($this->referrable_type == ReferralLink::class){
-            $referalble =[
+
+
+            if($referalble){
+                $referalble =[
                 'id' => $this->referrable_id ,
                 'referral'  => $this->referrable->link ,
                 'brand' => ['id' => $this->referrable->brand->id,
@@ -33,8 +36,12 @@ class ReferralEarningResource extends JsonResource
                         ],
                 'type'  => 'referral_link'
             ];
+            }
+            
 
         }else if($this->referrable_type == DiscountCode::class){
+            if($referalble){
+
             $referalble =[
                 'id' => $this->referrable_id ,
                 'referral'  => $this->referrable->code ,
@@ -43,6 +50,7 @@ class ReferralEarningResource extends JsonResource
                         ],
                 'type'  => 'discount_code'
             ];
+            }
         }
 
 
