@@ -400,12 +400,16 @@ class CustomerController extends Controller
 
         $referralLink = ReferralEarning::where('user_id', $user->id)
             ->where('referrable_type', ReferralLink::class)
+            ->whereHas('referrable')
+
             ->orderBy('total_earnings', 'desc')
             ->first();
 
 
         $descountcode = ReferralEarning::where('user_id', $user->id)
             ->where('referrable_type', DiscountCode::class)
+            ->whereHas('referrable')
+
             ->orderBy('total_earnings', 'desc')
             ->first();
 
@@ -452,8 +456,11 @@ class CustomerController extends Controller
 
 
         $data = [
-            'referral_link' => $referralLink ? $referralLink->referalble ? new ReferralEarningResource($referralLink) : null : null,
-            'descount_code' => $descountcode ? $descountcode->referalble ? new ReferralEarningResource($descountcode) : null : null,
+            //  'referral_link' => $referralLink ? $referralLink->referalble ? new ReferralEarningResource($referralLink) : null : null,
+            // 'descount_code' => $descountcode ? $descountcode->referalble ? new ReferralEarningResource($descountcode) : null : null,
+            
+            'referral_link' => $referralLink ?  new ReferralEarningResource($referralLink)  : null,
+            'descount_code' => $descountcode ?  new ReferralEarningResource($descountcode)  : null,
             'chart_points'  => $intervals,
             'total_balance' => $customer->total_balance,
             'total_earning' => $total_earnings,
