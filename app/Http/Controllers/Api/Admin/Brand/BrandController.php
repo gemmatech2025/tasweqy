@@ -185,15 +185,13 @@ class BrandController extends BaseController
     public function getAll()
     {
         $brands =Brand::all()->map(function ($brand){
-            return ['id' => $brand->id ,'name' => $brand->name];
+            return ['id' => $brand->id,
+            'name' => $brand->name,
+            'default_link_earning' => $brand->default_link_earning,
+            'default_code_earning' => $brand->default_code_earning
+            ];
         });
         
-
-
-
-
-
-
         return jsonResponse(
             true,
             200,
