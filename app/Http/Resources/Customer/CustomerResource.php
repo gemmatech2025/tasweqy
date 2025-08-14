@@ -44,7 +44,7 @@ class CustomerResource extends JsonResource
             'is_2fa_enabled'      => (bool) $this->two_factor_secret,
             'is_2fa_confirmed'    => (bool) $this->two_factor_confirmed_at,
             'has_recovery_codes'  => (bool) $this->two_factor_recovery_codes,
-            'completed_profile'   => $customer ? true : false,
+            'completed_profile'   => ($customer->gender && $customer->country && $customer->birthdate) ? true : false,
             'country'       => $country ? [
                 'id'        => $country->id ,
                 'name'      => $country->name , 
