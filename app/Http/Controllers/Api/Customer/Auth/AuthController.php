@@ -75,6 +75,11 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password), 
             ]);
 
+            $customer = Customer::create([
+                'user_id'        => $user->id,                
+            ]);
+
+
             if( $request->deviceType && $request->fcmToken){
             $fcm = FcmToken::create([
                             'deviceType'   => $request->deviceType,

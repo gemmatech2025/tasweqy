@@ -20,7 +20,9 @@ class Brand extends Model
         'total_marketers',
         'email' ,
         'phone' ,
-        'code'
+        'code',
+        'default_link_earning',
+        'default_code_earning'
     ];
 
 

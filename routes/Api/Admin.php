@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
                 
-            Route::get('/get-not-reserved', 'getNotReserved');
+            Route::get('/get-not-reserved/{brand_id}', 'getNotReserved');
         
             Route::get('/get-numbers', 'getReferralLinksNumbers');
             Route::put('/update-status/{id}', 'updateStatus');
@@ -170,7 +170,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::controller(DiscountCodeController::class)->prefix('discount-code')->group(function () {
             
-            Route::get('/get-not-reserved', 'getNotReserved');
+            Route::get('/get-not-reserved/{brand_id}', 'getNotReserved');
         
             Route::get('/get-numbers', 'getDiscountCodesNumbers');
             Route::put('/update-status/{id}', 'updateStatus');

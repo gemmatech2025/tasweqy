@@ -305,13 +305,17 @@ class DiscountCodeController extends BaseController
 
 
 
-    public function getNotReserved(Request $request)
+    public function getNotReserved(Request $request , $brand_id)
     {
 
         $searchTerm = trim($request->input('searchTerm', ''));
+        
 
-        $query = DiscountCode::whereDoesntHave('referralEarning');
-        if ($searchTerm) {
+        $query = DiscountCode::whereDoesntHave('referralEarning')
+        ->where('brand_id', $brand_id)
+        ->where('status', 'active');
+
+            if ($searchTerm) {
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('id', 'LIKE', "%$searchTerm%")
                         ->orWhere('code', 'LIKE', "%$searchTerm%");
