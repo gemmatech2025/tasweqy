@@ -225,7 +225,12 @@ public function socialLogin(Request $request)
             ]
         );
 
-        $customer_object = Customer::updateOrCreate(['user_id' => $user->id]);
+        // $customer_object = Customer::updateOrCreate(['user_id' => $user->id]);
+
+        $customer_object = Customer::updateOrCreate(
+            ['user_id' => $customer->id],
+            []
+        );
 
         // Generate token
         $token = $customer->createToken('customer_token', ['*'])->plainTextToken;
