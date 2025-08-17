@@ -72,6 +72,7 @@ class UpdateProfileRequest extends FormRequest
          \Log::error('Error sending notification', [
                
                 'error' => $flatErrors,
+                'input'  => $this->all(), 
             ]);
 
         throw new HttpResponseException(
