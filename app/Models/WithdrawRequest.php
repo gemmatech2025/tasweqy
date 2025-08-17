@@ -7,7 +7,7 @@ use App\Models\User;
 
 class WithdrawRequest extends Model
 {
-    protected $fillable = ['user_id', 'total', 'status', 'withdrawable_type', 'withdrawable_id'];
+    protected $fillable = ['user_id', 'total', 'status', 'withdrawable_type', 'withdrawable_id' , 'code'];
 
     protected $casts = [
         'total' => 'decimal:2',

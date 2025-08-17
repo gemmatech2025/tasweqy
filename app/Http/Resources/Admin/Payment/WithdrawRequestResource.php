@@ -31,6 +31,7 @@ class WithdrawRequestResource extends JsonResource
         return [
             'id'                    => $this->id,
             'customer'              => $this->user->name ,
+            'code'                  => $this->code,
             'total'                 => $this->total,
             'type'                  => $type,
             'status'                => $this->status,
