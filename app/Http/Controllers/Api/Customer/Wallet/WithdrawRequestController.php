@@ -117,10 +117,12 @@ class WithdrawRequestController extends BaseController
                                 ]);
                     }
                 }
+                $code = $this->generateCode();
                 
                 $model = $paypal->withdrawRequests()->create([
-                'user_id' => Auth::id(),
-                'total'   => $request->total,
+                    'user_id' => Auth::id(),
+                    'total'   => $request->total,
+                    'code'    => $code,
                 ]);
 
             }
@@ -143,6 +145,15 @@ class WithdrawRequestController extends BaseController
         }
     }
 
+    public function generateCode()
+    {
+        $code = random_int(100000, 999999); 
+        while (WithdrawRequest::where('code', $code)->exists()) {
+            $code = random_int(100000, 999999); 
+        }
+        return $code;
+
+    }
 
 
 
