@@ -14,6 +14,10 @@ use App\Services\FirebaseService;
 use App\Services\CustomerWalletService;
 
 use App\Http\Resources\Admin\Payment\WithdrawRequestResource;
+use App\Http\Resources\Admin\Payment\WithdrawRequestShowResource;
+
+
+
 
 class WithdrawRequestController extends Controller
 {
@@ -158,7 +162,9 @@ public function updateRequestStatus($request_id , $status)
 
     public function show($id)
     {
-        $request = WithdrawRequest::find($id);
+
+        // dd('herer');
+        $request = WithdrawRequest::with([ 'withdrawable'])->find($id);
 
         if (!$request) {
             return jsonResponse(false, 404, __('messages.not_found'));
@@ -167,7 +173,7 @@ public function updateRequestStatus($request_id , $status)
             true,
             200,
             __('messages.success'),
-            new WithdrawRequestResource($request)
+            new WithdrawRequestShowResource($request)
         );
 
 

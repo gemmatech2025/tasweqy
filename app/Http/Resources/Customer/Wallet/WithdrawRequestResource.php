@@ -28,7 +28,7 @@ class WithdrawRequestResource extends JsonResource
             'type'      => class_basename($this->withdrawable_type),
             'withdrawable' => $this->whenLoaded('withdrawable', function () {
                 return match (class_basename($this->withdrawable_type)) {
-                    'BankAccount' => [
+                    'BankInfo' => [
                         'iban'           => $this->withdrawable->iban,
                         'account_number' => $this->withdrawable->account_number,
                         'account_name'   => $this->withdrawable->account_name,
