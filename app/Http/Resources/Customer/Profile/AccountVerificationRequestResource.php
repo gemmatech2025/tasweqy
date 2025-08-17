@@ -16,6 +16,8 @@ class AccountVerificationRequestResource extends JsonResource
     {
         return [
                     'id'          => $this->id,
+                    'code'                  => $this->code,
+
                     'name'        => $this->name,
                     'type'        => $this->type,
                     'front_image' => asset($this->front_image),

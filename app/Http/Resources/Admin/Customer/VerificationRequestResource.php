@@ -21,7 +21,10 @@ class VerificationRequestResource extends JsonResource
     public function toArray(Request $request): array
     {
  return [
+    
             'id'          => $this->id,
+                'code'                  => $this->code,
+
             'type'        => $this->type,
             'front_image' => asset($this->front_image),
             'back_image'  => $this->back_image ? asset($this->back_image) : null,

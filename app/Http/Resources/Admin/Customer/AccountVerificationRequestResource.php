@@ -25,13 +25,14 @@ class AccountVerificationRequestResource extends JsonResource
     $country = $this->user->customer ? $this->user->customer->country : null;
     return [
                 'id'                    => $this->id,
+                'code'                  => $this->code,
                 'name_in_request'       => $this->name,
                 'name'                  => $this->user->name,
                 'country'               => $country ? $country->name : null,
                 'front_image'           => asset($this->front_image),
                 'back_image'            => $this->back_image ? asset($this->back_image) : null,
                 'phone'                 => $this->user->phone,
-                'code'                  => $this->user->code,
+                'user_phone_code'                  => $this->user->code,
                 'email'                 => $this->user->email ,
                 'status'                => $this->status,
                 'reason'                => $this->reason,
