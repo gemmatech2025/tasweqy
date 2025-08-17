@@ -20,6 +20,7 @@ use App\Models\ReferralEarning;
 
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Http\Resources\Customer\Referral\ReferralEarningResource;
 
@@ -80,6 +81,10 @@ class CustomerController extends Controller
         try {
             
             $user = Auth::user();
+            \Log::error('Error sending notification', [
+                'user' => $user,
+                'request' => $request->all(),
+            ]);
 
             $customer = Customer::where('user_id' , $user->id)->first();
 
