@@ -323,9 +323,11 @@ class CustomerController extends Controller
                 $image = $request->file('back_image');
                 $backImagePath = $this->uploadFilesService->uploadImage($image , 'account_approve_request');
             }
-    
-    
+
+
+            $code = $this->generateCode();
             $approvalRequest = AccountVerificationRequest::create([
+                'code'           => $code,
                 'name'           => $request->name,
                 'type'           => $request->type,
                 'front_image'    => $frontImagePath,
@@ -333,11 +335,7 @@ class CustomerController extends Controller
                 'user_id'        => $user->id,
   
             ]);
-
-
             $this->firebaseService->sendAdminNotification('verification_request_added', $approvalRequest->id ,  $user);
-
-
             return jsonResponse( true ,  200 ,__('messages.created_successfully') , new AccountVerificationRequestResource($approvalRequest) );        
         }
 
@@ -345,6 +343,19 @@ class CustomerController extends Controller
 
                  
     }
+
+
+    public function generateCode()
+    {
+        $code = random_int(100000, 999999); 
+        while (WithdrawRequest::where('code', $code)->exists()) {
+            $code = random_int(100000, 999999); 
+        }
+        return $code;
+
+    }
+
+
 
 
 

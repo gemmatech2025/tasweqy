@@ -19,6 +19,7 @@ class AccountVerificationRequest extends Model
         'reason',
         'status',
         'approved_by',
+        'code',
     ];
 
     public function user()
