@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -67,6 +68,11 @@ class UpdateProfileRequest extends FormRequest
         $flatErrors = collect($errors)->map(function ($messages) {
             return $messages[0];
         });
+
+         \Log::error('Error sending notification', [
+               
+                'error' => $flatErrors,
+            ]);
 
         throw new HttpResponseException(
             jsonResponse(false, 422, __('messages.validation_error'), null, null, $flatErrors)
