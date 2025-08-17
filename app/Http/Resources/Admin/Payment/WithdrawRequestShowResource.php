@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\TrackingEvent;
 
-class WithdrawRequestResource extends JsonResource
+class WithdrawRequestShowResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -35,7 +35,26 @@ class WithdrawRequestResource extends JsonResource
             'total'                 => $this->total,
             'type'                  => $type,
             'status'                => $this->status,
+
+            'withdrawable' => $this->whenLoaded('withdrawable', function () {
+                return match (class_basename($this->withdrawable_type)) {
+                    'BankInfo' => [
+                        'iban'           => $this->withdrawable->iban,
+                        'account_number' => $this->withdrawable->account_number,
+                        'account_name'   => $this->withdrawable->account_name,
+                        'bank_name'      => $this->withdrawable->bank_name,
+                        'swift_code'     => $this->withdrawable->swift_code,
+                        'address'        => $this->withdrawable->address,
+                    ],
+                    'PaypalAccount' => [
+                        'email' => $this->withdrawable->email,
+                    ],
+                    default => null,
+                };
+            }),
+
             'created_at'            => $this->created_at->format('F j, Y g:i A'),
+            
 
         ];
     }
