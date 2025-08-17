@@ -74,8 +74,8 @@ public function index(Request $request)
 
     $searchTerm = trim($request->input('searchTerm', ''));
     $filters = $request->input('filter', []);
-    $sortBy = $request->input('sort_by', 'id');
-    $sortOrder = $request->input('sort_order', 'asc');
+    // $sortBy = $request->input('sort_by', 'id');
+    // $sortOrder = $request->input('sort_order', 'asc');
     $query = $this->getModel()->with($this->getRelations());
     $columns = \Schema::getColumnListing($this->getModel()->getTable());
     
@@ -111,13 +111,6 @@ public function index(Request $request)
         });
     }
 
-    if ($sortBy && $sortOrder) {
-        $query->orderBy($sortBy, $sortOrder);
-    } else {
-        foreach ($this->getSort() as $sort) {
-            $query->orderBy($sort['sort'], $sort['order']);
-        }
-    }
 
     if ($this->indexPaginat()) {
         $page = $request->input('page', 1);
