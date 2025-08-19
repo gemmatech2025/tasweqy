@@ -159,7 +159,7 @@ class FirebaseService
 
 
 
-    public function sendNotification(array $deviceTokens, string $title, string $body , string $type = 'pushed' ,string $payload = '' ): bool
+    public function sendNotification(array $deviceTokens, string $title, string $body , string $type = ']' ,string $payload = '' ): bool
     {
         try {
             foreach ($deviceTokens as $token) {
