@@ -127,28 +127,26 @@ class CustomerController extends Controller
 
 
             $user->image =$imagePath;
-            $user->save();
-            if(!$user->phone_verified_at){
+            $user->save();            
 
+             if(!$user->phone_verified_at){
                 $result = $this->sendPhoneOtp($request->code .$request->phone , $user->id);
-
-                DB::commit();
-
-                if($result){
-                    return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_please_send_otp_on_your_whatsapp') ,
-                      ['whatsapp_otp' =>true , 'customer' => new CustomerResource($user)] );    
-                }
-
-                return jsonResponse( true ,  201 ,__('messages.data_updated_successfully_but_otp_not_sent_make_sure_phone_number_correct') ,
-                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($user)] );    
-
-
+                $otpMessage = $result
+                    ? __('messages.data_updated_successfully_please_send_otp_on_your_whatsapp')
+                    : __('messages.data_updated_successfully_but_otp_not_sent_make_sure_phone_number_correct');
+                $otpFlag = $result;
+            } else {
+                $otpMessage = __('messages.data_updated_successfully');
+                $otpFlag = false;
             }
-            DB::commit();
 
-            
-            return jsonResponse( true ,  201 ,__('messages.data_updated_successfully') ,
-                      ['whatsapp_otp' =>false , 'customer' => new CustomerResource($user)] );                            
+            DB::commit();
+            $user->load('customer');
+
+                return jsonResponse(true, 201, $otpMessage, [
+                        'whatsapp_otp' => $otpFlag,
+                        'customer' => new CustomerResource($user)
+                    ]);                          
         } catch (\Exception $e) {
             DB::rollBack();
 
