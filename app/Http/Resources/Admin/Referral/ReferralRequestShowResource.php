@@ -19,6 +19,8 @@ class ReferralRequestShowResource extends JsonResource
             'id'       => $this->id,
             'type'     => $this->type,
             'brand'    => $this->brand->name,
+            'brand_id'    => $this->brand->id,
+
             'user'     => $this->user->name,
 
             'created_at' => $this->created_at?->format('F j, Y g:i A'),
