@@ -280,22 +280,22 @@ public function index(Request $request)
         return [];
     }
 
-public function show(int $id)
-{
-    $relations = $this->showRelations();
-    $model = $this->getModel()->with($relations)->find($id);
+    public function show(int $id)
+    {
+        $relations = $this->showRelations();
+        $model = $this->getModel()->with($relations)->find($id);
 
-    if (!$model) {
-        return jsonResponse(false, 404, __('messages.not_found'));
+        if (!$model) {
+            return jsonResponse(false, 404, __('messages.not_found'));
+        }
+
+        return jsonResponse(
+            true,
+            200,
+            __('messages.success'),
+            new (static::RESOURCE_SHOW)($model)
+        );
     }
-
-    return jsonResponse(
-        true,
-        200,
-        __('messages.success'),
-        new (static::RESOURCE_SHOW)($model)
-    );
-}
 
 
     public function updateImageDynamically(Request $request, $images, $model)
