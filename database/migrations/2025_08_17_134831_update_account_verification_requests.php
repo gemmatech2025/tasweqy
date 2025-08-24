@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('account_verification_requests', function (Blueprint $table) {
-            $table->string('code')->unique()->after('id');
+            // $table->string('code')->unique()->after('id');
         });
     }
 
