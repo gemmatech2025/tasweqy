@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Admin\General\SocialMediaPlatformController;
 use App\Http\Controllers\Api\Customer\Referral\ReferralController;
 use App\Http\Controllers\Api\Admin\Brand\CategoryController;
 use App\Http\Controllers\Api\Customer\Auth\SocialAuthController;
+use App\Http\Controllers\Api\Admin\Setting\PageController;
 
 
 use App\Http\Controllers\Api\Admin\Notification\NotificationController as AdminNotificationController;
@@ -76,6 +77,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             
     });
 
+
+
+        Route::controller(PageController::class)->prefix('pages')->group(function () {
+        Route::get('/by-key/{key}', 'getByKey');
+        Route::get('/{id}', 'show');
+
+    });
+        
 
 
     
