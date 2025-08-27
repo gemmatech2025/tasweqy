@@ -27,7 +27,7 @@ class WhatsAppOtpService
 
         foreach ($sessions as $session) {
 
-            $result = $this->sendMessageToWhatsapp($sessions->sessionId,$phoneNumber, $body);
+            $result = $this->sendMessageToWhatsapp($session->session_id,$phoneNumber, $body);
             if ($result) {
                 return true;
             }
