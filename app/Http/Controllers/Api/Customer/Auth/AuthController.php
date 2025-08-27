@@ -394,7 +394,12 @@ class AuthController extends Controller
         if($request->email){              
          $result = $this->sendEmailOtp($user->email , $user->id , 'forget');
         }else if($request->phone){
-        $result = $this->sendPhoneOtp($request->code . $request->phone  , $user->id , 'forget');
+
+
+        $phoneNumber = preg_replace('/[+\s]/', '', $request->code . $request->phone);
+
+
+        $result = $this->sendPhoneOtp($phoneNumber  , $user->id , 'forget');
         } 
 
         if($result){
@@ -799,11 +804,11 @@ class AuthController extends Controller
         
 
 
-        //  $result = $this->whatsAppWebService->sendWhatsappOtp(
-        //             $credential,
-        //             __('messages.otp_code_message') . ' ' . $verificationCode
-        //         );
-        //     return $result;
+         $result = $this->whatsAppWebService->sendWhatsappOtp(
+                    $phone,
+                    __('messages.otp_code_message') . ' ' . $otp_code
+                );
+            return $result;
 
     return true;
     

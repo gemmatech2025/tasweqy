@@ -130,7 +130,9 @@ class CustomerController extends Controller
             $user->save();            
 
              if(!$user->phone_verified_at){
-                $result = $this->sendPhoneOtp($request->code .$request->phone , $user->id);
+            $phoneNumber = preg_replace('/[+\s]/', '', $request->code . $request->phone);
+
+                $result = $this->sendPhoneOtp($phoneNumber , $user->id);
                 $otpMessage = $result
                     ? __('messages.data_updated_successfully_please_send_otp_on_your_whatsapp')
                     : __('messages.data_updated_successfully_but_otp_not_sent_make_sure_phone_number_correct');
@@ -376,11 +378,11 @@ class CustomerController extends Controller
         
 
 
-        //  $result = $this->whatsAppWebService->sendWhatsappOtp(
-        //             $credential,
-        //             __('messages.otp_code_message') . ' ' . $verificationCode
-        //         );
-        //     return $result;
+         $result = $this->whatsAppWebService->sendWhatsappOtp(
+                    $phone,
+                    __('messages.otp_code_message') . ' ' . $otp_code
+                );
+            return $result;
 
 
 
