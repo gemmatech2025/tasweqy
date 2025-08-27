@@ -360,7 +360,6 @@ class CustomerController extends Controller
 
 
         private function sendPhoneOtp($phone , $user_id) {
-        // $otp_code = random_int(100000, 999999);  
         try{
         $otp_code = 123456;
         $otp= Otp::where('user_id' , $user_id)->where('type' , 'phone')->first();
