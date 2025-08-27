@@ -31,6 +31,10 @@ use App\Http\Controllers\Api\Customer\Chat\ChatController;
 
 Route::middleware(['set-locale'])->group(function () {
 
+
+  
+    Route::post('test-otp', [CustomerController::class, 'testotp']);
+
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('send-otp', [AuthController::class, 'sendOtp']);

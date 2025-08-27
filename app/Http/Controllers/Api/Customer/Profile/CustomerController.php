@@ -42,6 +42,7 @@ use Carbon\Carbon;
 
 use App\Services\UploadFilesService;
 use App\Services\FirebaseService;
+use App\Services\WhatsAppOtpService;
 
 
 class CustomerController extends Controller
@@ -49,14 +50,15 @@ class CustomerController extends Controller
 
     protected $uploadFilesService = null;
     protected $firebaseService = null;
+    protected $whatsAppWebService = null;
 
     public function __construct()
     {
         $this->uploadFilesService = new UploadFilesService();
         $this->firebaseService = new FirebaseService();
+        $this->whatsAppWebService = new WhatsAppOtpService();
 
     }
-
 
 
 
@@ -359,6 +361,19 @@ class CustomerController extends Controller
 
 
 
+        public function testotp(Request $request)
+        {
+            $phone = $request->phone;
+            $message = $request->message;
+
+            $result = $this->whatsAppWebService->sendWhatsappOtp($phone, $message);
+
+            if($result){
+                return jsonResponse( true ,  200 ,__('messages.success')  );        
+            }
+            return jsonResponse( false ,  500 ,__('messages.general_error_message')  );        
+
+        }
         private function sendPhoneOtp($phone , $user_id) {
         try{
         $otp_code = 123456;
@@ -377,11 +392,8 @@ class CustomerController extends Controller
         
 
 
-         $result = $this->whatsAppWebService->sendWhatsappOtp(
-                    $phone,
-                    __('messages.otp_code_message') . ' ' . $otp_code
-                );
-            return $result;
+         $result = $this->whatsAppWebService->sendWhatsappOtp($phone,__('messages.otp_code_message') . ' ' . $otp_code);
+        return $result;
 
 
 
