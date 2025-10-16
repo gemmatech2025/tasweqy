@@ -18,6 +18,8 @@ Route::controller(ReferralLinkController::class)->prefix('refferral')->group(fun
             Route::get('/export-template', 'exportReferralLinksTemplate');
 
 });
+
+
 Route::post('/handel-callback', [WhatsappController::class, 'handelWhatsappCallback']);
 
 
@@ -56,11 +58,8 @@ Route::get('/run-seeder/{name}', function ($name) {
 
 
 
-
-
 Route::controller(TrakingController::class)->prefix('event-tracker')->group(function () {
     Route::get('/track', 'trackPixel');
-
 });
 
 
@@ -68,10 +67,6 @@ Route::controller(SocialAuthController::class)->prefix('auth')->group(function (
     Route::post('/social-login', 'socialLogin');
     Route::get('/google/callback', 'googleCallback');
     Route::get('/google/generat-url', 'getGoogleAuthUrl');
-
-    
-
-
 });
 
 

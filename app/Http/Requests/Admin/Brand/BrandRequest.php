@@ -33,7 +33,7 @@ namespace App\Http\Requests\Admin\Brand;
             switch ($this->method()) {
                 case 'POST':
                     $rules +=  [
-                            'name'                        => 'required|array',
+                            'name'                           => 'required|array',
                             'name.ar'                     => 'required|string|max:255',
                             'name.en'                     => 'required|string|max:255',
                             

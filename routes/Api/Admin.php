@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Admin\Brand\BrandBlockController;
 use App\Http\Controllers\Api\Admin\Padge\PadgeController;
 use App\Http\Controllers\Api\Admin\Setting\SettingController;
 use App\Http\Controllers\Api\Admin\Setting\PageController;
+use App\Http\Controllers\Api\Admin\WhatsappControllerNew;
 
 
 
@@ -114,10 +115,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/delete-session/{id}', 'deleteSession');
             Route::get('/get-all-sessions', 'getSessions');
             Route::get('/get-session/{id}', 'getSessionDetails');
-
-
         });
 
+
+        Route::controller(WhatsappControllerNew::class)->prefix('whatsapp-v2')->group(function () {
+            Route::post('/create-session', 'createSession');
+            Route::delete('/delete-session/{id}', 'deleteSession');
+            Route::get('/get-all-sessions', 'getSessions');
+            Route::get('/get-session/{id}', 'getSessionDetails');
+        });
+
+
+        
         Route::controller(ApprovalRequestController::class)->prefix('approval-requests')->group(function () {
 
 

@@ -5,50 +5,48 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\WhatsAppOtpService;
+use App\Services\WhatsAppOtpServiceNew;
 use App\Models\WhatsappSession;
 use Illuminate\Support\Facades\Log;
 
 
 class WhatsappController extends Controller
 {
+
     protected $whatsAppOtpService;
-    public function __construct(WhatsAppOtpService $whatsAppOtpService)
+    public function __construct(WhatsAppOtpServiceNew $whatsAppOtpService)
     {
         $this->whatsAppOtpService = $whatsAppOtpService;
     }
 
-public function createSession(Request $request)
+
+    public function createSession(Request $request)
 {
     $session =WhatsappSession::where('session_name' ,$request->session_name )->first();
-    if($session){
-         return jsonResponse(
+    if (!$session) {
+        // Generate unique session ID
+        $sessionId = $this->whatsAppOtpService->generateRandomText(10);
+
+        // Ensure session ID is unique
+        while (WhatsappSession::where('session_id', $sessionId)->exists()) {
+            $sessionId = $this->whatsAppOtpService->generateRandomText(10);
+        }
+
+        $session = WhatsappSession::create([
+            'session_name' => $request->session_name,
+            'status' => 'qr',
+            'session_id' => $sessionId,
+        ]);
+    }
+    $result = $this->whatsAppOtpService->startSession($session->session_id);
+
+    if (!$result) {
+return jsonResponse(
         false,
         400,
-        'session name already exists',
+        'an error happend please check log files.',
         );
-    }
-
-     if(!$request->session_name){
-         return jsonResponse(
-        false,
-        422,
-        'session name is required',
-        );
-    }
-
-    $result = $this->whatsAppOtpService->startSession($request->session_name);
-
-    if(!$result){
-    return jsonResponse(
-            false,
-            400,
-            'an error happend please check log files',
-            );
-    }
-
-
-
+}
     return jsonResponse(
         true,
         200,
@@ -56,7 +54,6 @@ public function createSession(Request $request)
         $result
     );
 }
-
 
 
 
@@ -106,7 +103,6 @@ public function handelWhatsappCallback(Request $request)
 }
 
 
-
 public function deleteSession($id){
     $session =WhatsappSession::find($id);
     if(!$session){
@@ -136,93 +132,70 @@ public function deleteSession($id){
 }
 
 
-public function getSessions(Request $request)
-{
-    $sessions = WhatsappSession::query();
 
-    $name = $request->input('name', '');
-    $page = $request->input('page', 1);
-    $perPage = $request->input('per_page', 20);
+    public function getSessions(Request $request)
+    {
+        $sessions = WhatsappSession::query();
 
-    if ($name) {
-        $sessions->where('session_name', 'like', '%' . $name . '%');
-    }
+        $name = $request->input('name', '');
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 20);
 
-    $data = $sessions->paginate($perPage, ['*'], 'page', $page);
+        if ($name) {
+            $sessions->where('session_name', 'like', '%' . $name . '%');
+        }
 
-    $pagination = [
-        'total' => $data->total(),
-        'current_page' => $data->currentPage(),
-        'per_page' => $data->perPage(),
-        'last_page' => $data->lastPage(),
-    ];
+        $sessions = $sessions->paginate($perPage, ['*'], 'page', $page);
 
-    return jsonResponse(
-        true,
-        200,
-        __('messages.fetch_successful'),
-        $data->items(), 
-        $pagination    
-    );
-}
+        // Get status for each session from WhatsApp service and update local database
+        $sessionsWithStatus = [];
+        foreach ($sessions->items() as $session) {
+            $sessionData = $session->toArray();
 
+            // Get session status from WhatsApp service
+            $statusResponse = $this->whatsAppOtpService->getSessionStatus($session->session_id);
 
-// public function getSessions(Request $request)
-// {
-//     $sessions = WhatsappSession::query();
+            // Update local database with status from WhatsApp service
+            if (isset($statusResponse['status'])) {
+                $session->update([
+                    'status' => $statusResponse['status']
+                ]);
+                $sessionData['status'] = $statusResponse['status'];
+            }
 
-//     $name = $request->input('name', '');
-//     $page =$request->input('page', 1);
-//     $perPage = $request->input('per_page', 20);
+            // Add status information to session data
+            $sessionData['whatsapp_status'] = $statusResponse;
+            $sessionData['is_connected'] = isset($statusResponse['status']) && $statusResponse['status'] === 'active';
 
-//     if ($name) {
-//         $sessions->where('session_name', 'like', '%' . $name . '%');
-//     }
+            $sessionsWithStatus[] = $sessionData;
+        }
 
-//         $data = $sessions->paginate($perPage, ['*'], 'page', $page);
-
-
-
-//         //  $data = $query->paginate($perPage, ['*'], 'page', $page);
-
-//         $pagination = [
-//             'total' => $data->total(),
-//             'current_page' => $data->currentPage(),
-//             'per_page' => $data->perPage(),
-//             'last_page' => $data->lastPage(),
-//         ];
-
-
-//          return jsonResponse(
-//                     true,
-//                     200,
-//                     __('messages.fetch_successful'),
-//         $data->items(),
-//                          $pagination
-
-//     );
-// }
-
-public function getSessionDetails($id)
-{
-    $session = WhatsappSession::find($id);
-
-        if(!$session){
-    return jsonResponse(
-        false,
-        404,
-        'not found',
+        return jsonResponse(
+            true,
+            200,
+            __('messages.fetch_successful'),
+            $sessionsWithStatus,
+            [
+                'current_page' => $sessions->currentPage(),
+                'last_page' => $sessions->lastPage(),
+                'total' => $sessions->total(),
+                'per_page' => $sessions->perPage(),
+                'request_url' => $request->fullUrl(),
+            ]
         );
     }
 
-         return jsonResponse(
-                    true,
-                    200,
-                    __('messages.fetch_successful'),
-                        $session,
+    public function getSessionDetails($id)
+    {
+        $session = WhatsappSession::find($id);
 
-    );
-}
+        if(!$session){
+            return jsonResponse(false,404,'not found',);
+        }
+
+        return jsonResponse(true, 200, __('messages.fetch_successful'), $session);
+    }
+
 
 
 
