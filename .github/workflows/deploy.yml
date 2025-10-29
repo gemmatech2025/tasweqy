@@ -13,13 +13,11 @@ jobs:
       - name:  Sync files to server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: 172.105.33.197
-          # username: ismailmagdy8@gemmawhats.com
-          # password: ismailmagdy8
-          username: hyatk_ftp@hyatk.net
-          password: hyatk_ftp@123
+          server: 147.93.52.107
+          username: hyatk_ftp_account@hyatk.net
+          password: hyatk_ftp_account@123
           local-dir: ./
-          server-dir: back-tasweqy.hyatk.net/
+          server-dir: backend-tasweqy.hyatk.net/
           exclude: |
             **/.git*
             **/.git/**
