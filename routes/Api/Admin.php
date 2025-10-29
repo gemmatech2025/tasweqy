@@ -78,8 +78,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::controller(SettingController::class)->prefix('settings')->group(function () {
             Route::post('/update', 'updateSetting');
             Route::get('/get-all', 'getAllSettings');
-
-            
         });
 
         Route::controller(CountryController::class)->prefix('countries')->group(function () {

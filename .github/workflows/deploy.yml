@@ -14,10 +14,12 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: 172.105.33.197
-          username: ismailmagdy8@gemmawhats.com
-          password: ismailmagdy8
+          # username: ismailmagdy8@gemmawhats.com
+          # password: ismailmagdy8
+          username: hyatk_ftp@hyatk.net
+          password: hyatk_ftp@123
           local-dir: ./
-          server-dir: back-tasweqy.gemmawhats.com/
+          server-dir: back-tasweqy.hyatk.net/
           exclude: |
             **/.git*
             **/.git/**
